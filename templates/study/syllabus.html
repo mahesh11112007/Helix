@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Import Syllabus - Helix AI{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto my-6 p-8 glass-card border border-gray-200 shadow-sm bg-white rounded-2xl">
+    <h2 class="text-3xl font-extrabold mb-3 text-[#1d1d1f]">
+        Syllabus Importer
+    </h2>
+    <p class="text-sm text-gray-500 mb-6">
+        Paste your university or school syllabus below. Helix AI will parse the structure and automatically generate corresponding Subjects, Units, and Topics to build your custom curriculum.
+    </p>
+
+    <form action="{{ url_for('study.paste_syllabus') }}" method="POST" class="space-y-6">
+        <div>
+            <label class="block text-sm font-bold mb-2 text-[#1d1d1f]">Select Active Semester</label>
+            {% if semesters %}
+                <select name="semester_id" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
+                    {% for sem in semesters %}
+                        <option value="{{ sem.id }}">{{ sem.name }}</option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <div class="p-4 rounded-xl bg-red-50 text-red-600 text-sm border border-red-100 mb-4 font-medium">
+                    No semesters available. Please create a semester first in the dashboard before importing a syllabus.
+                </div>
+            {% endif %}
+        </div>
+
+        <div>
+            <div class="flex justify-between items-center mb-2">
+                <label class="block text-sm font-bold text-[#1d1d1f]">Paste Syllabus Text</label>
+                <button type="button" onclick="insertTemplate()" class="text-xs font-semibold text-[#0071e3] hover:text-[#0077ed] bg-blue-50 px-3 py-1 rounded-full transition-all">
+                    + Insert Template
+                </button>
+            </div>
+            <textarea id="syllabus_input" name="syllabus_text" rows="12" placeholder="Click 'Insert Template' to see the recommended structure, or paste your university syllabus directly..." required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all font-mono text-sm leading-relaxed"></textarea>
+        </div>
+
+        <button type="submit" {% if not semesters %}disabled{% endif %} class="w-full py-4 rounded-full bg-[#0071e3] hover:bg-[#0077ed] font-semibold transition-all text-white shadow-sm {% if not semesters %}opacity-50 cursor-not-allowed{% endif %} text-lg mt-4">
+            Analyze & Build Syllabus
+        </button>
+    </form>
+</div>
+
+<script>
+function insertTemplate() {
+    const template = `Subject: Artificial Intelligence (CS-401)
+
+Unit 1: Introduction
+Topics:
+- History of AI
+- Intelligent Agents
+- State Space Search
+
+Unit 2: Logic and Reasoning
+Topics:
+- Propositional Logic
+- First Order Logic
+- Forward and Backward Chaining
+
+Subject: Web Development (CS-402)
+
+Unit 1: Frontend Basics
+Topics:
+- HTML5 & CSS3
+- JavaScript Fundamentals
+- Responsive Design`;
+    const textarea = document.getElementById('syllabus_input');
+    textarea.value = template;
+    textarea.focus();
+}
+</script>
+{% endblock %}

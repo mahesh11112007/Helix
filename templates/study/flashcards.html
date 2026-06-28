@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Review Flashcards - Helix AI{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto my-12 space-y-8 text-center">
+    <div class="text-sm opacity-70 text-left">
+        <a href="{{ url_for('dashboard.index') }}" class="hover:underline">Dashboard</a> &rarr; 
+        <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id) }}" class="hover:underline">{{ topic.name }}</a> &rarr;
+        <span class="font-bold text-violet-400">Flashcard Review</span>
+    </div>
+
+    <!-- Active Card Container -->
+    {% if flashcards %}
+        <div class="text-sm font-semibold text-gray-500 mb-2">
+            Card <span id="current-card-num">1</span> of {{ flashcards | length }}
+        </div>
+        
+        <div class="perspective-1000 w-full h-80 cursor-pointer" onclick="this.classList.toggle('flipped')">
+            <div class="card-inner w-full h-full relative transition-transform duration-500 transform-style-preserve">
+                <!-- Front Side -->
+                <div class="card-front w-full h-full absolute inset-0 glass-card flex flex-col justify-center items-center p-8 border border-slate-700/40">
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-[#0071e3] opacity-70 mb-4">Question</span>
+                    <h3 id="card-question" class="text-xl font-bold max-w-md text-[#1d1d1f]">{{ flashcards[0].question }}</h3>
+                    <p class="text-[11px] opacity-40 mt-8 text-gray-500">Tap anywhere on the card to flip</p>
+                </div>
+                <!-- Back Side -->
+                <div class="card-back w-full h-full absolute inset-0 glass-card flex flex-col justify-center items-center p-8 border border-slate-700/40 transform rotate-y-180">
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-[#0071e3] opacity-70 mb-4">Answer</span>
+                    <p id="card-answer" class="text-lg font-medium max-w-md text-[#1d1d1f]">{{ flashcards[0].answer }}</p>
+                    <p class="text-[11px] opacity-40 mt-8 text-gray-500">Tap anywhere to flip back</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Control Buttons -->
+        <div class="flex justify-center items-center space-x-4 mt-6">
+            <button id="prev-btn" onclick="prevCard()" class="px-6 py-3 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-bold border border-gray-200 transition-all shadow-sm opacity-50 cursor-not-allowed" disabled>
+                &larr; Previous
+            </button>
+            <button id="next-btn" onclick="nextCard()" class="px-6 py-3 rounded-full bg-[#0071e3]/10 text-[#0071e3] hover:bg-[#0071e3] hover:text-white text-sm font-bold border border-[#0071e3]/20 transition-all shadow-sm">
+                Next Card &rarr;
+            </button>
+        </div>
+    {% else %}
+        <div class="glass-card p-12 border border-slate-800">
+            <p class="opacity-60 mb-2">No flashcards found for this topic.</p>
+            <p class="text-xs opacity-50">Generate an AI study deck to create active flashcards instantly.</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    /* CSS Card Flip Utility styling */
+    .perspective-1000 {
+        perspective: 1000px;
+    }
+    .transform-style-preserve {
+        transform-style: preserve-3d;
+    }
+    .card-inner {
+        transition: transform 0.6s;
+    }
+    .flipped .card-inner {
+        transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+        transform: rotateY(180deg);
+    }
+</style>
+
+<script id="flashcards-data" type="application/json">
+    {{ flashcards | tojson | safe if flashcards else '[]' }}
+</script>
+<script>
+    const cardDeck = JSON.parse(document.getElementById('flashcards-data').textContent);
+    let currentIdx = 0;
+
+    function updateButtons() {
+        const prevBtn = document.getElementById('prev-btn');
+        if (currentIdx === 0) {
+            prevBtn.disabled = true;
+            prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            prevBtn.classList.remove('hover:bg-gray-200');
+        } else {
+            prevBtn.disabled = false;
+            prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            prevBtn.classList.add('hover:bg-gray-200');
+        }
+        
+        const nextBtn = document.getElementById('next-btn');
+        if (currentIdx === cardDeck.length - 1) {
+            nextBtn.innerHTML = 'Finish &rarr;';
+        } else {
+            nextBtn.innerHTML = 'Next Card &rarr;';
+        }
+    }
+
+    function renderCard() {
+        const qEl = document.getElementById('card-question');
+        const aEl = document.getElementById('card-answer');
+        
+        qEl.innerHTML = window.parseMarkdownWithMath ? parseMarkdownWithMath(cardDeck[currentIdx].question) : cardDeck[currentIdx].question;
+        aEl.innerHTML = window.parseMarkdownWithMath ? parseMarkdownWithMath(cardDeck[currentIdx].answer) : cardDeck[currentIdx].answer;
+        
+        if (window.typesetMath) {
+            window.typesetMath(qEl);
+            window.typesetMath(aEl);
+        }
+        
+        updateButtons();
+    }
+
+    // Initialize first card
+    document.addEventListener("DOMContentLoaded", () => {
+        if (cardDeck.length > 0) renderCard();
+    });
+
+    function nextCard() {
+        // Toggle flip off before shifting cards
+        const container = document.querySelector('.perspective-1000');
+        container.classList.remove('flipped');
+        
+        setTimeout(() => {
+            currentIdx++;
+            if (currentIdx < cardDeck.length) {
+                renderCard();
+                document.getElementById('current-card-num').innerText = currentIdx + 1;
+            } else {
+                alert('Flashcard review session complete!');
+                window.location.href = "{{ url_for('dashboard.view_topic', topic_id=topic.id) }}";
+            }
+        }, 300);
+    }
+    
+    function prevCard() {
+        if (currentIdx > 0) {
+            const container = document.querySelector('.perspective-1000');
+            container.classList.remove('flipped');
+            
+            setTimeout(() => {
+                currentIdx--;
+                renderCard();
+                document.getElementById('current-card-num').innerText = currentIdx + 1;
+            }, 300);
+        }
+    }
+</script>
+{% endblock %}

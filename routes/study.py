@@ -1,0 +1,647 @@
+import uuid
+import json
+from datetime import datetime
+# pyrefly: ignore [missing-import]
+from flask import Blueprint, request, session, render_template, redirect, url_for, flash, jsonify
+from services.db_service import db_service
+from services.ai_service import ai_service
+from services.task_service import task_service
+from services.usage_service import usage_service
+
+study_bp = Blueprint("study", __name__)
+
+def get_current_user_id():
+    return session.get("user_id")
+
+@study_bp.route("/topic/<topic_id>/chat", methods=["POST"])
+def chat_with_topic(topic_id):
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+        
+    user_message = request.form.get("message")
+    image_base64 = request.form.get("image")
+    
+    if not user_message and not image_base64:
+        return jsonify({"error": "Empty message"}), 400
+        
+    if not user_message and image_base64:
+        user_message = "Please describe this image."
+
+        
+    if not usage_service.can_chat(user_id):
+        return jsonify({"error": "You have reached your free daily chat limit. Please upgrade to Premium!"}), 403
+        
+    usage_service.increment_chat(user_id)
+        
+    # Build context from OCR texts and notes associated with topic
+    files = db_service.query("SELECT ocr_text FROM files WHERE topic_id = ? AND ocr_text IS NOT NULL", (topic_id,))
+    notes = db_service.query("SELECT content FROM notes WHERE topic_id = ?", (topic_id,))
+    
+    context = ""
+    for f in files:
+        context += f"\nFile Excerpt:\n{f['ocr_text']}"
+    for n in notes:
+        context += f"\nNote Excerpt:\n{n['content']}"
+        
+    session_id = request.form.get("session_id")
+    if not session_id:
+        # Create a new session
+        session_id = str(uuid.uuid4())
+        # Truncate user message for a title (first 30 chars)
+        title = user_message[:30] + ("..." if len(user_message) > 30 else "")
+        db_service.execute(
+            "INSERT INTO chat_sessions (id, topic_id, user_id, title) VALUES (?, ?, ?, ?)",
+            (session_id, topic_id, user_id, title)
+        )
+        
+    # Fetch existing chat history for context
+    history_rows = db_service.query("SELECT role, content FROM chat_messages WHERE session_id = ? ORDER BY created_at ASC", (session_id,))
+    chat_history = [{"role": row["role"], "content": row["content"]} for row in history_rows]
+    
+    # Save user message to DB
+    user_msg_id = str(uuid.uuid4())
+    db_service.execute(
+        "INSERT INTO chat_messages (id, topic_id, session_id, user_id, role, content) VALUES (?, ?, ?, ?, ?, ?)",
+        (user_msg_id, topic_id, session_id, user_id, "user", user_message)
+    )
+        
+    # Connect to NVIDIA NIM API with history
+    ai_response = ai_service.generate_chat_response(
+        user_message, 
+        context, 
+        chat_history=chat_history, 
+        image_base64=image_base64
+    )
+    
+    # Save AI response to DB
+    ai_msg_id = str(uuid.uuid4())
+    db_service.execute(
+        "INSERT INTO chat_messages (id, topic_id, session_id, user_id, role, content) VALUES (?, ?, ?, ?, ?, ?)",
+        (ai_msg_id, topic_id, session_id, user_id, "assistant", ai_response)
+    )
+    
+    return jsonify({"response": ai_response, "session_id": session_id})
+
+@study_bp.route("/topic/<topic_id>/explain", methods=["GET"])
+def explain_topic_ai(topic_id):
+    user_id = get_current_user_id()
+    if not user_id:
+        return redirect(url_for("auth.login"))
+        
+    level = request.args.get("level", "beginner")
+    language = request.args.get("language", "English")
+    
+    topic = db_service.query("SELECT * FROM topics WHERE id = ?", (topic_id,), one=True)
+    if not topic:
+        flash("Topic not found", "error")
+        return redirect(url_for("dashboard.index"))
+        
+    # Render immediately. The explanation will be loaded via AJAX.
+    return render_template("study/explanation.html", topic=topic, level=level, language=language)
+
+@study_bp.route("/api/topic/<topic_id>/explain", methods=["POST"])
+def api_explain_topic(topic_id):
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+        
+    data = request.get_json()
+    level = data.get("level", "beginner")
+    language = data.get("language", "English")
+    
+    topic = db_service.query("SELECT * FROM topics WHERE id = ?", (topic_id,), one=True)
+    if not topic:
+        return jsonify({"error": "Topic not found"}), 404
+        
+    explanation = ai_service.explain_topic(topic["name"], level, language)
+    return jsonify({"explanation": explanation})
+
+@study_bp.route("/topic/<topic_id>/generate-resources", methods=["POST"])
+def generate_resources(topic_id):
+    user_id = get_current_user_id()
+    if not user_id:
+        return redirect(url_for("auth.login"))
+        
+    topic = db_service.query("""
+        SELECT t.*, s.name as subject_name 
+        FROM topics t 
+        JOIN units u ON t.unit_id = u.id 
+        JOIN subjects s ON u.subject_id = s.id 
+        WHERE t.id = ?
+    """, (topic_id,), one=True)
+    if not topic:
+        flash("Topic not found", "error")
+        return redirect(url_for("dashboard.index"))
+        
+    if not usage_service.can_generate_deck(user_id):
+        flash("You have reached your free AI Study Deck generation limit. Please upgrade to Premium to generate more!", "error")
+        return redirect(url_for("dashboard.view_topic", topic_id=topic_id))
+        
+    usage_service.increment_deck(user_id)
+        
+    # If the user clicks Generate again, we want to cancel any existing generation tasks
+    # and start from scratch. We'll mark them as 'cancelled' so the worker can abort.
+    db_service.execute("""
+        UPDATE background_tasks 
+        SET status = 'cancelled', message = 'Cancelled by user'
+        WHERE user_id = ? AND task_type = 'generate_study_materials' AND status IN ('pending', 'processing')
+    """, (user_id,))
+    
+    # Archive existing AI-generated materials so the UI clears immediately
+    db_service.execute(
+        "UPDATE notes SET is_archived = 1 WHERE topic_id = ? AND is_ai_generated = 1 AND is_archived = 0",
+        (topic_id,)
+    )
+    db_service.execute(
+        "UPDATE flashcards SET is_archived = 1 WHERE topic_id = ? AND is_archived = 0",
+        (topic_id,)
+    )
+    db_service.execute(
+        "UPDATE quizzes SET is_archived = 1 WHERE topic_id = ? AND is_archived = 0",
+        (topic_id,)
+    )
+    
+    # Start the background task
+    task_service.start_generate_materials_task(user_id, [(topic_id, topic["name"], topic["subject_name"])])
+    
+    flash("AI Study Deck is generating in the background! You will be notified when it's ready.", "success")
+    return redirect(url_for("dashboard.view_topic", topic_id=topic_id))
+
+from datetime import datetime, timezone, timedelta
+
+def increment_daily_streak(user_id):
+    from services.db_service import db_service
+    profile = db_service.query("SELECT last_active, study_streak FROM profiles WHERE id = ?", (user_id,), one=True)
+    if not profile:
+        return
+        
+    # IST is UTC+5:30 permanently (no DST)
+    ist = timezone(timedelta(hours=5, minutes=30))
+    now_ist = datetime.now(ist)
+    today_ist = now_ist.date()
+    
+    current_streak = profile["study_streak"] if profile["study_streak"] is not None else 0
+    last_active_str = profile["last_active"]
+    
+    needs_update = False
+    
+    if last_active_str:
+        try:
+            clean_iso = last_active_str[:19]
+            last_dt = datetime.fromisoformat(clean_iso)
+            if last_dt.tzinfo is None:
+                last_dt = last_dt.replace(tzinfo=timezone.utc)
+            last_dt_ist = last_dt.astimezone(ist).date()
+            
+            delta = (today_ist - last_dt_ist).days
+            
+            if delta == 1:
+                current_streak += 1
+                needs_update = True
+            elif delta > 1:
+                current_streak = 1
+                needs_update = True
+            elif delta == 0:
+                needs_update = True
+        except Exception:
+            current_streak = 1
+            needs_update = True
+    else:
+        current_streak = 1
+        needs_update = True
+        
+    if needs_update:
+        db_service.execute(
+            "UPDATE profiles SET study_streak = ?, last_active = ? WHERE id = ?",
+            (current_streak, now_ist.isoformat(), user_id)
+        )
+
+# ── Helper to Get Current User ID ───────────────────────────────────────────────
+@study_bp.route("/topic/<topic_id>/archive/<item_type>/<item_id>/delete", methods=["POST"])
+def delete_archived_item(topic_id, item_type, item_id):
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    table_map = {"note": "notes", "flashcard": "flashcards", "quiz": "quizzes"}
+    table = table_map.get(item_type)
+    if not table:
+        return jsonify({"error": "Invalid type"}), 400
+    
+    db_service.execute(f"DELETE FROM {table} WHERE id = ? AND topic_id = ? AND is_archived = 1", (item_id, topic_id))
+    return jsonify({"success": True})
+
+@study_bp.route("/syllabus/paste", methods=["GET", "POST"])
+def paste_syllabus():
+    user_id = get_current_user_id()
+    if not user_id:
+        return redirect(url_for("auth.login"))
+        
+    semesters = db_service.query("SELECT * FROM semesters WHERE user_id = ? ORDER BY created_at DESC", (user_id,))
+    
+    if request.method == "POST":
+        semester_id = request.form.get("semester_id")
+        syllabus_text = request.form.get("syllabus_text")
+        
+        if not semester_id or not syllabus_text:
+            flash("Semester and syllabus text are required.", "error")
+            return redirect(url_for("study.paste_syllabus"))
+            
+        parsed = ai_service.parse_syllabus(syllabus_text)
+        
+        # Populate DB automatically
+        for sub in parsed.get("subjects", []):
+            sub_id = str(uuid.uuid4())
+            db_service.execute(
+                "INSERT INTO subjects (id, semester_id, name, code) VALUES (?, ?, ?, ?)",
+                (sub_id, semester_id, sub["name"], sub.get("code", ""))
+            )
+            
+            for unit in sub.get("units", []):
+                unit_id = str(uuid.uuid4())
+                db_service.execute(
+                    "INSERT INTO units (id, subject_id, name, number) VALUES (?, ?, ?, ?)",
+                    (unit_id, sub_id, unit["name"], unit.get("number", 1))
+                )
+                
+                for idx, topic_name in enumerate(unit.get("topics", [])):
+                    topic_id = str(uuid.uuid4())
+                    db_service.execute(
+                        "INSERT INTO topics (id, unit_id, name, order_index, is_completed) VALUES (?, ?, ?, ?, 0)",
+                        (topic_id, unit_id, topic_name, idx + 1)
+                    )
+                    
+        flash("Syllabus processed. Created subjects, units, and topics successfully.", "success")
+        return redirect(url_for("dashboard.index"))
+        
+    return render_template("study/syllabus.html", semesters=semesters)
+
+@study_bp.route("/quiz/<quiz_id>", methods=["GET", "POST"])
+def play_quiz(quiz_id):
+    user_id = get_current_user_id()
+    if not user_id:
+        return redirect(url_for("auth.login"))
+        
+    quiz = db_service.query("SELECT * FROM quizzes WHERE id = ?", (quiz_id,), one=True)
+    if not quiz:
+        flash("Quiz not found", "error")
+        return redirect(url_for("dashboard.index"))
+        
+    quiz_data = json.loads(quiz["quiz_data"])
+    
+    if request.method == "POST":
+        # Calculate scores
+        user_answers = request.form.to_dict()
+        score = 0
+        total = len(quiz_data)
+        
+        for idx, question in enumerate(quiz_data):
+            submitted = user_answers.get(f"q_{idx}")
+            if submitted is not None and int(submitted) == question["correct_index"]:
+                score += 1
+                
+        accuracy = (score / total) * 100 if total > 0 else 0
+        result_id = str(uuid.uuid4())
+        
+        db_service.execute(
+            """INSERT INTO quiz_results (id, quiz_id, user_id, score, total_questions, accuracy) 
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (result_id, quiz_id, user_id, score, total, accuracy)
+        )
+        
+        increment_daily_streak(user_id)
+        
+        return render_template("study/quiz_result.html", quiz=quiz, quiz_data=quiz_data, score=score, total=total, accuracy=accuracy)
+        
+    return render_template("study/quiz.html", quiz=quiz, quiz_data=quiz_data)
+
+@study_bp.route("/flashcards/review/<topic_id>")
+def review_flashcards(topic_id):
+    user_id = get_current_user_id()
+    if not user_id:
+        return redirect(url_for("auth.login"))
+        
+    topic = db_service.query("SELECT * FROM topics WHERE id = ?", (topic_id,), one=True)
+    flashcards_rows = db_service.query("SELECT * FROM flashcards WHERE topic_id = ?", (topic_id,))
+    flashcards = [dict(row) for row in flashcards_rows]
+    
+    increment_daily_streak(user_id)
+    
+    return render_template("study/flashcards.html", topic=topic, flashcards=flashcards)
+
+@study_bp.route("/session/track", methods=["POST"])
+def track_study_session():
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+        
+    topic_id = request.form.get("topic_id")
+    duration = request.form.get("duration") # in minutes
+    
+    if topic_id and duration:
+        session_id = str(uuid.uuid4())
+        db_service.execute(
+            """INSERT INTO study_sessions (id, user_id, topic_id, start_time, duration_minutes) 
+               VALUES (?, ?, ?, ?, ?)""",
+            (session_id, user_id, topic_id, datetime.now().isoformat(), int(duration))
+        )
+        
+        # Increment study streak using the IST daily logic
+        increment_daily_streak(user_id)
+        return jsonify({"success": True})
+    return jsonify({"error": "Invalid payload"}), 400
+
+# ── AI Natural Language Command ──────────────────────────────────────────
+@study_bp.route("/ai/command", methods=["POST"])
+def ai_command():
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data = request.get_json(silent=True) or {}
+    command = data.get("command", "").strip()
+    if not command:
+        return jsonify({"error": "No command provided"}), 400
+
+    # Parse the natural language command via AI service
+    plan = ai_service.process_natural_language_command(command)
+    action = plan.get("action")
+
+    if action == "create_study_structure":
+        if not usage_service.can_use_planner(user_id):
+            return jsonify({"success": False, "message": "You have reached your free AI Planner limit. Please upgrade to Premium!"})
+        usage_service.increment_planner(user_id)
+
+        # ── Create or find semester ──────────────────────────────────
+        sem_name = plan.get("semester", {}).get("name", "Semester 1")
+        semester = db_service.query(
+            "SELECT * FROM semesters WHERE user_id = ? AND name = ?",
+            (user_id, sem_name), one=True
+        )
+        if semester:
+            sem_id = semester["id"]
+        else:
+            sem_id = str(uuid.uuid4())
+            db_service.execute(
+                "INSERT INTO semesters (id, user_id, name) VALUES (?, ?, ?)",
+                (sem_id, user_id, sem_name)
+            )
+
+        focus_topics = [ft.lower() for ft in plan.get("focus_topics", [])]
+        generate_materials = plan.get("generate_materials", False)
+        created_topic_ids = []
+
+        for sub in plan.get("subjects", []):
+            existing_sub = db_service.query(
+                "SELECT * FROM subjects WHERE semester_id = ? AND LOWER(name) = ?",
+                (sem_id, sub["name"].lower()), one=True
+            )
+            if existing_sub:
+                sub_id = existing_sub["id"]
+            else:
+                sub_id = str(uuid.uuid4())
+                db_service.execute(
+                    "INSERT INTO subjects (id, semester_id, name, code) VALUES (?, ?, ?, ?)",
+                    (sub_id, sem_id, sub["name"], sub.get("code", ""))
+                )
+
+            for unit in sub.get("units", []):
+                existing_unit = db_service.query(
+                    "SELECT * FROM units WHERE subject_id = ? AND LOWER(name) = ?",
+                    (sub_id, unit["name"].lower()), one=True
+                )
+                if existing_unit:
+                    unit_id = existing_unit["id"]
+                else:
+                    unit_id = str(uuid.uuid4())
+                    db_service.execute(
+                        "INSERT INTO units (id, subject_id, name, number) VALUES (?, ?, ?, ?)",
+                        (unit_id, sub_id, unit["name"], unit.get("number", 1))
+                    )
+
+                for idx, topic_name in enumerate(unit.get("topics", [])):
+                    topic_id = str(uuid.uuid4())
+                    db_service.execute(
+                        "INSERT INTO topics (id, unit_id, name, order_index, is_completed) VALUES (?, ?, ?, ?, 0)",
+                        (topic_id, unit_id, topic_name, idx + 1)
+                    )
+                    created_topic_ids.append((topic_id, topic_name, sub["name"]))
+
+        # ── Generate study materials ─────────────────────────────────
+        if generate_materials:
+            topics_to_generate = []
+            if focus_topics:
+                # Only generate for focus topics
+                for tid, tname, sname in created_topic_ids:
+                    if any(ft in tname.lower() for ft in focus_topics):
+                        topics_to_generate.append((tid, tname, sname))
+            else:
+                # Generate for ALL topics
+                topics_to_generate = created_topic_ids
+
+            if topics_to_generate:
+                task_id = task_service.start_generate_materials_task(user_id, topics_to_generate)
+                return jsonify({
+                    "success": True, 
+                    "message": f"Created {len(plan.get('subjects', []))} subjects. Generating materials for {len(topics_to_generate)} topics in the background.", 
+                    "redirect": f"/semester/{sem_id}",
+                    "task_id": task_id
+                })
+
+        return jsonify({
+            "success": True,
+            "message": f"Created study structure for {sem_name} with {len(created_topic_ids)} topics.",
+            "redirect": f"/semester/{sem_id}"
+        })
+
+    return jsonify({"error": "Unknown action", "plan": plan}), 400
+
+
+# ── Search ───────────────────────────────────────────────────────────────
+@study_bp.route("/search")
+def search():
+    user_id = get_current_user_id()
+    if not user_id:
+        return redirect(url_for("auth.login"))
+
+    q = request.args.get("q", "").strip()
+    results = {"subjects": [], "topics": [], "notes": [], "files": []}
+
+    if q:
+        like_q = f"%{q}%"
+
+        results["subjects"] = db_service.query(
+            """SELECT s.*, sem.name as semester_name FROM subjects s
+               JOIN semesters sem ON s.semester_id = sem.id
+               WHERE sem.user_id = ? AND s.name LIKE ?""",
+            (user_id, like_q)
+        )
+
+        results["topics"] = db_service.query(
+            """SELECT t.*, u.name as unit_name, s.name as subject_name
+               FROM topics t
+               JOIN units u ON t.unit_id = u.id
+               JOIN subjects s ON u.subject_id = s.id
+               JOIN semesters sem ON s.semester_id = sem.id
+               WHERE sem.user_id = ? AND t.name LIKE ?""",
+            (user_id, like_q)
+        )
+
+        results["notes"] = db_service.query(
+            """SELECT n.*, t.name as topic_name
+               FROM notes n
+               JOIN topics t ON n.topic_id = t.id
+               JOIN units u ON t.unit_id = u.id
+               JOIN subjects s ON u.subject_id = s.id
+               JOIN semesters sem ON s.semester_id = sem.id
+               WHERE sem.user_id = ? AND (n.title LIKE ? OR n.content LIKE ?)""",
+            (user_id, like_q, like_q)
+        )
+
+        results["files"] = db_service.query(
+            """SELECT f.*, t.name as topic_name
+               FROM files f
+               JOIN topics t ON f.topic_id = t.id
+               JOIN units u ON t.unit_id = u.id
+               JOIN subjects s ON u.subject_id = s.id
+               JOIN semesters sem ON s.semester_id = sem.id
+               WHERE sem.user_id = ? AND (f.name LIKE ? OR f.ocr_text LIKE ?)""",
+            (user_id, like_q, like_q)
+        )
+
+    return render_template("study/search.html", query=q, results=results)
+
+
+# ── Analytics ────────────────────────────────────────────────────────────
+@study_bp.route("/analytics")
+def analytics():
+    user_id = get_current_user_id()
+    if not user_id:
+        return redirect(url_for("auth.login"))
+
+    # Total study sessions & hours
+    session_stats = db_service.query(
+        """SELECT COUNT(*) as total_sessions,
+                  COALESCE(SUM(duration_minutes), 0) as total_minutes
+           FROM study_sessions WHERE user_id = ?""",
+        (user_id,), one=True
+    )
+    total_sessions = session_stats["total_sessions"] if session_stats else 0
+    total_hours = round((session_stats["total_minutes"] if session_stats else 0) / 60, 1)
+
+    # Topics completed vs total
+    topic_stats = db_service.query(
+        """SELECT COUNT(*) as total,
+                  SUM(CASE WHEN t.is_completed = 1 THEN 1 ELSE 0 END) as completed
+           FROM topics t
+           JOIN units u ON t.unit_id = u.id
+           JOIN subjects s ON u.subject_id = s.id
+           JOIN semesters sem ON s.semester_id = sem.id
+           WHERE sem.user_id = ?""",
+        (user_id,), one=True
+    )
+    topics_total = topic_stats["total"] if topic_stats else 0
+    topics_completed = topic_stats["completed"] if topic_stats else 0
+
+    # Quiz average accuracy
+    quiz_stats = db_service.query(
+        "SELECT COALESCE(AVG(accuracy), 0) as avg_accuracy FROM quiz_results WHERE user_id = ?",
+        (user_id,), one=True
+    )
+    avg_accuracy = round(quiz_stats["avg_accuracy"], 1) if quiz_stats else 0
+
+    # Study streak from profile
+    profile = db_service.query(
+        "SELECT study_streak FROM profiles WHERE id = ?",
+        (user_id,), one=True
+    )
+    study_streak = profile["study_streak"] if profile else 0
+
+    # Recent quiz results
+    recent_quizzes = db_service.query(
+        """SELECT qr.*, q.title as quiz_title
+           FROM quiz_results qr
+           JOIN quizzes q ON qr.quiz_id = q.id
+           WHERE qr.user_id = ?
+           ORDER BY qr.completed_at DESC LIMIT 10""",
+        (user_id,)
+    )
+
+    return render_template(
+        "study/analytics.html",
+        total_sessions=total_sessions,
+        total_hours=total_hours,
+        total_topics=topics_total,
+        completed_topics=topics_completed,
+        avg_accuracy=avg_accuracy,
+        study_streak=study_streak,
+        recent_results=recent_quizzes
+    )
+
+
+# ── Bookmark Toggle ──────────────────────────────────────────────────────
+@study_bp.route("/topic/<topic_id>/bookmark", methods=["POST"])
+def toggle_bookmark(topic_id):
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    existing = db_service.query(
+        "SELECT id FROM bookmarks WHERE user_id = ? AND topic_id = ?",
+        (user_id, topic_id), one=True
+    )
+
+    if existing:
+        db_service.execute("DELETE FROM bookmarks WHERE id = ?", (existing["id"],))
+        return jsonify({"success": True, "bookmarked": False, "message": "Bookmark removed"})
+    else:
+        bookmark_id = str(uuid.uuid4())
+        db_service.execute(
+            "INSERT INTO bookmarks (id, user_id, topic_id) VALUES (?, ?, ?)",
+            (bookmark_id, user_id, topic_id)
+        )
+        return jsonify({"success": True, "bookmarked": True, "message": "Bookmark added"})
+
+@study_bp.route("/topic/<topic_id>/complete", methods=["POST"])
+def toggle_complete(topic_id):
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify({"success": False, "error": "Not authenticated"}), 401
+
+    topic = db_service.query("SELECT is_completed FROM topics WHERE id = ?", (topic_id,), one=True)
+    if not topic:
+        return jsonify({"success": False, "error": "Topic not found"}), 404
+
+    is_completed = bool(topic["is_completed"])
+    new_status = 0 if is_completed else 1
+
+    db_service.execute(
+        "UPDATE topics SET is_completed = ? WHERE id = ?",
+        (new_status, topic_id)
+    )
+    
+    return jsonify({
+        "success": True, 
+        "is_completed": bool(new_status), 
+        "message": "Topic marked as completed" if new_status else "Topic marked as incomplete"
+    })
+
+
+# ── API Background Tasks ──────────────────────────────────────────────────
+@study_bp.route("/api/tasks/active", methods=["GET"])
+def get_active_tasks():
+    user_id = get_current_user_id()
+    if not user_id:
+        return jsonify([])
+
+    # Fetch active tasks (pending or processing)
+    # Also fetch completed/failed tasks from the last 10 seconds to show brief completion toast
+    tasks = db_service.query("""
+        SELECT * FROM background_tasks 
+        WHERE user_id = ? 
+        AND (status IN ('pending', 'processing') OR (status IN ('completed', 'failed') AND strftime('%s', 'now') - strftime('%s', updated_at) < 10))
+        ORDER BY created_at DESC
+    """, (user_id,))
+    
+    return jsonify([dict(t) for t in tasks])

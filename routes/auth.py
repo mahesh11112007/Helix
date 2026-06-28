@@ -1,0 +1,271 @@
+import uuid
+import os
+import requests
+from datetime import datetime
+from flask import Blueprint, request, session, redirect, url_for, render_template, flash
+from werkzeug.security import generate_password_hash, check_password_hash
+from services.db_service import db_service
+
+auth_bp = Blueprint("auth", __name__)
+
+@auth_bp.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        full_name = request.form.get("full_name")
+        
+        if not email or not password or not full_name:
+            flash("All fields are required.", "error")
+            return redirect(url_for("auth.signup"))
+            
+        # Check if user exists
+        existing = db_service.query("SELECT * FROM profiles WHERE email = ?", (email,), one=True)
+        if existing:
+            flash("Email already registered.", "error")
+            return redirect(url_for("auth.signup"))
+            
+        user_id = str(uuid.uuid4())
+        hashed_pw = generate_password_hash(password)
+        
+        # Insert profile
+        db_service.execute(
+            "INSERT INTO profiles (id, email, full_name, study_streak, password_hash, last_active) VALUES (?, ?, ?, 0, ?, ?)",
+            (user_id, email, full_name, hashed_pw, datetime.now().isoformat())
+        )
+        
+        # Generate custom API key
+        try:
+            admin_url = os.getenv("CUSTOM_AI_ADMIN_URL")
+            admin_token = os.getenv("CUSTOM_AI_MASTER_TOKEN")
+            if admin_url and admin_token:
+                resp = requests.post(
+                    admin_url,
+                    headers={"Authorization": f"Bearer {admin_token}"},
+                    json={"user_id": user_id, "tier": "free"},
+                    timeout=5
+                )
+                if resp.status_code == 200:
+                    new_key = resp.json().get("api_key")
+                    if new_key:
+                        db_service.execute("UPDATE profiles SET api_keys = ? WHERE id = ?", (new_key, user_id))
+        except Exception as e:
+            print(f"Failed to generate custom API key: {e}")
+        
+        session["user_id"] = user_id
+        session["email"] = email
+        session["full_name"] = full_name
+        
+        flash("Welcome to Helix AI!", "success")
+        return redirect(url_for("dashboard.index"))
+        
+    return render_template("auth/signup.html")
+
+@auth_bp.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        
+        if not email or not password:
+            flash("Please fill in all fields.", "error")
+            return redirect(url_for("auth.login"))
+            
+        user = db_service.query("SELECT * FROM profiles WHERE email = ?", (email,), one=True)
+        
+        # Verify user and password
+        if user and "password_hash" in user.keys() and user["password_hash"] and check_password_hash(user["password_hash"], password):
+            session["user_id"] = user["id"]
+            session["email"] = user["email"]
+            session["full_name"] = user["full_name"]
+            
+            # Update last active
+            db_service.execute(
+                "UPDATE profiles SET last_active = ? WHERE id = ?",
+                (datetime.now().isoformat(), user["id"])
+            )
+            
+            flash("Logged in successfully.", "success")
+            return redirect(url_for("dashboard.index"))
+        else:
+            flash("Invalid email or password.", "error")
+            return redirect(url_for("auth.login"))
+            
+    return render_template("auth/login.html")
+
+@auth_bp.route("/google/login")
+def google_login():
+    client_id = os.environ.get("GOOGLE_CLIENT_ID")
+    if not client_id:
+        flash("Google Sign-In is not configured yet. (Missing GOOGLE_CLIENT_ID)", "error")
+        return redirect(url_for("auth.login"))
+        
+    redirect_uri = url_for("auth.google_callback", _external=True)
+    scope = "openid email profile"
+    
+    auth_url = (
+        "https://accounts.google.com/o/oauth2/v2/auth?"
+        f"client_id={client_id}&"
+        f"redirect_uri={redirect_uri}&"
+        "response_type=code&"
+        f"scope={scope}&"
+        "access_type=online"
+    )
+    return redirect(auth_url)
+
+@auth_bp.route("/google/callback")
+def google_callback():
+    code = request.args.get("code")
+    if not code:
+        flash("Google authentication failed or was cancelled.", "error")
+        return redirect(url_for("auth.login"))
+        
+    client_id = os.environ.get("GOOGLE_CLIENT_ID")
+    client_secret = os.environ.get("GOOGLE_CLIENT_SECRET")
+    redirect_uri = url_for("auth.google_callback", _external=True)
+    
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        "code": code,
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "redirect_uri": redirect_uri,
+        "grant_type": "authorization_code",
+    }
+    
+    try:
+        token_res = requests.post(token_url, data=token_data)
+        token_res.raise_for_status()
+        access_token = token_res.json().get("access_token")
+        
+        userinfo_url = "https://www.googleapis.com/oauth2/v2/userinfo"
+        userinfo_res = requests.get(userinfo_url, headers={"Authorization": f"Bearer {access_token}"})
+        userinfo_res.raise_for_status()
+        user_info = userinfo_res.json()
+        
+        email = user_info.get("email")
+        google_id = user_info.get("id")
+        full_name = user_info.get("name", "Google User")
+        
+        if not email:
+            flash("Could not retrieve email from Google.", "error")
+            return redirect(url_for("auth.login"))
+            
+        # Check if user exists by google_id or email
+        user = db_service.query("SELECT * FROM profiles WHERE google_id = ? OR email = ?", (google_id, email), one=True)
+        
+        if not user:
+            # Create new user
+            user_id = str(uuid.uuid4())
+            db_service.execute(
+                "INSERT INTO profiles (id, email, full_name, google_id, study_streak, last_active) VALUES (?, ?, ?, ?, 0, ?)",
+                (user_id, email, full_name, google_id, datetime.now().isoformat())
+            )
+            
+            # Generate custom API key
+            try:
+                admin_url = os.getenv("CUSTOM_AI_ADMIN_URL")
+                admin_token = os.getenv("CUSTOM_AI_MASTER_TOKEN")
+                if admin_url and admin_token:
+                    resp = requests.post(
+                        admin_url,
+                        headers={"Authorization": f"Bearer {admin_token}"},
+                        json={"user_id": user_id, "tier": "free"},
+                        timeout=5
+                    )
+                    if resp.status_code == 200:
+                        new_key = resp.json().get("api_key")
+                        if new_key:
+                            db_service.execute("UPDATE profiles SET api_keys = ? WHERE id = ?", (new_key, user_id))
+            except Exception as e:
+                print(f"Failed to generate custom API key via Google Auth: {e}")
+                
+        else:
+            user_id = user["id"]
+            # If they exist but don't have google_id linked yet, link it
+            if not user["google_id"]:
+                db_service.execute("UPDATE profiles SET google_id = ? WHERE id = ?", (google_id, user_id))
+            # Update last active
+            db_service.execute("UPDATE profiles SET last_active = ? WHERE id = ?", (datetime.now().isoformat(), user_id))
+            
+        session["user_id"] = user_id
+        session["email"] = email
+        session["full_name"] = full_name
+        
+        flash("Logged in successfully with Google.", "success")
+        return redirect(url_for("dashboard.index"))
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Google Auth Error: {e}")
+        flash("An error occurred during Google authentication.", "error")
+        return redirect(url_for("auth.login"))
+
+@auth_bp.route("/logout")
+def logout():
+    session.clear()
+    flash("Logged out successfully.", "success")
+    return redirect(url_for("auth.login"))
+
+import secrets
+from datetime import timedelta
+from services.email_service import email_service
+
+@auth_bp.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        if not email:
+            flash('Email is required.', 'error')
+            return redirect(url_for('auth.forgot_password'))
+        user = db_service.query('SELECT id FROM profiles WHERE email = ?', (email,), one=True)
+        if user:
+            otp_code = ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+            otp_hash = generate_password_hash(otp_code)
+            expires_at = (datetime.now() + timedelta(minutes=15)).isoformat()
+            db_service.execute(
+                'INSERT INTO password_reset_otps (id, email, otp_hash, expires_at) VALUES (?, ?, ?, ?)',
+                (str(uuid.uuid4()), email, otp_hash, expires_at)
+            )
+            email_service.send_password_reset_otp(email, otp_code)
+        session['reset_email'] = email
+        flash('If an account exists with that email, a 6-digit OTP has been sent.', 'success')
+        return redirect(url_for('auth.verify_otp'))
+    return render_template('auth/forgot_password.html')
+
+@auth_bp.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    email = session.get('reset_email')
+    if not email:
+        return redirect(url_for('auth.forgot_password'))
+    if request.method == 'POST':
+        otp_code = request.form.get('otp')
+        record = db_service.query(
+            'SELECT * FROM password_reset_otps WHERE email = ? ORDER BY created_at DESC LIMIT 1',
+            (email,), one=True
+        )
+        if record and check_password_hash(record['otp_hash'], otp_code):
+            if datetime.fromisoformat(record['expires_at']) > datetime.now():
+                session['otp_verified'] = True
+                return redirect(url_for('auth.reset_password'))
+            else:
+                flash('OTP has expired. Please request a new one.', 'error')
+        else:
+            flash('Invalid OTP.', 'error')
+    return render_template('auth/verify_otp.html', email=email)
+
+@auth_bp.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    email = session.get('reset_email')
+    if not email or not session.get('otp_verified'):
+        return redirect(url_for('auth.forgot_password'))
+    if request.method == 'POST':
+        password = request.form.get('password')
+        password_hash = generate_password_hash(password)
+        db_service.execute('UPDATE profiles SET password_hash = ? WHERE email = ?', (password_hash, email))
+        db_service.execute('DELETE FROM password_reset_otps WHERE email = ?', (email,))
+        session.pop('reset_email', None)
+        session.pop('otp_verified', None)
+        flash('Password has been successfully reset. You can now log in.', 'success')
+        return redirect(url_for('auth.login'))
+    return render_template('auth/reset_password.html')
+

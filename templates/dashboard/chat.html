@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-4rem)] flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6 flex-shrink-0">
+        <div>
+            <h1 class="text-3xl font-extrabold text-[#1d1d1f] tracking-tight">AI Chat</h1>
+            <p class="text-gray-500 mt-2 text-sm">Review your past conversations with your AI Tutor across all topics.</p>
+        </div>
+    </div>
+
+    <!-- Main Chat Interface -->
+    <div class="glass-card flex-1 flex overflow-hidden border border-gray-100 rounded-3xl shadow-sm bg-white/50">
+        
+        <!-- Left Sidebar: History -->
+        <div id="chat-sidebar" class="w-72 border-r border-gray-100 bg-white/40 flex flex-col h-full hidden md:flex flex-shrink-0 transition-all duration-300">
+            <div class="p-4 border-b border-gray-100/50">
+                <h3 class="font-bold text-gray-700 text-sm flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    Chat History
+                </h3>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                {% if grouped_sessions %}
+                    {% for topic_name, sessions in grouped_sessions.items() %}
+                        <div class="group">
+                            <h4 class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2 px-2 flex items-center justify-between cursor-pointer hover:text-gray-600 transition-colors" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('svg').classList.toggle('rotate-180')">
+                                {{ topic_name }}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </h4>
+                            <div class="space-y-1 transition-all duration-300">
+                                {% for session in sessions %}
+                                    <a href="{{ url_for('chat.global_chat', session_id=session.id) }}" 
+                                       class="block px-3 py-2 rounded-xl text-xs font-medium truncate transition-all {% if active_session_id == session.id %}bg-[#0071e3] text-white shadow-sm font-bold{% else %}text-gray-600 hover:bg-gray-100/80{% endif %}">
+                                        {{ session.title }}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center p-6 opacity-50">
+                        <p class="text-xs">No chat history found.</p>
+                        <p class="text-[10px] mt-2">Go to a Topic and chat with your AI Tutor to start saving history.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Side: Active Chat -->
+        <div class="flex-1 flex flex-col h-full relative bg-transparent min-w-0">
+            {% if active_session %}
+                <div class="p-4 border-b border-gray-100/50 bg-white/60 backdrop-blur-md z-10 flex items-center justify-between">
+                    <div class="min-w-0 pr-4 flex items-center gap-3">
+                        <button onclick="toggleSidebar()" class="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        <div>
+                            <h2 class="font-bold text-[#1d1d1f] text-sm truncate">{{ active_session.title }}</h2>
+                            <p class="text-[10px] text-gray-500 truncate">Context: {{ active_session.topic_name }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('dashboard.view_topic', topic_id=active_session.topic_id) }}" class="flex-shrink-0 px-4 py-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-xs font-semibold rounded-full shadow-sm transition-all text-gray-700">
+                        Go to Topic
+                    </a>
+                </div>
+                
+                <div id="chat-box" class="flex-1 overflow-y-auto p-6 space-y-6 text-sm flex flex-col">
+                    {% if chat_messages %}
+                        {% for msg in chat_messages %}
+                            {% if msg.role == 'user' %}
+                                <div class="flex justify-end">
+                                    <div class="p-4 rounded-2xl rounded-tr-sm bg-[#0071e3] text-white text-sm max-w-[75%] shadow-sm whitespace-pre-wrap leading-relaxed">{{ msg.content }}</div>
+                                </div>
+                            {% else %}
+                                <div class="flex justify-start relative group">
+                                    <div class="w-8 h-8 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center font-bold text-xs flex-shrink-0 mr-3 mt-1 shadow-sm border border-violet-200">AI</div>
+                                    <div class="ai-message p-5 rounded-2xl rounded-tl-sm bg-white border border-gray-100 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto leading-relaxed" data-markdown="{{ msg.content | escape }}"></div>
+                                    <button onclick="copyToClipboard(this)" data-content="{{ msg.content | escape }}" class="absolute -right-2 -bottom-2 opacity-0 group-hover:opacity-100 bg-white border border-gray-200 text-gray-500 rounded-full p-2 shadow-sm hover:text-violet-600 transition-all text-xs" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="flex justify-start">
+                            <div class="w-8 h-8 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center font-bold text-xs flex-shrink-0 mr-3 mt-1 shadow-sm border border-violet-200">AI</div>
+                            <div class="p-5 rounded-2xl rounded-tl-sm bg-white border border-gray-100 text-[#1d1d1f] text-sm max-w-[85%] shadow-sm leading-relaxed">
+                                Hello! This is a new chat session. Ask me anything.
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="p-4 bg-gradient-to-t from-white/90 to-transparent sticky bottom-0">
+                    <!-- Image Preview Container -->
+                    <div id="image-preview-container" class="max-w-4xl mx-auto mb-2 hidden">
+                        <div class="relative inline-block">
+                            <img id="image-preview" src="" class="h-20 w-auto rounded-lg shadow-sm border border-gray-200">
+                            <button type="button" onclick="clearImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <form id="chat-form" class="flex gap-2 max-w-4xl mx-auto bg-white p-2 rounded-[1.25rem] shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100">
+                        <input type="hidden" id="chat-session-id" value="{{ active_session.id }}">
+                        <input type="hidden" id="chat-topic-id" value="{{ active_session.topic_id }}">
+                        <input type="file" id="image-input" accept="image/*" class="hidden">
+                        
+                        <button type="button" onclick="document.getElementById('image-input').click()" class="p-3 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors self-end flex items-center justify-center" title="Upload Image">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                        </button>
+                        
+                        <textarea id="chat-input" rows="1" placeholder="Reply to AI Tutor... (Shift+Enter for new line)" class="flex-1 px-4 py-3 bg-transparent text-sm focus:outline-none text-[#1d1d1f] transition-all resize-none overflow-hidden min-h-[48px] max-h-[120px] leading-relaxed"></textarea>
+                        <button type="submit" class="px-6 py-2.5 rounded-xl bg-black hover:bg-gray-800 text-sm font-bold text-white shadow transition-all self-end flex items-center justify-center min-w-[100px] h-[44px]">
+                            Send
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="flex-1 flex flex-col items-center justify-center text-center p-8 bg-transparent">
+                    <div class="w-20 h-20 bg-white rounded-full shadow-sm flex items-center justify-center mb-6 border border-gray-100 text-4xl">
+                        ✨
+                    </div>
+                    <h2 class="text-2xl font-bold text-[#1d1d1f]">AI Chat History</h2>
+                    <p class="text-gray-500 mt-3 text-sm max-w-sm leading-relaxed">Select a conversation from the sidebar to review your past notes and discussions with your AI Tutor.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<script>
+// Copy to clipboard function for total response
+function copyToClipboard(button) {
+    const content = button.getAttribute('data-content');
+    if (content) {
+        navigator.clipboard.writeText(content).then(() => {
+            const originalTitle = button.title;
+            button.title = 'Copied!';
+            button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            setTimeout(() => {
+                button.title = originalTitle;
+                button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+            }, 2000);
+        });
+    }
+}
+
+function addCodeCopyButtons(container) {
+    container.querySelectorAll('pre').forEach(pre => {
+        if (pre.querySelector('.copy-code-btn')) return;
+        pre.style.position = 'relative';
+        const btn = document.createElement('button');
+        btn.className = 'copy-code-btn absolute top-2 right-2 bg-gray-700/50 hover:bg-gray-700 text-white p-1.5 rounded transition-colors shadow-sm';
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+        btn.onclick = () => {
+            const codeNode = pre.querySelector('code');
+            if(codeNode) {
+                navigator.clipboard.writeText(codeNode.innerText);
+                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-400"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                setTimeout(() => {
+                    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+                }, 2000);
+            }
+        };
+        pre.appendChild(btn);
+    });
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('chat-sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('hidden');
+        sidebar.classList.toggle('md:flex');
+    }
+}
+
+let currentImageBase64 = null;
+
+function clearImage() {
+    const input = document.getElementById('image-input');
+    if(input) input.value = '';
+    currentImageBase64 = null;
+    const container = document.getElementById('image-preview-container');
+    if(container) container.classList.add('hidden');
+}
+
+window.clearImage = clearImage;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatBox = document.getElementById('chat-box');
+    const imageInput = document.getElementById('image-input');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageBase64 = e.target.result.split(',')[1];
+                    document.getElementById('image-preview').src = e.target.result;
+                    document.getElementById('image-preview-container').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Set Marked.js options
+    if (typeof marked !== 'undefined') {
+        marked.setOptions({ breaks: true, gfm: true });
+               // Render all existing chat messages
+        document.querySelectorAll('.ai-message').forEach(el => {
+            const md = el.getAttribute('data-markdown');
+            if (md) {
+                el.innerHTML = parseMarkdownWithMath(md);
+                if (typeof hljs !== 'undefined') {
+                    el.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                }
+                addCodeCopyButtons(el);
+            }
+        });
+        
+        // Typeset math equations
+        if (window.typesetMath) {
+            window.typesetMath();
+        }
+        
+        // Scroll to bottom on load
+        if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    
+    // Auto-expand textarea
+    if (chatInput) {
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Shift+Enter to newline, Enter to submit
+        chatInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    }
+    
+    if (chatForm) {
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (!message && !currentImageBase64) return;
+            
+            const topicId = document.getElementById('chat-topic-id').value;
+            const sessionId = document.getElementById('chat-session-id').value;
+            
+            // Append user message
+            const userWrapper = document.createElement('div');
+            userWrapper.className = 'flex justify-end';
+            const userDiv = document.createElement('div');
+            userDiv.className = 'p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[75%] shadow-sm whitespace-pre-wrap flex flex-col gap-2';
+            
+            if (currentImageBase64) {
+                const img = document.createElement('img');
+                img.src = 'data:image/jpeg;base64,' + currentImageBase64;
+                img.className = 'rounded-lg max-h-48 object-contain';
+                userDiv.appendChild(img);
+            }
+            if (message) {
+                const textSpan = document.createElement('span');
+                textSpan.innerText = message;
+                userDiv.appendChild(textSpan);
+            }
+            
+            userWrapper.appendChild(userDiv);
+            chatBox.appendChild(userWrapper);
+            
+            chatInput.value = '';
+            const pendingImageBase64 = currentImageBase64;
+            clearImage();
+            
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // Append typing indicator
+            const typingWrapper = document.createElement('div');
+            typingWrapper.className = 'flex justify-start';
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'p-4 rounded-2xl rounded-bl-sm bg-white border border-gray-100 text-[#1d1d1f] text-sm max-w-[85%] shadow-sm animate-pulse';
+            typingDiv.innerText = 'AI is typing...';
+            typingWrapper.appendChild(typingDiv);
+            chatBox.appendChild(typingWrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // Send to server
+            try {
+                const bodyParams = new URLSearchParams();
+                if (message) bodyParams.append('message', message);
+                if (sessionId) bodyParams.append('session_id', sessionId);
+                if (pendingImageBase64) bodyParams.append('image', pendingImageBase64);
+                
+                const response = await fetch(`/topic/${topicId}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: bodyParams.toString()
+                });
+                const data = await response.json();
+                
+                // Remove typing indicator
+                typingWrapper.remove();
+                
+                const aiWrapper = document.createElement('div');
+                aiWrapper.className = 'flex justify-start relative group';
+                
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'ai-message p-4 rounded-2xl rounded-bl-sm bg-white border border-gray-100 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto';
+                
+                if (data.response && typeof marked !== 'undefined') {
+                    aiDiv.innerHTML = parseMarkdownWithMath(data.response);
+                    if (typeof hljs !== 'undefined') {
+                        aiDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                    }
+                    addCodeCopyButtons(aiDiv);
+                } else {
+                    aiDiv.innerText = data.response || "No response";
+                }
+                
+                aiWrapper.appendChild(aiDiv);
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'absolute -right-2 -bottom-2 opacity-0 group-hover:opacity-100 bg-white border border-gray-200 text-gray-500 rounded-full p-2 shadow hover:text-violet-600 transition-all text-xs';
+                copyBtn.title = 'Copy';
+                copyBtn.setAttribute('data-content', data.response);
+                copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+                copyBtn.onclick = function() { copyToClipboard(this); };
+                
+                aiWrapper.appendChild(copyBtn);
+                chatBox.appendChild(aiWrapper);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+                // Typeset math equations in the new message
+                if (window.typesetMath) {
+                    window.typesetMath(aiDiv);
+                }
+                
+            } catch (error) {
+                console.error("Chat error:", error);
+                typingWrapper.remove();
+                
+                const errWrapper = document.createElement('div');
+                errWrapper.className = 'flex justify-start';
+                const errDiv = document.createElement('div');
+                errDiv.className = 'p-4 rounded-2xl rounded-bl-sm bg-red-50 text-red-600 text-sm max-w-[85%]';
+                errDiv.innerText = "Error connecting to AI. Please try again.";
+                errWrapper.appendChild(errDiv);
+                chatBox.appendChild(errWrapper);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

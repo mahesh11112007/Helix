@@ -1,0 +1,30 @@
+# Tasks - KiraakStudy AI
+
+- `[x]` Phase 1: Foundation & Configurations
+    - `[x]` Create `vercel.json` and `requirements.txt`
+    - `[x]` Create `.env.example` and base project files
+    - `[x]` Set up CSS/JS static files with Tailwind and Glassmorphism
+- `[x]` Phase 2: Dual-Mode Database & Authentication
+    - `[x]` Create `services/db_service.py` with SQLite & Supabase compatibility
+    - `[x]` Create session-based & Supabase auth backend in `routes/auth.py`
+    - `[x]` Design registration/login templates
+- `[x]` Phase 3: Core Dashboard & Study Organization
+    - `[x]` Build database tables structure/migration script
+    - `[x]` Create Semester -> Subject -> Unit -> Topic routes and templates
+    - `[x]` Develop file upload, list, rename, delete, tag, and archive functionality
+- `[x]` Phase 4: Image & PDF Processing
+    - `[x]` Implement `services/pdf_service.py` to extract PDF pages as images using PyMuPDF
+    - `[x]` Implement `services/image_service.py` with Pillow for enhancement (contrast, rotation, sharpening)
+- `[x]` Phase 5: NVIDIA NIM AI Service (Vision + Language)
+    - `[x]` Implement `services/ai_service.py` for NVIDIA NIM connection
+    - `[x]` Build Vision AI pipeline for document parsing and JSON generation
+    - `[x]` Implement chatbot with document context (RAG)
+    - `[x]` Create syllabus importer (auto-creating semesters, subjects, units, topics)
+- `[x]` Phase 6: Study UI & Tools
+    - `[x]` Design dashboard template (streaks, progress, planners, Pomodoro timer)
+    - `[x]` Create Flashcard study interface (Spaced Repetition)
+    - `[x]` Build interactive Quiz engine
+    - `[x]` Implement Rich text / Markdown notes editor
+- `[x]` Phase 7: Verification & Final Polish
+    - `[x]` Run manual/automated service verification
+    - `[x]` Verify Vercel builds and deployment readiness

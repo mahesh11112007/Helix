@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Helix AI{% endblock %}
+
+{% block content %}
+<!-- AI Command Prompt -->
+<div class="glass-card p-5 mb-6 cursor-pointer" onclick="openCommandBar()">
+    <div class="flex items-center gap-4">
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-gray-500">Ask AI anything... e.g. "Create 5th sem DBMS study plan"</span>
+            </div>
+        </div>
+        <kbd class="hidden sm:inline-block text-[10px] px-2 py-1 rounded-md bg-gray-100 text-gray-500 font-mono">Ctrl+K</kbd>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Study Track & Organization -->
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Streak and Stats -->
+        <div class="glass-card p-8 flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight text-[#1d1d1f]">Kiraak Study Hub</h1>
+                <p class="text-gray-500 text-sm mt-1">Organize your academic syllabus and unlock AI vision notes.</p>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="text-center">
+                    <span class="block text-3xl font-bold text-[#0071e3]">{{ profile.study_streak or 0 }}</span>
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-gray-400">Day Streak</span>
+                </div>
+                <div class="text-center">
+                    <span class="block text-3xl font-bold text-gray-800">Active</span>
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-gray-400">Status</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <button onclick="openCommandBar()" class="glass-card p-6 text-center hover:bg-gray-50 transition-all duration-200">
+                <i data-lucide="sparkles" class="w-8 h-8 mx-auto mb-3 text-[#0071e3]"></i>
+                <span class="text-sm font-semibold text-[#1d1d1f]">AI Study Plan</span>
+            </button>
+            <a href="{{ url_for('study.paste_syllabus') }}" class="glass-card p-6 text-center hover:bg-gray-50 transition-all duration-200 block">
+                <i data-lucide="file-plus" class="w-8 h-8 mx-auto mb-3 text-emerald-500"></i>
+                <span class="text-sm font-semibold text-[#1d1d1f]">Import Syllabus</span>
+            </a>
+            <a href="/analytics" class="glass-card p-6 text-center hover:bg-gray-50 transition-all duration-200 block">
+                <i data-lucide="bar-chart-2" class="w-8 h-8 mx-auto mb-3 text-amber-500"></i>
+                <span class="text-sm font-semibold text-[#1d1d1f]">View Analytics</span>
+            </a>
+            <a href="/search" class="glass-card p-6 text-center hover:bg-gray-50 transition-all duration-200 block">
+                <i data-lucide="search" class="w-8 h-8 mx-auto mb-3 text-violet-500"></i>
+                <span class="text-sm font-semibold text-[#1d1d1f]">Search Notes</span>
+            </a>
+        </div>
+
+        <!-- Semesters Section -->
+        <div class="glass-card p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-[#1d1d1f]">Your Semesters</h2>
+                <form action="{{ url_for('dashboard.add_semester') }}" method="POST" class="flex items-center space-x-2">
+                    <input type="text" name="name" placeholder="e.g. Semester 5" required class="px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] text-[#1d1d1f]">
+                    <button type="submit" class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white transition">
+                        + Add
+                    </button>
+                </form>
+            </div>
+
+            {% if semesters %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {% for sem in semesters %}
+                        <a href="{{ url_for('dashboard.view_semester', sem_id=sem.id) }}" class="block p-5 rounded-2xl border border-gray-100 hover:border-[#0071e3] hover:shadow-md transition">
+                            <h3 class="font-bold text-lg text-[#1d1d1f]">{{ sem.name }}</h3>
+                            <span class="text-xs text-gray-500">View subjects & curriculum</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12 border border-dashed border-gray-200 rounded-2xl">
+                    <p class="text-gray-500 mb-2">No semesters created yet.</p>
+                    <p class="text-xs text-gray-400">Tip: Paste a syllabus to auto-generate all semesters, units, and topics!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Uploads & AI processing status -->
+        <div class="glass-card p-8">
+            <h2 class="text-xl font-bold mb-6 text-[#1d1d1f]">Recent Uploads</h2>
+            {% if recent_files %}
+                <div class="space-y-4">
+                    {% for file in recent_files %}
+                        <div class="p-4 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+                            <div>
+                                <span class="block font-medium text-sm text-[#1d1d1f]">{{ file.name }}</span>
+                                <span class="text-xs text-gray-500">{{ file.subject_name }} &rarr; {{ file.topic_name }}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                {% if file.ocr_text %}
+                                    <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] uppercase font-bold">AI Processed</span>
+                                {% else %}
+                                    <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-[10px] uppercase font-bold">Processing</span>
+                                {% endif %}
+                                <a href="{{ url_for('files.download_file', file_id=file.id) }}" class="text-[#0071e3] hover:text-[#0077ed] text-xs font-semibold">Download</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-sm text-gray-500">No materials uploaded yet. Go to a topic to upload notes.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Side Utilities (Pomodoro, AI Suggestions, Exam Countdown) -->
+    <div class="space-y-6">
+        <!-- Pomodoro Timer -->
+        <div class="glass-card p-8 text-center">
+            <h2 class="text-lg font-bold mb-2 flex justify-center items-center gap-2 text-[#1d1d1f]"><i data-lucide="timer" class="w-5 h-5 text-gray-400"></i> Pomodoro Focus</h2>
+            <div id="pomodoro-display" class="text-4xl font-black my-6 font-mono tracking-wider text-[#1d1d1f]">25:00</div>
+            <div class="flex justify-center space-x-3">
+                <button id="pomodoro-toggle" onclick="togglePomodoro()" class="px-5 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-bold text-white transition">Start</button>
+                <button onclick="resetPomodoro()" class="px-5 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm font-semibold text-[#1d1d1f] transition">Reset</button>
+            </div>
+        </div>
+
+        <!-- AI Study Suggestions -->
+        <div class="glass-card p-8">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-[#1d1d1f]"><i data-lucide="lightbulb" class="w-5 h-5 text-amber-500"></i> AI Study Coach</h2>
+            <ul class="space-y-3">
+                {% for suggestion in ai_suggestions %}
+                    <li class="text-sm p-4 rounded-xl bg-gray-50 border border-gray-100 text-gray-700">
+                        {{ suggestion }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Upcoming Exam Countdown -->
+        <div class="glass-card p-8">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-[#1d1d1f]"><i data-lucide="calendar" class="w-5 h-5 text-rose-500"></i> Upcoming Exams</h2>
+            {% if exams %}
+                <div class="space-y-3">
+                    {% for exam in exams %}
+                        <div class="p-4 rounded-xl bg-rose-50 border border-rose-100">
+                            <span class="block font-bold text-sm text-rose-700">{{ exam.title }}</span>
+                            <span class="text-xs text-rose-500">{{ exam.start_time }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-xs text-gray-500">No upcoming exam events found. Schedule one in the Planner!</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

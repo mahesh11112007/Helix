@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Study Planner - Helix AI{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left: Event Scheduler and List -->
+    <div class="lg:col-span-2 space-y-6">
+        <div class="glass-card p-6 border border-gray-200 bg-white shadow-sm rounded-2xl">
+            <div class="flex items-center justify-between mb-6 border-b border-gray-200 pb-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-[#1d1d1f]">Study Planner</h1>
+                    <p class="text-sm text-gray-500 mt-1">Organize study sessions, revision timelines, and exam countdowns.</p>
+                </div>
+            </div>
+
+            <!-- Add Event Form -->
+            <form action="{{ url_for('planner.add_event') }}" method="POST" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-[#1d1d1f]">Event Title</label>
+                        <input type="text" name="title" required placeholder="e.g. DBMS Midterm Exam" class="w-full px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-[#1d1d1f]">Event Category</label>
+                        <select name="event_type" class="w-full px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
+                            <option value="daily">Daily Planner</option>
+                            <option value="weekly">Weekly Planner</option>
+                            <option value="exam">Exam Countdown</option>
+                            <option value="revision">Revision Plan</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-[#1d1d1f]">Start Date & Time</label>
+                        <input type="datetime-local" name="start_time" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1 text-[#1d1d1f]">End Date & Time (Optional)</label>
+                        <input type="datetime-local" name="end_time" class="w-full px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1 text-[#1d1d1f]">Description</label>
+                    <textarea name="description" placeholder="Notes about this schedule item..." rows="3" class="w-full px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all mt-4">
+                    Schedule Event
+                </button>
+            </form>
+        </div>
+
+        <!-- Planned Events List -->
+        <div class="glass-card p-6 border border-gray-200 bg-white shadow-sm rounded-2xl">
+            <h2 class="text-xl font-extrabold text-[#1d1d1f] mb-4 border-b border-gray-200 pb-3">Your Planned Calendar</h2>
+            {% if events %}
+                <div class="space-y-4">
+                    {% for event in events %}
+                        <div class="p-5 rounded-2xl border border-gray-200 bg-gray-50 flex items-center justify-between gap-4 shadow-sm hover:shadow transition-all">
+                            <div>
+                                <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider
+                                    {% if event.event_type == 'exam' %}bg-red-50 text-red-600 border border-red-200
+                                    {% elif event.event_type == 'revision' %}bg-indigo-50 text-indigo-600 border border-indigo-200
+                                    {% else %}bg-gray-100 text-gray-600 border border-gray-200{% endif %}">
+                                    {{ event.event_type | upper }}
+                                </span>
+                                <h3 class="font-bold text-base mt-2 {% if event.is_completed %}line-through opacity-50{% endif %}">{{ event.title }}</h3>
+                                <p class="text-xs opacity-60 mt-1">{{ event.start_time }} {% if event.end_time %}to {{ event.end_time }}{% endif %}</p>
+                                {% if event.description %}
+                                    <p class="text-xs text-gray-600 mt-2 bg-white p-3 rounded-lg border border-gray-200 shadow-inner">{{ event.description }}</p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <button onclick="toggleEventStatus('{{ event.id }}', this)" class="px-4 py-2 rounded text-xs font-bold transition 
+                                    {% if event.is_completed %}bg-green-100 text-green-700 hover:bg-green-200{% else %}bg-gray-200 hover:bg-[#0071e3] hover:text-white text-gray-700{% endif %}">
+                                    {% if event.is_completed %}✓ Done{% else %}Mark Done{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-sm text-gray-500 text-center py-6">No events scheduled. Use the form above to add some!</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right: Focus Assistant & Pomodoro -->
+    <div class="space-y-6">
+        <div class="glass-card p-6 text-center border border-gray-200 bg-white shadow-sm rounded-2xl">
+            <h2 class="text-lg font-extrabold mb-2 text-[#1d1d1f]">⏱️ Study Focus Timer</h2>
+            <p class="text-xs text-gray-500 mb-4">Set aside distractions and study in 25-minute blocks.</p>
+            <div id="pomodoro-display-large" class="text-5xl font-black font-mono tracking-wider my-6 bg-gray-50 py-4 rounded-xl border border-gray-200 text-[#1d1d1f] shadow-inner">
+                25:00
+            </div>
+            <div class="flex justify-center space-x-3">
+                <button id="pomodoro-toggle-large" onclick="togglePomodoroLarge()" class="px-6 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] font-bold text-white shadow-sm transition-all">
+                    Start
+                </button>
+                <button onclick="resetPomodoroLarge()" class="px-6 py-2 rounded-full bg-gray-200 hover:bg-gray-300 font-semibold text-gray-700 transition-all">
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Duplicate timer functions customized for planner page
+    let pTimeLeft = 25 * 60;
+    let pIsRunning = false;
+    let pInterval;
+
+    function updateLargeDisplay() {
+        const mins = Math.floor(pTimeLeft / 60);
+        const secs = pTimeLeft % 60;
+        const disp = document.getElementById('pomodoro-display-large');
+        if (disp) {
+            disp.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+    }
+
+    function togglePomodoroLarge() {
+        const btn = document.getElementById('pomodoro-toggle-large');
+        if (pIsRunning) {
+            clearInterval(pInterval);
+            pIsRunning = false;
+            btn.innerText = 'Start';
+        } else {
+            pIsRunning = true;
+            btn.innerText = 'Pause';
+            pInterval = setInterval(() => {
+                if (pTimeLeft > 0) {
+                    pTimeLeft--;
+                    updateLargeDisplay();
+                } else {
+                    clearInterval(pInterval);
+                    pIsRunning = false;
+                    btn.innerText = 'Start';
+                    alert('Pomodoro completed!');
+                    pTimeLeft = 25 * 60;
+                    updateLargeDisplay();
+                }
+            }, 1000);
+        }
+    }
+
+    function resetPomodoroLarge() {
+        clearInterval(pInterval);
+        pIsRunning = false;
+        pTimeLeft = 25 * 60;
+        updateLargeDisplay();
+        document.getElementById('pomodoro-toggle-large').innerText = 'Start';
+    }
+
+    async function toggleEventStatus(eventId, btn) {
+        try {
+            const response = await fetch(`/planner/event/${eventId}/toggle`, {
+                method: 'POST'
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                const isCompleted = data.is_completed;
+                btn.innerText = isCompleted ? '✓ Done' : 'Mark Done';
+                btn.className = isCompleted 
+                    ? 'px-4 py-2 rounded text-xs font-bold transition bg-green-100 text-green-700 hover:bg-green-200' 
+                    : 'px-4 py-2 rounded text-xs font-bold transition bg-gray-200 hover:bg-[#0071e3] hover:text-white text-gray-700';
+                const titleEl = btn.parentElement.parentElement.querySelector('h3');
+                if (isCompleted) {
+                    titleEl.classList.add('line-through', 'opacity-50');
+                } else {
+                    titleEl.classList.remove('line-through', 'opacity-50');
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+</script>
+{% endblock %}

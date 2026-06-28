@@ -1,0 +1,751 @@
+{% extends "base.html" %}
+
+{% block title %}{{ topic.name }} - Helix AI{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Breadcrumb -->
+    <div class="text-sm text-gray-500 no-print">
+        <a href="{{ url_for('dashboard.index') }}" class="hover:underline">Dashboard</a> &rarr; 
+        <a href="{{ url_for('dashboard.view_subject', sub_id=topic.subject_id) }}" class="hover:underline">{{ topic.subject_name }}</a> &rarr;
+        <span class="font-bold text-[#0071e3]">{{ topic.name }}</span>
+    </div>
+
+    <!-- Header Section -->
+    <div class="glass-card p-6 flex flex-wrap items-center justify-between gap-4 border border-gray-200 bg-white rounded-2xl shadow-sm no-print">
+        <div>
+            <span class="text-xs uppercase font-bold text-[#0071e3] tracking-wider">{{ topic.unit_name }}</span>
+            <h1 class="text-3xl font-extrabold mt-1 text-[#1d1d1f]">{{ topic.name }}</h1>
+        </div>
+        
+        <div class="flex items-center space-x-3 flex-wrap gap-y-2">
+            <!-- Complete Toggle -->
+            <button
+                id="complete-btn"
+                onclick="toggleComplete('{{ topic.id }}')"
+                class="px-4 py-2 rounded-full text-sm font-bold shadow-sm transition border border-gray-200 hover:border-emerald-500/40 {{ 'bg-emerald-500 text-white border-emerald-500' if topic.is_completed else 'bg-white text-[#1d1d1f]' }}"
+                title="Mark this topic as completed"
+            >
+                <span id="complete-icon">{{ '✅' if topic.is_completed else '⭕' }}</span>
+                <span id="complete-text" class="hidden sm:inline ml-1">{{ 'Completed' if topic.is_completed else 'Mark Complete' }}</span>
+            </button>
+            <!-- Bookmark Toggle -->
+            <button
+                id="bookmark-btn"
+                onclick="toggleBookmark('{{ topic.id }}')"
+                class="px-4 py-2 rounded-full text-sm font-bold shadow-sm transition border border-gray-200 hover:border-[#0071e3]/40 bg-white text-[#1d1d1f]"
+                title="Bookmark this topic"
+            >
+                <span id="bookmark-icon">{{ '🔖' if is_bookmarked else '📑' }}</span>
+                <span id="bookmark-text" class="hidden sm:inline ml-1">{{ 'Bookmarked' if is_bookmarked else 'Bookmark' }}</span>
+            </button>
+            <!-- Print PDF -->
+            <button onclick="printNotes()" class="px-4 py-2 rounded-full text-sm font-bold shadow-sm transition border border-gray-200 hover:border-[#0071e3]/40 bg-white text-[#1d1d1f]" title="Print notes as PDF">
+                🖨️ <span class="hidden sm:inline ml-1">Print PDF</span>
+            </button>
+            <form id="generate-deck-form" action="{{ url_for('study.generate_resources', topic_id=topic.id) }}" method="POST" onsubmit="
+                const btn = document.getElementById('generate-deck-btn');
+                btn.disabled = true;
+                btn.classList.add('opacity-70', 'cursor-not-allowed');
+                btn.innerHTML = '⚙️ Generating... (This takes 20s)';
+            ">
+                <button id="generate-deck-btn" type="submit" class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all">
+                    🤖 Generate AI Study Deck
+                </button>
+            </form>
+            <a href="{{ url_for('study.explain_topic_ai', topic_id=topic.id) }}" class="px-4 py-2 rounded-full bg-[#1d1d1f] hover:bg-black text-sm font-semibold text-white shadow-sm transition-all">
+                💡 AI Tutor Explain
+            </a>
+        </div>
+    </div>
+
+    <!-- Grid Layout for Materials and AI Tools -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left: Uploaded Documents & Interactive Elements -->
+        <div class="lg:col-span-2 space-y-6 min-w-0">
+            <!-- Files & Upload -->
+            <div class="glass-card p-6">
+                <div class="flex flex-wrap items-center justify-between mb-4 gap-2">
+                    <h2 class="text-lg font-bold">Study Documents & Notes</h2>
+                    <!-- Upload Form -->
+                    <form action="{{ url_for('files.upload_file', topic_id=topic.id) }}" method="POST" enctype="multipart/form-data" class="flex items-center space-x-2">
+                        <input type="file" name="file" required class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3]/10 file:text-[#0071e3] hover:file:bg-[#0071e3]/20 transition-all cursor-pointer">
+                        <button type="submit" class="px-4 py-1.5 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-xs font-semibold text-white shadow-sm transition-all">Upload</button>
+                    </form>
+                </div>
+
+                {% if files %}
+                    <div class="space-y-3">
+                        {% for file in files %}
+                            <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+                                <div>
+                                    <h4 class="font-bold text-sm text-[#1d1d1f] break-all">{{ file.name }}</h4>
+                                    <p class="text-[11px] text-gray-500 mt-0.5">Uploaded {{ file.created_at }} | {{ (file.file_size / 1024) | round(1) }} KB</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    {% if file.ocr_text %}
+                                        <button onclick="toggleOCR('{{ file.id }}')" class="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold hover:border-[#0071e3]/40 text-[#1d1d1f] shadow-sm transition">
+                                            👁️ View Extract
+                                        </button>
+                                    {% else %}
+                                        <form action="{{ url_for('files.extract_pdf', file_id=file.id) }}" method="POST">
+                                            <button type="submit" class="px-3 py-1.5 rounded-full bg-[#0071e3]/10 text-[#0071e3] text-xs font-semibold hover:bg-[#0071e3]/20 transition">
+                                                🧠 Extract Text
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <a href="{{ url_for('files.download_file', file_id=file.id) }}" class="px-3 py-1.5 rounded-full bg-gray-200 text-xs font-bold hover:bg-gray-300 text-gray-700 transition-all">Download</a>
+                                    <form action="{{ url_for('files.delete_file', file_id=file.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this file?');">
+                                        <button type="submit" class="px-3 py-1.5 rounded-full bg-red-50 text-xs font-bold hover:bg-red-100 text-red-600 transition-all">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% if file.ocr_text %}
+                                <div id="ocr-{{ file.id }}" class="hidden p-5 rounded-2xl bg-gray-50 border border-gray-200 shadow-inner mt-2">
+                                    <h5 class="text-xs font-bold uppercase tracking-widest text-[#0071e3] mb-3">Extracted Text (OCR)</h5>
+                                    <div class="text-sm font-mono whitespace-pre-wrap text-gray-700 max-h-64 overflow-y-auto break-words">{{ file.ocr_text }}</div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12 border-2 border-dashed border-gray-200 bg-gray-50 rounded-2xl">
+                        <p class="text-sm text-gray-500 font-medium">No documents uploaded yet.</p>
+                        <p class="text-xs text-gray-400 mt-1">Upload printed notes, handwritten documents, or PDFs for AI Vision processing.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Notes Section -->
+            <div class="glass-card p-6 border border-gray-200 bg-white rounded-2xl shadow-sm overflow-hidden" id="printable-notes">
+                <div class="flex items-center justify-between mb-4 no-print">
+                    <h2 class="text-lg font-extrabold text-[#1d1d1f]">AI Notes & Summaries</h2>
+                    {% if notes %}
+                    <button onclick="printNotes()" class="text-xs text-[#0071e3] font-semibold hover:underline">🖨️ Print</button>
+                    {% endif %}
+                </div>
+                <!-- Print Header (hidden on screen, shown on print) -->
+                <div class="print-header hidden">
+                    <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">{{ topic.name }}</h1>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 16px;">{{ topic.subject_name }} • {{ topic.unit_name }}</p>
+                    <hr style="border-top: 2px solid #0071e3; margin-bottom: 16px;">
+                </div>
+                {% if notes %}
+                    <div class="space-y-4">
+                        {% for note in notes %}
+                            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-200 shadow-sm relative group overflow-hidden">
+                                <h3 class="font-bold text-[#1d1d1f] mb-3 text-lg border-b border-gray-200 pb-2">{{ note.title }}</h3>
+                                <div class="note-content text-sm text-[#1d1d1f] leading-relaxed prose max-w-none overflow-x-auto break-words" data-markdown="{{ note.content | escape }}"></div>
+                                <button onclick="copyToClipboard(this)" data-content="{{ note.content | escape }}" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white border border-gray-200 text-gray-500 rounded-full p-2 shadow-sm hover:text-[#0071e3] transition-all text-xs no-print" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-sm text-gray-400">No generated notes yet. Click "Generate AI Study Deck" above.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right: Quizzes, Flashcards, and Topic Chat -->
+        <div class="space-y-6">
+            <!-- Flashcards Review -->
+            <div class="glass-card p-6 text-center">
+                <h2 class="text-lg font-bold mb-2">⚡ Active Flashcards</h2>
+                <p class="text-xs opacity-70 mb-4">Leverage spaced repetition to master this topic.</p>
+                {% if flashcards %}
+                    <a href="{{ url_for('study.review_flashcards', topic_id=topic.id) }}" class="block w-full py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] font-semibold transition-all text-white shadow-sm">
+                        Review {{ flashcards | length }} Cards
+                    </a>
+                {% else %}
+                    <button disabled class="w-full py-3 rounded-full bg-gray-100 text-gray-400 font-semibold cursor-not-allowed border border-gray-200">
+                        No Flashcards Available
+                    </button>
+                {% endif %}
+            </div>
+
+            <!-- Interactive Quizzes -->
+            <div class="glass-card p-6">
+                <h2 class="text-lg font-bold mb-3">📝 Topic Quizzes</h2>
+                {% if quizzes %}
+                    <div class="space-y-3">
+                        {% for quiz in quizzes %}
+                            <div class="p-3 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-between shadow-sm hover:shadow transition-all group">
+                                <span class="text-sm font-medium text-[#1d1d1f] truncate pr-2">{{ quiz.title }}</span>
+                                <a href="{{ url_for('study.play_quiz', quiz_id=quiz.id) }}" class="px-4 py-1.5 rounded-full bg-gray-200 text-xs font-semibold hover:bg-[#0071e3] hover:text-white transition-all text-[#1d1d1f]">Start</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-xs opacity-60">No quizzes generated yet. Generate a study deck to create a quiz.</p>
+                {% endif %}
+            </div>
+
+            <!-- Chat with Notes (RAG) -->
+            <div class="glass-card p-6 flex flex-col h-[500px]">
+                <div class="flex items-center justify-between mb-4 flex-shrink-0">
+                    <h2 class="text-lg font-bold">💬 Chat with Notes</h2>
+                    <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-[#1d1d1f] transition-all">
+                        + New Chat
+                    </a>
+                </div>
+                <div class="flex flex-1 min-h-0 relative overflow-hidden">
+                    <!-- Sessions Sidebar Overlay -->
+                    <div id="topic-chat-sidebar" class="absolute top-0 left-0 h-full w-64 bg-white/95 backdrop-blur-xl border-r border-gray-200 z-20 transform -translate-x-full transition-transform duration-300 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.1)] flex flex-col rounded-l-2xl">
+                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <h3 class="font-bold text-[#1d1d1f] text-sm">Chat History</h3>
+                            <button onclick="document.getElementById('topic-chat-sidebar').classList.add('-translate-x-full')" class="p-1 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                        </div>
+                        <div class="flex-1 overflow-y-auto p-3 space-y-1">
+                            {% if chat_sessions %}
+                                {% for session in chat_sessions %}
+                                    <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, session_id=session.id) }}" 
+                                       class="block w-full px-3 py-2 rounded-lg text-xs font-medium truncate transition-all {% if active_session_id == session.id %}bg-[#0071e3] text-white shadow-sm font-bold{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                                        {{ session.title }}
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-xs text-gray-400 p-2 text-center mt-4">No history found</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Area -->
+                    <div class="flex-1 flex flex-col min-w-0 bg-white/50 rounded-2xl border border-gray-100 p-0 relative">
+                        <!-- Chat Header with Toggle -->
+                        <div class="absolute top-2 left-2 z-10">
+                            <button onclick="document.getElementById('topic-chat-sidebar').classList.remove('-translate-x-full')" class="p-1.5 rounded-lg bg-white/80 backdrop-blur border border-gray-200 text-gray-500 hover:text-violet-600 hover:bg-white shadow-sm transition-all" title="Toggle History">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                            </button>
+                        </div>
+                        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 p-4 pt-12 text-sm flex flex-col">
+                            {% if chat_messages %}
+                                {% for msg in chat_messages %}
+                                    {% if msg.role == 'user' %}
+                                        <div class="flex justify-end">
+                                            <div class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm whitespace-pre-wrap">{{ msg.content }}</div>
+                                        </div>
+                                    {% else %}
+                                        <div class="flex justify-start relative group">
+                                            <div class="ai-message p-4 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto" data-markdown="{{ msg.content | escape }}"></div>
+                                            <button onclick="copyToClipboard(this)" data-content="{{ msg.content | escape }}" class="absolute -right-2 -bottom-2 opacity-0 group-hover:opacity-100 bg-white border border-gray-200 text-gray-500 rounded-full p-1.5 shadow-sm hover:text-violet-600 transition-all text-xs" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <div class="flex justify-start">
+                                    <div class="p-4 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm max-w-[85%] shadow-sm">
+                                        Hello! Ask me anything about the uploaded materials or this topic.
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <form id="chat-form" class="mt-2 flex space-x-2 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm flex-shrink-0">
+                            <input type="hidden" id="chat-session-id" name="session_id" value="{{ active_session_id or '' }}">
+                            <textarea id="chat-input" rows="1" placeholder="Ask a question..." required class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none overflow-hidden min-h-[40px] max-h-[120px] leading-relaxed"></textarea>
+                            <button type="submit" class="px-5 py-2 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all self-end h-[40px]">Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Archived Study Decks ─────────────────────────────────────── -->
+    {% if archived_notes or archived_quizzes %}
+    <div class="glass-card p-6 border border-gray-200 bg-white rounded-2xl shadow-sm no-print">
+        <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="document.getElementById('archive-body').classList.toggle('hidden')">
+            <h2 class="text-lg font-extrabold text-[#1d1d1f] flex items-center gap-2">
+                🗃️ Archived Study Decks
+                <span class="text-xs font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{{ archived_notes|length + archived_quizzes|length }}</span>
+            </h2>
+            <span class="text-gray-400 text-xs font-medium">Click to expand/collapse</span>
+        </div>
+        <div id="archive-body" class="hidden space-y-4">
+            {% for note in archived_notes %}
+            <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 relative group flex items-start justify-between gap-3" id="archive-note-{{ note.id }}">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Archived Note</span>
+                        <span class="text-[10px] text-gray-400">{{ note.created_at }}</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-gray-600 truncate">{{ note.title }}</h4>
+                    <div class="text-xs text-gray-500 mt-1 line-clamp-2">{{ note.content[:200] }}...</div>
+                </div>
+                <button onclick="deleteArchived('{{ topic.id }}', 'note', '{{ note.id }}')" class="px-3 py-1.5 rounded-full bg-red-50 text-xs font-bold text-red-500 hover:bg-red-100 transition-all flex-shrink-0" title="Delete permanently">
+                    🗑️ Delete
+                </button>
+            </div>
+            {% endfor %}
+            {% for quiz in archived_quizzes %}
+            <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 relative group flex items-start justify-between gap-3" id="archive-quiz-{{ quiz.id }}">
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Archived Quiz</span>
+                        <span class="text-[10px] text-gray-400">{{ quiz.created_at }}</span>
+                    </div>
+                    <h4 class="font-bold text-sm text-gray-600 truncate">{{ quiz.title }}</h4>
+                </div>
+                <button onclick="deleteArchived('{{ topic.id }}', 'quiz', '{{ quiz.id }}')" class="px-3 py-1.5 rounded-full bg-red-50 text-xs font-bold text-red-500 hover:bg-red-100 transition-all flex-shrink-0" title="Delete permanently">
+                    🗑️ Delete
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatBox = document.getElementById('chat-box');
+    
+    // Set Marked.js options
+    if (typeof marked !== 'undefined') {
+        marked.setOptions({ breaks: true, gfm: true });
+        
+        // Render all existing notes
+        document.querySelectorAll('.note-content').forEach(el => {
+            const md = el.getAttribute('data-markdown');
+            if (md) el.innerHTML = parseMarkdownWithMath(md);
+        });
+        
+        // Render all existing chat messages
+        document.querySelectorAll('.ai-message').forEach(el => {
+            const md = el.getAttribute('data-markdown');
+            if (md) {
+                el.innerHTML = parseMarkdownWithMath(md);
+                if (typeof hljs !== 'undefined') {
+                    el.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                }
+                addCodeCopyButtons(el);
+            }
+        });
+        
+        // Typeset math equations
+        if (window.typesetMath) {
+            window.typesetMath();
+        }
+        
+        // Scroll to bottom on load
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    
+    // Auto-expand textarea
+    chatInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    // Shift+Enter to newline, Enter to submit
+    chatInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+    });
+    
+    if (chatForm) {
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            // Append user message
+            const userWrapper = document.createElement('div');
+            userWrapper.className = 'flex justify-end';
+            const userDiv = document.createElement('div');
+            userDiv.className = 'p-2.5 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm';
+            userDiv.innerText = message;
+            userWrapper.appendChild(userDiv);
+            chatBox.appendChild(userWrapper);
+            chatInput.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // Append typing indicator
+            const typingWrapper = document.createElement('div');
+            typingWrapper.className = 'flex justify-start';
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'p-3 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm max-w-[85%] animate-pulse';
+            typingDiv.innerText = 'AI is typing...';
+            typingWrapper.appendChild(typingDiv);
+            chatBox.appendChild(typingWrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // Send to server
+            try {
+                const sessionId = document.getElementById('chat-session-id').value;
+                const bodyParams = new URLSearchParams();
+                bodyParams.append('message', message);
+                if (sessionId) {
+                    bodyParams.append('session_id', sessionId);
+                }
+                
+                const response = await fetch('{{ url_for("study.chat_with_topic", topic_id=topic.id) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: bodyParams.toString()
+                });
+                const data = await response.json();
+                
+                if (data.session_id && !document.getElementById('chat-session-id').value) {
+                    document.getElementById('chat-session-id').value = data.session_id;
+                }
+                
+                // Remove typing indicator with actual AI response
+                typingWrapper.remove();
+                
+                const aiWrapper = document.createElement('div');
+                aiWrapper.className = 'flex justify-start';
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'p-3 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto';
+                
+                if (data.response && typeof marked !== 'undefined') {
+                    aiDiv.innerHTML = parseMarkdownWithMath(data.response);
+                    // Apply highlighting if available
+                    if (typeof hljs !== 'undefined') {
+                        aiDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                    }
+                    addCodeCopyButtons(aiDiv);
+                } else {
+                    aiDiv.innerText = data.response || data.error || 'No response received.';
+                }
+                
+                aiWrapper.appendChild(aiDiv);
+                chatBox.appendChild(aiWrapper);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+                // Typeset new math equations
+                if (window.typesetMath) {
+                    window.typesetMath(aiDiv);
+                }
+            } catch (err) {
+                typingDiv.innerText = 'Failed to connect. Please try again.';
+                typingDiv.classList.remove('animate-pulse');
+                typingDiv.classList.add('text-red-500', 'bg-red-50', 'border-red-200');
+                console.error(err);
+            }
+        });
+    }
+});
+</script>
+
+<script>
+// Bookmark Toggle
+async function toggleBookmark(topicId) {
+    const btn = document.getElementById('bookmark-btn');
+    const icon = document.getElementById('bookmark-icon');
+    const text = document.getElementById('bookmark-text');
+
+    try {
+        const response = await fetch(`/topic/${topicId}/bookmark`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+
+        if (data.bookmarked) {
+            icon.textContent = '🔖';
+            text.textContent = 'Bookmarked';
+        } else {
+            icon.textContent = '📑';
+            text.textContent = 'Bookmark';
+        }
+    } catch (err) {
+        console.error('Bookmark toggle failed:', err);
+    }
+}
+
+async function toggleComplete(topicId) {
+    try {
+        const response = await fetch(`/topic/${topicId}/complete`, { method: 'POST' });
+        const data = await response.json();
+        if (data.success) {
+            const btn = document.getElementById('complete-btn');
+            const icon = document.getElementById('complete-icon');
+            const text = document.getElementById('complete-text');
+            
+            if (data.is_completed) {
+                icon.innerText = '✅';
+                text.innerText = 'Completed';
+                btn.classList.remove('bg-white', 'text-[#1d1d1f]');
+                btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
+            } else {
+                icon.innerText = '⭕';
+                text.innerText = 'Mark Complete';
+                btn.classList.remove('bg-emerald-500', 'text-white', 'border-emerald-500');
+                btn.classList.add('bg-white', 'text-[#1d1d1f]');
+            }
+        }
+    } catch (err) {
+        console.error('Complete toggle failed:', err);
+    }
+}
+
+// Copy to clipboard function for total response
+function copyToClipboard(button) {
+    const content = button.getAttribute('data-content');
+    if (content) {
+        navigator.clipboard.writeText(content).then(() => {
+            const originalTitle = button.title;
+            button.title = 'Copied!';
+            button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            setTimeout(() => {
+                button.title = originalTitle;
+                button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+            }, 2000);
+        });
+    }
+}
+
+function addCodeCopyButtons(container) {
+    container.querySelectorAll('pre').forEach(pre => {
+        if (pre.querySelector('.copy-code-btn')) return;
+        pre.style.position = 'relative';
+        const btn = document.createElement('button');
+        btn.className = 'copy-code-btn absolute top-2 right-2 bg-gray-700/50 hover:bg-gray-700 text-white p-1.5 rounded transition-colors shadow-sm';
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+        btn.onclick = () => {
+            const codeNode = pre.querySelector('code');
+            if(codeNode) {
+                navigator.clipboard.writeText(codeNode.innerText);
+                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-400"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                setTimeout(() => {
+                    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+                }, 2000);
+            }
+        };
+        pre.appendChild(btn);
+    });
+}
+
+// Print Notes as PDF
+function printNotes() {
+    window.print();
+}
+
+// Delete Archived Item
+async function deleteArchived(topicId, itemType, itemId) {
+    if (!confirm('Permanently delete this archived item?')) return;
+    try {
+        const response = await fetch(`/topic/${topicId}/archive/${itemType}/${itemId}/delete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        if (data.success) {
+            const el = document.getElementById(`archive-${itemType}-${itemId}`);
+            if (el) {
+                el.style.transition = 'opacity 0.3s, transform 0.3s';
+                el.style.opacity = '0';
+                el.style.transform = 'translateX(20px)';
+                setTimeout(() => el.remove(), 300);
+            }
+        }
+    } catch (err) {
+        console.error('Delete archived failed:', err);
+    }
+}
+</script>
+
+<!-- Print Styles with Watermark -->
+<style>
+    @media print {
+        @page {
+            margin: 1cm; /* Adjust margins to hide browser default headers and footers, or use 0 and pad body */
+        }
+        
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Hide everything except the printable notes */
+        body * { visibility: hidden; }
+        
+        #printable-notes, #printable-notes * { visibility: visible; }
+        
+        #printable-notes { 
+            position: absolute; 
+            left: 0; 
+            top: 0; 
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* Show print header */
+        .print-header { display: block !important; visibility: visible !important; }
+        
+        /* Hide non-print elements */
+        .no-print, .no-print * { display: none !important; visibility: hidden !important; }
+        
+        /* Watermark that repeats on every page */
+        body::before {
+            content: 'Helix';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            font-size: 80px;
+            font-weight: 900;
+            color: rgba(0, 113, 227, 0.08); /* slight blue tint */
+            z-index: 9999;
+            pointer-events: none;
+            letter-spacing: 8px;
+            white-space: nowrap;
+            visibility: visible;
+        }
+        
+        /* Clean prose styling for print */
+        .prose { font-size: 12pt; line-height: 1.6; color: #000; }
+        .prose h1 { font-size: 20pt; margin-top: 16pt; color: #0071e3 !important; }
+        .prose h2 { font-size: 16pt; margin-top: 14pt; color: #1d1d1f !important; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+        .prose h3 { font-size: 14pt; margin-top: 12pt; }
+        .prose code { background: #f0f0f0 !important; padding: 2px 4px; border-radius: 3px; color: #d63384 !important; }
+        .prose pre { background: #f8f9fa !important; padding: 12px !important; border-radius: 6px; overflow: visible !important; white-space: pre-wrap !important; word-wrap: break-word !important; border: 1px solid #e9ecef !important; }
+        .prose pre code { background: transparent !important; color: #212529 !important; padding: 0 !important; }
+        .prose pre * { color: #212529 !important; } /* Force highlight.js spans to print darkly */
+        
+        /* Page break after each note section if needed */
+        .note-content { page-break-inside: auto; }
+        h1, h2, h3 { page-break-after: avoid; }
+    }
+
+    /* Screen Styles for AI Notes (Premium Markdown Rendering) */
+    @media screen {
+        .note-content h1 {
+            font-size: 1.75rem;
+            font-weight: 900;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #0071e3 0%, #4facfe 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 2px solid #f0f4f8;
+            padding-bottom: 0.5rem;
+        }
+        .note-content h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-top: 1.75rem;
+            margin-bottom: 0.75rem;
+            color: #1d1d1f;
+            display: flex;
+            align-items: center;
+        }
+        .note-content h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1.2em;
+            background-color: #0071e3;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        .note-content h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #4b5563;
+        }
+        .note-content blockquote {
+            border-left: 4px solid #0071e3;
+            background: linear-gradient(to right, rgba(0, 113, 227, 0.05), transparent);
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #4b5563;
+        }
+        .note-content ul {
+            list-style-type: none;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .note-content ul li {
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        .note-content ul li::before {
+            content: '•';
+            color: #0071e3;
+            font-weight: bold;
+            font-size: 1.5em;
+            position: absolute;
+            left: -1rem;
+            top: -0.2rem;
+        }
+        .note-content ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .note-content ol li::marker {
+            color: #0071e3;
+            font-weight: 700;
+        }
+        .note-content code:not(pre code) {
+            background-color: rgba(0, 113, 227, 0.08);
+            color: #c2410c;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .note-content pre {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.25rem;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .note-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9em;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .note-content th {
+            background-color: #f8fafc;
+            color: #334155;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.75rem 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            text-align: left;
+        }
+        .note-content td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .note-content tr:last-child td {
+            border-bottom: none;
+        }
+        .note-content tr:hover td {
+            background-color: #f8fafc;
+        }
+    }
+
+    /* Line clamp for archived items */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
+{% endblock %}

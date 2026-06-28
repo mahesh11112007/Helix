@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Search - Helix AI{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-8">
+    <!-- Search Header -->
+    <div class="text-center space-y-2 pt-4">
+        <h1 class="text-3xl font-bold font-outfit text-[#1d1d1f]">
+            Search Library
+        </h1>
+        <p class="text-sm text-gray-500">Find subjects, topics, notes, and files across your study library.</p>
+    </div>
+
+    <!-- Search Form -->
+    <form action="/search" method="GET" class="relative">
+        <div class="glass-card p-2 flex items-center gap-2">
+            <span class="pl-3 text-lg opacity-50">🔍</span>
+            <input
+                type="text"
+                name="q"
+                value="{{ query or '' }}"
+                placeholder="Search subjects, topics, notes, files..."
+                autofocus
+                class="flex-1 px-3 py-3 bg-transparent text-base focus:outline-none placeholder:opacity-40"
+            >
+            <button type="submit" class="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-sm font-bold text-white transition shrink-0">
+                Search
+            </button>
+        </div>
+    </form>
+
+    {% if query %}
+        <!-- Results -->
+        <div class="space-y-8">
+            <!-- Subjects -->
+            {% if results.subjects %}
+            <div>
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 font-outfit">
+                    <span class="w-8 h-8 rounded-lg bg-violet-600/20 flex items-center justify-center text-sm">📚</span>
+                    Subjects
+                    <span class="text-xs opacity-50 font-normal ml-1">({{ results.subjects|length }})</span>
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {% for subject in results.subjects %}
+                    <a href="/subject/{{ subject.id }}" class="glass-card p-4 rounded-xl border border-white/5 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-200 group block">
+                        <h3 class="font-bold text-violet-300 group-hover:text-violet-200 transition">{{ subject.name }}</h3>
+                        {% if subject.semester_name %}
+                        <span class="text-xs opacity-50 mt-1 block">{{ subject.semester_name }}</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Topics -->
+            {% if results.topics %}
+            <div>
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 font-outfit">
+                    <span class="w-8 h-8 rounded-lg bg-indigo-600/20 flex items-center justify-center text-sm">📖</span>
+                    Topics
+                    <span class="text-xs opacity-50 font-normal ml-1">({{ results.topics|length }})</span>
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {% for topic in results.topics %}
+                    <a href="/topic/{{ topic.id }}" class="glass-card p-4 rounded-xl border border-white/5 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-200 group block">
+                        <h3 class="font-bold text-indigo-300 group-hover:text-indigo-200 transition">{{ topic.name }}</h3>
+                        {% if topic.subject_name %}
+                        <span class="text-xs opacity-50 mt-1 block">{{ topic.subject_name }}</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Notes -->
+            {% if results.notes %}
+            <div>
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 font-outfit">
+                    <span class="w-8 h-8 rounded-lg bg-emerald-600/20 flex items-center justify-center text-sm">📝</span>
+                    Notes
+                    <span class="text-xs opacity-50 font-normal ml-1">({{ results.notes|length }})</span>
+                </h2>
+                <div class="space-y-3">
+                    {% for note in results.notes %}
+                    <div class="glass-card p-4 rounded-xl border border-white/5">
+                        <h3 class="font-bold text-emerald-300 text-sm">{{ note.title }}</h3>
+                        {% if note.content %}
+                        <p class="text-xs opacity-60 mt-2 line-clamp-2">{{ note.content[:200] }}{% if note.content|length > 200 %}...{% endif %}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Files -->
+            {% if results.files %}
+            <div>
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 font-outfit">
+                    <span class="w-8 h-8 rounded-lg bg-amber-600/20 flex items-center justify-center text-sm">📁</span>
+                    Files
+                    <span class="text-xs opacity-50 font-normal ml-1">({{ results.files|length }})</span>
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {% for file in results.files %}
+                    <div class="glass-card p-4 rounded-xl border border-white/5">
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-lg bg-amber-600/20 flex items-center justify-center text-lg shrink-0">📄</span>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-amber-300 text-sm truncate">{{ file.name }}</h3>
+                                {% if file.file_type %}
+                                <span class="text-[10px] uppercase opacity-50 font-bold">{{ file.file_type }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- No Results -->
+            {% if not results.subjects and not results.topics and not results.notes and not results.files %}
+            <div class="text-center py-16">
+                <div class="text-5xl mb-4">🔍</div>
+                <h3 class="text-xl font-bold opacity-70 mb-2">No results found</h3>
+                <p class="text-sm opacity-50">Try a different search term or check your spelling.</p>
+            </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <!-- Initial State -->
+        <div class="text-center py-16">
+            <div class="text-5xl mb-4">📚</div>
+            <h3 class="text-xl font-bold opacity-70 mb-2">Start searching</h3>
+            <p class="text-sm opacity-50">Type a keyword to search across all your study materials.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ subject.name }} - Helix AI{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Breadcrumb -->
+    <div class="text-sm opacity-70">
+        <a href="{{ url_for('dashboard.index') }}" class="hover:underline">Dashboard</a> &rarr; 
+        <a href="{{ url_for('dashboard.view_semester', sem_id=subject.semester_id) }}" class="hover:underline">Semester</a> &rarr;
+        <span class="font-bold text-[#0071e3]">{{ subject.name }}</span>
+    </div>
+
+    <!-- Subject Header -->
+    <div class="glass-card p-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <span class="text-xs uppercase font-bold text-[#0071e3] tracking-wider">{{ subject.code or "No Code" }}</span>
+            <h1 class="text-3xl font-extrabold text-[#1d1d1f] mt-1">{{ subject.name }}</h1>
+        </div>
+        
+        <!-- Quick Add Unit Form -->
+        <form action="{{ url_for('dashboard.add_unit', sub_id=subject.id) }}" method="POST" class="flex items-center space-x-2">
+            <input type="number" name="number" placeholder="Unit No." required min="1" class="w-20 px-3 py-2 rounded-full bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
+            <input type="text" name="name" placeholder="Unit Title" required class="px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all w-48">
+            <button type="submit" class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all flex items-center">
+                + Add Unit
+            </button>
+        </form>
+    </div>
+
+    <!-- Units & Topics Section -->
+    {% if units_with_topics %}
+        <div class="space-y-6">
+            {% for entry in units_with_topics %}
+                <!-- Unit Card -->
+                <div class="glass-card overflow-hidden border border-gray-200">
+                    <div class="bg-gray-50 border-b border-gray-200 p-4 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center font-bold text-[#0071e3] shadow-sm">
+                                {{ entry.unit.number }}
+                            </div>
+                            <h2 class="text-lg font-bold text-[#1d1d1f]">{{ entry.unit.name }}</h2>
+                        </div>
+                        
+                        <!-- Add Topic Form -->
+                        <form action="{{ url_for('dashboard.add_topic', unit_id=entry.unit.id) }}" method="POST" class="flex items-center space-x-2">
+                            <input type="text" name="name" placeholder="New Topic Name" required class="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs focus:outline-none focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]/30 text-[#1d1d1f] transition-all">
+                            <button type="submit" class="px-3 py-1.5 rounded-full bg-gray-200 hover:bg-gray-300 text-xs font-semibold text-gray-700 transition">Add</button>
+                        </form>
+                    </div>
+
+                    <!-- Topics list -->
+                    {% if entry.topics %}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                            {% for topic in entry.topics %}
+                                <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id) }}" class="p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-[#0071e3]/30 hover:shadow-sm hover:-translate-y-0.5 transition-all flex items-center justify-between group">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-2 h-2 rounded-full {% if topic.is_completed %}bg-green-500{% else %}bg-gray-300 group-hover:bg-[#0071e3]/50{% endif %}"></div>
+                                        <span class="font-medium text-sm text-[#1d1d1f]">{{ topic.name }}</span>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-xs text-gray-400 italic">No topics added to this unit yet.</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-12 border-2 border-dashed border-gray-200 rounded-2xl bg-white">
+            <p class="text-gray-500 font-medium">No units added yet.</p>
+            <p class="text-xs text-gray-400 mt-1">Use the form above to add your first unit.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

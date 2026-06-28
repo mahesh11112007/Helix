@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}AI Explanation - Helix AI{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-4xl mx-auto">
+    <!-- Breadcrumb -->
+    <div class="text-sm text-gray-500">
+        <a href="{{ url_for('dashboard.index') }}" class="hover:underline">Dashboard</a> &rarr; 
+        <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id) }}" class="hover:underline">{{ topic.name }}</a> &rarr;
+        <span class="font-bold text-[#0071e3]">AI Explanation</span>
+    </div>
+
+    <!-- Configuration Panel -->
+    <div class="glass-card p-6 border border-gray-200 bg-white rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-sm">
+        <div>
+            <h1 class="text-2xl font-extrabold text-[#1d1d1f]">AI Tutor: {{ topic.name }}</h1>
+            <p class="text-xs text-gray-500 mt-1">Configure level and language for custom explanations.</p>
+        </div>
+
+        <form id="explain-form" class="flex flex-wrap items-center gap-3">
+            <div>
+                <label class="block text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1">Expertise Level</label>
+                <select id="level-select" class="px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
+                    <option value="beginner" {% if level == 'beginner' %}selected{% endif %}>Beginner (Analogies)</option>
+                    <option value="intermediate" {% if level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                    <option value="expert" {% if level == 'expert' %}selected{% endif %}>Expert / Technical</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1">Language Mode</label>
+                <select id="language-select" class="px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 text-xs focus:outline-none focus:border-[#0071e3] focus:ring-1 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
+                    <option value="English" {% if language == 'English' %}selected{% endif %}>English Only</option>
+                    <option value="Telugu + English" {% if language == 'Telugu + English' %}selected{% endif %}>Telugu + English (Tanglish)</option>
+                </select>
+            </div>
+            <button type="submit" class="mt-4 px-4 py-1.5 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-xs font-bold text-white transition-all shadow-sm flex items-center gap-2">
+                <span id="refresh-text">Refresh</span>
+                <svg id="refresh-spinner" class="hidden animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <!-- Output Explanation -->
+    <div class="glass-card p-8 border border-gray-200 bg-white shadow-sm rounded-2xl leading-relaxed min-h-[400px]">
+        
+        <!-- Skeleton Loader -->
+        <div id="skeleton-loader" class="space-y-6 animate-pulse">
+            <div class="h-6 bg-gray-200 rounded w-1/4"></div>
+            <div class="space-y-3">
+                <div class="h-4 bg-gray-100 rounded"></div>
+                <div class="h-4 bg-gray-100 rounded w-5/6"></div>
+            </div>
+            <div class="h-6 bg-gray-200 rounded w-1/3 mt-8"></div>
+            <div class="space-y-3">
+                <div class="h-4 bg-gray-100 rounded"></div>
+                <div class="h-4 bg-gray-100 rounded"></div>
+                <div class="h-4 bg-gray-100 rounded w-4/5"></div>
+            </div>
+            <div class="h-32 bg-gray-50 border border-gray-100 rounded-xl mt-6"></div>
+        </div>
+
+        <!-- Markdown Content Container -->
+        <div id="explanation-content" class="prose max-w-none text-sm text-[#1d1d1f] hidden"></div>
+        
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const topicId = "{{ topic.id }}";
+        const loader = document.getElementById("skeleton-loader");
+        const content = document.getElementById("explanation-content");
+        const form = document.getElementById("explain-form");
+        const refreshText = document.getElementById("refresh-text");
+        const refreshSpinner = document.getElementById("refresh-spinner");
+
+        // Set Marked.js options
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                breaks: true,
+                gfm: true
+            });
+        }
+
+        async function fetchExplanation() {
+            // Show loader
+            loader.classList.remove("hidden");
+            content.classList.add("hidden");
+            content.innerHTML = "";
+            refreshText.textContent = "Loading...";
+            refreshSpinner.classList.remove("hidden");
+
+            const level = document.getElementById("level-select").value;
+            const language = document.getElementById("language-select").value;
+
+            try {
+                const response = await fetch(`/api/topic/${topicId}/explain`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ level, language })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.explanation) {
+                    if (typeof marked !== 'undefined') {
+                        content.innerHTML = parseMarkdownWithMath(data.explanation);
+                        // Apply Syntax Highlighting
+                        if (typeof hljs !== 'undefined') {
+                            document.querySelectorAll('#explanation-content pre code').forEach((block) => {
+                                hljs.highlightElement(block);
+                            });
+                        }
+                        // Typeset math equations
+                        if (window.typesetMath) {
+                            window.typesetMath(content);
+                        }
+                    } else {
+                        // Fallback if marked didn't load
+                        content.textContent = data.explanation;
+                    }
+                } else {
+                    content.innerHTML = `<div class="p-4 bg-red-900/30 text-red-300 rounded-lg border border-red-500/20">Error: ${data.error || "Failed to generate explanation."}</div>`;
+                }
+            } catch (err) {
+                content.innerHTML = `<div class="p-4 bg-red-900/30 text-red-300 rounded-lg border border-red-500/20">Network error occurred while fetching the explanation.</div>`;
+            } finally {
+                // Hide loader, show content
+                loader.classList.add("hidden");
+                content.classList.remove("hidden");
+                content.classList.add("animate-fade-in");
+                refreshText.textContent = "Refresh";
+                refreshSpinner.classList.add("hidden");
+            }
+        }
+
+        // Fetch on initial load
+        fetchExplanation();
+
+        // Fetch on form submit
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            fetchExplanation();
+        });
+    });
+</script>
+{% endblock %}
