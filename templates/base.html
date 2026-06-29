@@ -513,5 +513,50 @@
     <script>
       lucide.createIcons();
     </script>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 z-[200] hidden">
+        <div class="max-w-3xl mx-auto p-4">
+            <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div class="flex items-start gap-3 flex-1">
+                    <div class="p-2 bg-violet-50 rounded-xl text-violet-500 shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-[#1d1d1f] font-semibold">We use cookies</p>
+                        <p class="text-xs text-gray-500 mt-0.5">We use essential cookies only to keep you logged in. No tracking or advertising cookies. <a href="/privacy-policy" class="text-violet-600 hover:text-violet-700 underline underline-offset-2">Learn more</a></p>
+                    </div>
+                </div>
+                <div class="flex gap-2 shrink-0 w-full sm:w-auto">
+                    <button onclick="acceptCookies()" class="flex-1 sm:flex-none px-5 py-2 rounded-full bg-[#1d1d1f] hover:bg-black text-white text-sm font-semibold transition-all">
+                        Accept
+                    </button>
+                    <button onclick="acceptCookies()" class="flex-1 sm:flex-none px-5 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-[#1d1d1f] text-sm font-semibold transition-all">
+                        Got it
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            if (!localStorage.getItem('cookie_consent')) {
+                setTimeout(function() {
+                    document.getElementById('cookie-banner').classList.remove('hidden');
+                    document.getElementById('cookie-banner').style.animation = 'slideUp 0.3s ease-out';
+                }, 1000);
+            }
+        })();
+        function acceptCookies() {
+            localStorage.setItem('cookie_consent', 'accepted');
+            const banner = document.getElementById('cookie-banner');
+            banner.style.animation = 'slideDown 0.3s ease-in forwards';
+            setTimeout(function() { banner.classList.add('hidden'); }, 300);
+        }
+    </script>
+    <style>
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes slideDown { from { transform: translateY(0); opacity: 1; } to { transform: translateY(100%); opacity: 0; } }
+    </style>
 </body>
 </html>
