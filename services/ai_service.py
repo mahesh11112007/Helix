@@ -32,12 +32,14 @@ class AIService:
         keys_str = ""
         ai_platform = "nvidia"
         # Try to get from database first if in a request context
+        is_fallback = True
         try:
             if "user_id" in session:
                 profile = db_service.query("SELECT api_keys, ai_platform FROM profiles WHERE id = ?", (session["user_id"],), one=True)
                 if profile:
                     if profile["api_keys"]:
                         keys_str = profile["api_keys"]
+                        is_fallback = False
                     if "ai_platform" in profile.keys() and profile["ai_platform"]:
                         ai_platform = profile["ai_platform"]
         except RuntimeError:
@@ -54,9 +56,9 @@ class AIService:
                 pass
                 
             if tier == "premium":
-                keys_str = os.getenv("NVIDIA_NIM_PAID_API_KEY") or os.getenv("NVIDIA_NIM_API_KEYS") or os.getenv("NVIDIA_NIM_API_KEY")
+                keys_str = os.getenv("GLOBAL_AI_API_KEYS") or os.getenv("NVIDIA_NIM_PAID_API_KEY") or os.getenv("NVIDIA_NIM_API_KEYS") or os.getenv("NVIDIA_NIM_API_KEY")
             else:
-                keys_str = os.getenv("NVIDIA_NIM_API_KEYS") or os.getenv("NVIDIA_NIM_API_KEY")
+                keys_str = os.getenv("GLOBAL_AI_API_KEYS") or os.getenv("NVIDIA_NIM_API_KEYS") or os.getenv("NVIDIA_NIM_API_KEY")
             
         if not keys_str:
             return None, ai_platform
@@ -69,12 +71,25 @@ class AIService:
         key = keys[self._key_index % len(keys)]
         self._key_index = (self._key_index + 1) % max(1, len(keys))
         
+        # Dynamically infer platform for global fallback keys
+        if is_fallback:
+            if key.startswith("nvapi-"):
+                ai_platform = "nvidia"
+            elif key.startswith("AIza"):
+                ai_platform = "gemini"
+            elif key.startswith("gsk_"):
+                ai_platform = "groq"
+            elif key.startswith("sk-"):
+                ai_platform = "openai"
+        
         # Basic validation (if it's completely wrong format, treat as missing)
         if len(key) < 15:
             return None, ai_platform
         if ai_platform == "nvidia" and not key.startswith("nvapi-"):
             return None, ai_platform
         if ai_platform == "openai" and not key.startswith("sk-"):
+            return None, ai_platform
+        if ai_platform == "gemini" and not key.startswith("AIza"):
             return None, ai_platform
             
         return key, ai_platform

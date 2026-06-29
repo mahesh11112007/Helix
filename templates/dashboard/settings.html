@@ -57,6 +57,7 @@
                 <div class="relative">
                     <select id="ai_platform" name="ai_platform" class="appearance-none w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-semibold text-[#1d1d1f]">
                         <option value="nvidia" {% if profile.ai_platform == 'nvidia' %}selected{% endif %}>NVIDIA NIM (Recommended)</option>
+                        <option value="gemini" {% if profile.ai_platform == 'gemini' %}selected{% endif %}>Google Gemini</option>
                         <option value="openai" {% if profile.ai_platform == 'openai' %}selected{% endif %}>OpenAI</option>
                         <option value="groq" {% if profile.ai_platform == 'groq' %}selected{% endif %}>Groq</option>
                         <option value="custom" {% if profile.ai_platform == 'custom' %}selected{% endif %}>KiraakStudy Premium AI</option>
