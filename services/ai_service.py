@@ -84,7 +84,7 @@ class AIService:
                 ai_platform = "openrouter"
             elif key.startswith("nvapi-"):
                 ai_platform = "nvidia"
-            elif key.startswith("AIza"):
+            elif key.startswith("AIza") or key.startswith("AQ."):
                 ai_platform = "gemini"
             elif key.startswith("gsk_"):
                 ai_platform = "groq"
@@ -98,7 +98,7 @@ class AIService:
             return None, ai_platform
         if ai_platform == "openai" and not key.startswith("sk-"):
             return None, ai_platform
-        if ai_platform == "gemini" and not key.startswith("AIza"):
+        if ai_platform == "gemini" and not (key.startswith("AIza") or key.startswith("AQ.")):
             return None, ai_platform
         if ai_platform == "openrouter" and not key.startswith("sk-or-"):
             return None, ai_platform
