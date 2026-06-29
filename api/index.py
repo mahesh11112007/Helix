@@ -7,6 +7,8 @@ load_dotenv()
 
 def create_app():
     app = Flask(__name__, template_folder="../templates", static_folder="../static")
+    from werkzeug.middleware.proxy_fix import ProxyFix
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "supersecretkey")
     
     # Configure Uploads
