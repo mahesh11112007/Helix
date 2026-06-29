@@ -63,6 +63,17 @@ class AIService:
                 env_vars = ["GLOBAL_AI_API_KEYS", "NVIDIA_NIM_API_KEYS", "NVIDIA_NIM_API_KEY", "GEMINI_API_KEYS", "GROQ_API_KEYS", "OPENROUTER_API_KEYS"]
                 
             combined = []
+            
+            # Fetch from DB system_settings
+            try:
+                rows = db_service.query("SELECT key_name, key_value FROM system_settings")
+                if rows:
+                    for row in rows:
+                        if row["key_value"]:
+                            combined.append(row["key_value"])
+            except RuntimeError:
+                pass
+                
             for ev in env_vars:
                 val = os.getenv(ev)
                 if val: combined.append(val)

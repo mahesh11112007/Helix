@@ -141,6 +141,13 @@ class DBService:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"""))
+            # System Settings Table
+            cursor.execute(self._translate_schema("""
+            CREATE TABLE IF NOT EXISTS system_settings (
+                key_name TEXT PRIMARY KEY,
+                key_value TEXT,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )"""))
             
             # Chat Messages Table
             cursor.execute(self._translate_schema("""

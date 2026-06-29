@@ -30,15 +30,17 @@ def create_app():
     from routes.billing import billing_bp
     from routes.chat import chat_bp
     from routes.legal import legal_bp
+    from routes.admin import admin_bp
     
     app.register_blueprint(auth_bp)
+    app.register_blueprint(legal_bp)
+    app.register_blueprint(admin_bp)
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(files_bp)
     app.register_blueprint(planner_bp)
     app.register_blueprint(study_bp)
     app.register_blueprint(billing_bp)
     app.register_blueprint(chat_bp)
-    app.register_blueprint(legal_bp)
     
     @app.route("/debug_session")
     def debug_session():
