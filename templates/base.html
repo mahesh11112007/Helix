@@ -157,14 +157,14 @@
 
         <div class="flex items-center space-x-3 shrink-0">
             {% if current_user %}
-                <a href="{{ url_for('study.paste_syllabus') }}" class="px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition hidden md:inline-flex items-center">
+                <a href="{{ url_for('study.paste_syllabus') }}" class="px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition inline-flex items-center">
                     Import
                 </a>
-                <a href="{{ url_for('planner.view_planner') }}" class="px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition hidden md:inline-flex items-center">
+                <a href="{{ url_for('planner.view_planner') }}" class="px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition inline-flex items-center">
                     Planner
                 </a>
                 {% if current_user.subscription_tier != 'premium' %}
-                <a href="{{ url_for('billing.upgrade_page') }}" class="px-4 py-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-semibold hover:opacity-90 transition hidden md:inline-flex items-center shadow-md shadow-violet-500/20">
+                <a href="{{ url_for('billing.upgrade_page') }}" class="px-4 py-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-semibold hover:opacity-90 transition inline-flex items-center shadow-md shadow-violet-500/20">
                     <i data-lucide="sparkles" class="w-4 h-4 mr-1.5"></i> Upgrade
                 </a>
                 {% endif %}
