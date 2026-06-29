@@ -56,9 +56,17 @@ class AIService:
                 pass
                 
             if tier == "premium":
-                keys_str = os.getenv("GLOBAL_AI_API_KEYS") or os.getenv("NVIDIA_NIM_PAID_API_KEY") or os.getenv("NVIDIA_NIM_API_KEYS") or os.getenv("NVIDIA_NIM_API_KEY")
+                # For premium, we don't fall back to free global keys, but they might be the same. 
+                # Let's just collect all keys from the env.
+                env_vars = ["GLOBAL_AI_API_KEYS", "NVIDIA_NIM_PAID_API_KEY", "NVIDIA_NIM_API_KEYS", "NVIDIA_NIM_API_KEY", "GEMINI_API_KEYS", "GROQ_API_KEYS", "OPENROUTER_API_KEYS"]
             else:
-                keys_str = os.getenv("GLOBAL_AI_API_KEYS") or os.getenv("NVIDIA_NIM_API_KEYS") or os.getenv("NVIDIA_NIM_API_KEY")
+                env_vars = ["GLOBAL_AI_API_KEYS", "NVIDIA_NIM_API_KEYS", "NVIDIA_NIM_API_KEY", "GEMINI_API_KEYS", "GROQ_API_KEYS", "OPENROUTER_API_KEYS"]
+                
+            combined = []
+            for ev in env_vars:
+                val = os.getenv(ev)
+                if val: combined.append(val)
+            keys_str = ",".join(combined)
             
         if not keys_str:
             return None, ai_platform
@@ -73,7 +81,9 @@ class AIService:
         
         # Dynamically infer platform for global fallback keys
         if is_fallback:
-            if key.startswith("nvapi-"):
+            if key.startswith("sk-or-"):
+                ai_platform = "openrouter"
+            elif key.startswith("nvapi-"):
                 ai_platform = "nvidia"
             elif key.startswith("AIza"):
                 ai_platform = "gemini"
@@ -90,6 +100,8 @@ class AIService:
         if ai_platform == "openai" and not key.startswith("sk-"):
             return None, ai_platform
         if ai_platform == "gemini" and not key.startswith("AIza"):
+            return None, ai_platform
+        if ai_platform == "openrouter" and not key.startswith("sk-or-"):
             return None, ai_platform
             
         return key, ai_platform
@@ -126,6 +138,8 @@ class AIService:
             return (key, "https://api.groq.com/openai/v1", "llama-3.3-70b-versatile", "llama-3.2-90b-vision-preview")
         elif platform == "xai":
             return (key, "https://api.x.ai/v1", "grok-beta", "grok-vision-beta")
+        elif platform == "openrouter":
+            return (key, "https://openrouter.ai/api/v1", "google/gemini-2.0-flash-exp:free", "google/gemini-2.0-flash-exp:free")
         elif platform == "custom":
             import os
             return (key, os.getenv("CUSTOM_AI_BASE_URL", "http://localhost:8000/v1"), os.getenv("CUSTOM_AI_MODEL", "llama-3-8b"), os.getenv("CUSTOM_AI_MODEL", "llama-3-8b"))
