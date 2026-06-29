@@ -315,7 +315,7 @@ def update_api_keys():
     from flask import session
     session.pop("api_key_invalid", None)
     
-    flash("API Settings updated successfully.", "success")
+    flash(f"API Settings updated successfully. Received key length: {len(api_keys) if api_keys else 0}, Platform: {ai_platform}", "success")
     return redirect(url_for("dashboard.settings"))
 
 @dashboard_bp.route("/settings/reset", methods=["POST"])
