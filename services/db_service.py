@@ -34,7 +34,7 @@ class DBService:
             current_semester_id TEXT,
             study_streak INTEGER DEFAULT 0,
             api_keys TEXT,
-            ai_platform TEXT DEFAULT 'custom',
+            ai_platform TEXT DEFAULT 'nvidia',
             custom_instructions TEXT DEFAULT '',
             password_hash TEXT,
             google_id TEXT UNIQUE,
@@ -44,7 +44,7 @@ class DBService:
         
         # Add ai_platform column if it doesn't exist
         try:
-            cursor.execute("ALTER TABLE profiles ADD COLUMN ai_platform TEXT DEFAULT 'custom'")
+            cursor.execute("ALTER TABLE profiles ADD COLUMN ai_platform TEXT DEFAULT 'nvidia'")
         except sqlite3.OperationalError:
             pass
             

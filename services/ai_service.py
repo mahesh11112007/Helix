@@ -30,7 +30,7 @@ class AIService:
         import os
         
         keys_str = ""
-        ai_platform = "custom"
+        ai_platform = "nvidia"
         # Try to get from database first if in a request context
         try:
             if "user_id" in session:
