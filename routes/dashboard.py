@@ -29,6 +29,10 @@ def index():
         
     # Get user profile info
     profile = db_service.query("SELECT * FROM profiles WHERE id = ?", (user["id"],), one=True)
+    if not profile:
+        session.clear()
+        flash("Your session is invalid or database was reset. Please log in again.", "error")
+        return redirect(url_for("auth.login"))
     
     # Get semesters
     semesters = db_service.query("SELECT * FROM semesters WHERE user_id = ? ORDER BY created_at DESC", (user["id"],))
