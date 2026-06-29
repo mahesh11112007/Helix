@@ -635,13 +635,28 @@ def get_active_tasks():
     if not user_id:
         return jsonify([])
 
-    # Fetch active tasks (pending or processing)
-    # Also fetch completed/failed tasks from the last 10 seconds to show brief completion toast
-    tasks = db_service.query("""
-        SELECT * FROM background_tasks 
-        WHERE user_id = ? 
-        AND (status IN ('pending', 'processing') OR (status IN ('completed', 'failed') AND strftime('%s', 'now') - strftime('%s', updated_at) < 10))
-        ORDER BY created_at DESC
-    """, (user_id,))
-    
-    return jsonify([dict(t) for t in tasks])
+    try:
+        # Fetch active tasks (pending or processing)
+        # Also fetch completed/failed tasks from the last 10 seconds to show brief completion toast
+        if db_service.use_postgres:
+            tasks = db_service.query("""
+                SELECT * FROM background_tasks 
+                WHERE user_id = ? 
+                AND (status IN ('pending', 'processing') 
+                     OR (status IN ('completed', 'failed') AND updated_at >= NOW() - INTERVAL '10 seconds'))
+                ORDER BY created_at DESC
+            """, (user_id,))
+        else:
+            tasks = db_service.query("""
+                SELECT * FROM background_tasks 
+                WHERE user_id = ? 
+                AND (status IN ('pending', 'processing') 
+                     OR (status IN ('completed', 'failed') AND strftime('%s', 'now') - strftime('%s', updated_at) < 10))
+                ORDER BY created_at DESC
+            """, (user_id,))
+        
+        return jsonify([dict(t) for t in tasks])
+    except Exception as e:
+        print(f"Error fetching active tasks: {e}")
+        return jsonify([])
+
