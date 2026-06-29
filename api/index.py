@@ -11,7 +11,11 @@ def create_app():
     
     # Configure Uploads
     app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "../uploads")
-    os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+    try:
+        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+    except OSError:
+        app.config["UPLOAD_FOLDER"] = "/tmp/uploads"
+        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
     
     # Register blueprints
     from routes.auth import auth_bp
