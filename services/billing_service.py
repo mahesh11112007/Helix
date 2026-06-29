@@ -12,7 +12,11 @@ class BillingService:
         else:
             self.base_url = "https://test.instamojo.com/api/1.1"
 
-    def create_checkout_session(self, user_id, email, success_url, cancel_url):
+    def create_checkout_session(self, user_id, email, phone, success_url, cancel_url):
+        """Creates a payment request with Instamojo API and returns the checkout URL."""
+        if not self.api_key or not self.auth_token:
+            return None
+            
         try:
             headers = {
                 "X-Api-Key": self.api_key,
@@ -24,6 +28,7 @@ class BillingService:
                 "amount": "49", # ₹49
                 "buyer_name": user_id,
                 "email": email,
+                "phone": phone,
                 "redirect_url": success_url,
                 "send_email": True,
                 "allow_repeated_payments": False

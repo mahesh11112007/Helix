@@ -18,7 +18,11 @@ def checkout():
     user = get_current_user()
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
-        
+    phone = request.form.get("phone")
+    if not phone or len(phone) != 10:
+        flash("Please enter a valid 10-digit mobile number.", "error")
+        return redirect(url_for("billing.upgrade_page"))
+
     # Test Mode Simulation
     if not billing_service.api_key or billing_service.api_key == "test_placeholder_api_key":
         # Simulate payment success instantly
@@ -29,7 +33,7 @@ def checkout():
     success_url = request.host_url.rstrip("/") + url_for("billing.success")
     cancel_url = request.host_url.rstrip("/") + url_for("billing.upgrade_page")
     
-    checkout_url = billing_service.create_checkout_session(user["id"], user["email"], success_url, cancel_url)
+    checkout_url = billing_service.create_checkout_session(user["id"], user["email"], phone, success_url, cancel_url)
     
     if checkout_url:
         return redirect(checkout_url)
