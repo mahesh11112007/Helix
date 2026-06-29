@@ -162,10 +162,10 @@ def generate_resources(topic_id):
         (topic_id,)
     )
     
-    # Start the background task
-    task_service.start_generate_materials_task(user_id, [(topic_id, topic["name"], topic["subject_name"])])
+    # Run synchronously on Vercel to prevent thread termination
+    task_service.start_generate_materials_task(user_id, [(topic_id, topic["name"], topic["subject_name"])], run_sync=True)
     
-    flash("AI Study Deck is generating in the background! You will be notified when it's ready.", "success")
+    flash("AI Study Deck generated successfully!", "success")
     return redirect(url_for("dashboard.view_topic", topic_id=topic_id))
 
 from datetime import datetime, timezone, timedelta

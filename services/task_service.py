@@ -9,9 +9,9 @@ class TaskService:
     def __init__(self):
         pass
         
-    def start_generate_materials_task(self, user_id, topics_to_generate):
+    def start_generate_materials_task(self, user_id, topics_to_generate, run_sync=False):
         """
-        Spawns a background thread to generate materials for a list of topics.
+        Spawns a background thread (or runs synchronously) to generate materials for a list of topics.
         Returns the task_id.
         """
         task_id = str(uuid.uuid4())
@@ -24,14 +24,17 @@ class TaskService:
             (task_id, user_id, total_items)
         )
         
-        # Start thread
-        thread = threading.Thread(
-            target=self._generate_materials_worker,
-            args=(task_id, topics_to_generate)
-        )
-        thread.daemon = True
-        thread.start()
-        
+        if run_sync:
+            self._generate_materials_worker(task_id, topics_to_generate)
+        else:
+            # Start thread
+            thread = threading.Thread(
+                target=self._generate_materials_worker,
+                args=(task_id, topics_to_generate)
+            )
+            thread.daemon = True
+            thread.start()
+            
         return task_id
         
     def _generate_materials_worker(self, task_id, topics_to_generate):
