@@ -7,7 +7,7 @@ from supabase import create_client, Client
 class DBService:
     def __init__(self):
         # Vercel Supabase Integration automatically injects POSTGRES_URL
-        self.database_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL")
+        self.database_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or os.getenv("DATABASE_POSTGRES_URL")
         self.use_postgres = bool(self.database_url)
         
         # Keep supabase init just in case it's used elsewhere for storage
