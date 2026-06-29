@@ -205,21 +205,6 @@
 
     <!-- Main Content -->
     <main class="container mx-auto p-4 pb-20 md:pb-4 animate-slide-in">
-        <!-- API Key Warning -->
-        {% if current_user and not has_api_key %}
-        <div class="mb-6 p-4 rounded-2xl bg-orange-50 border border-orange-200 text-orange-800 shadow-sm flex items-start sm:items-center gap-4">
-            <div class="p-2 bg-orange-100 rounded-full text-orange-500 shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-            </div>
-            <div class="flex-1 text-sm">
-                <p class="font-bold text-orange-900 mb-0.5">Missing API Key</p>
-                <p class="opacity-90">AI features like Content Generation and the AI Tutor will not work because your API key is missing.</p>
-                <div class="mt-2 text-xs font-medium bg-orange-100/50 inline-block px-3 py-1.5 rounded-lg border border-orange-200">
-                    To fix this: <a href="/settings" class="text-orange-700 hover:text-orange-900 underline underline-offset-2">Go to Settings</a> &rarr; Scroll to <strong>AI Platform Configuration</strong> &rarr; Enter your API Key.
-                </div>
-            </div>
-        </div>
-        {% endif %}
 
         <!-- Flashed Messages -->
         {% with messages = get_flashed_messages(with_categories=true) %}
