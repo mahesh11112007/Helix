@@ -37,8 +37,19 @@ def chat_with_topic(topic_id):
     # Build context from OCR texts and notes associated with topic
     files = db_service.query("SELECT ocr_text FROM files WHERE topic_id = ? AND ocr_text IS NOT NULL", (topic_id,))
     notes = db_service.query("SELECT content FROM notes WHERE topic_id = ?", (topic_id,))
+    # Fetch topic details for subject context
+    topic_data = db_service.query("""
+        SELECT t.name as topic_name, s.name as subject_name 
+        FROM topics t 
+        JOIN units u ON t.unit_id = u.id 
+        JOIN subjects s ON u.subject_id = s.id 
+        WHERE t.id = ?
+    """, (topic_id,), one=True)
     
     context = ""
+    if topic_data:
+        context += f"Context:\nSubject: {topic_data['subject_name']}\nTopic: {topic_data['topic_name']}\n\n"
+
     for f in files:
         context += f"\nFile Excerpt:\n{f['ocr_text']}"
     for n in notes:
