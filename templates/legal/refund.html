@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Refund and Cancellation Policy - Helix AI{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto animate-fade-in">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="/" class="text-sm text-gray-500 hover:text-[#1d1d1f] transition flex items-center gap-1 mb-4">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+        </a>
+        <h1 class="text-3xl font-extrabold font-outfit text-[#1d1d1f]">Refund and Cancellation Policy</h1>
+        <p class="text-gray-500 text-sm mt-1">Last updated: June 29, 2026</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 p-8 prose prose-sm max-w-none text-gray-700">
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f]">1. Overview</h2>
+        <p>This Refund and Cancellation Policy applies to all paid subscriptions and purchases made on <strong>Helix AI</strong> (KiraakStudy), operated by <strong>Mahesh Vilasagaram</strong>. Payments are processed through <strong>Instamojo</strong>.</p>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">2. Digital Product Nature</h2>
+        <p>Helix AI is a digital SaaS (Software as a Service) product. Upon successful payment, your Premium subscription is activated <strong>immediately</strong> and you gain instant access to all premium features. Since our services are digital in nature and delivered instantly, the following refund terms apply.</p>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">3. Refund Eligibility</h2>
+        <p>Refunds may be granted under the following circumstances:</p>
+        <ul>
+            <li><strong>Duplicate payment:</strong> If you were charged multiple times for the same subscription due to a technical error.</li>
+            <li><strong>Service not delivered:</strong> If payment was debited but the Premium subscription was not activated within 24 hours.</li>
+            <li><strong>Technical failure:</strong> If the platform experiences a critical, prolonged outage (exceeding 72 hours) during your subscription period that we are unable to resolve.</li>
+        </ul>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">4. Refund Not Applicable</h2>
+        <p>Refunds will <strong>not</strong> be provided in the following cases:</p>
+        <ul>
+            <li>Change of mind after purchasing the subscription.</li>
+            <li>Failure to use the platform or its features during the subscription period.</li>
+            <li>Dissatisfaction with AI-generated content quality (as AI outputs may vary).</li>
+            <li>Issues caused by the user's own API key configuration or third-party service downtime.</li>
+            <li>Violation of our Terms and Conditions leading to account suspension.</li>
+        </ul>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">5. How to Request a Refund</h2>
+        <p>To request a refund, please follow these steps:</p>
+        <ol>
+            <li>Send an email to <a href="mailto:vilasagarammahesh90@gmail.com" class="text-violet-600 hover:text-violet-700">vilasagarammahesh90@gmail.com</a> with the subject line: <strong>"Refund Request – [Your Email]"</strong></li>
+            <li>Include the following information:
+                <ul>
+                    <li>Your registered email address</li>
+                    <li>Transaction ID / Payment ID from Instamojo</li>
+                    <li>Date of payment</li>
+                    <li>Reason for the refund request</li>
+                </ul>
+            </li>
+            <li>We will review your request and respond within <strong>3–5 business days</strong>.</li>
+        </ol>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">6. Refund Processing</h2>
+        <ul>
+            <li>Approved refunds will be processed within <strong>5–10 business days</strong> from the date of approval.</li>
+            <li>Refunds will be credited to the original payment method used during the transaction.</li>
+            <li>Processing times may vary depending on your bank or payment provider.</li>
+        </ul>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">7. Cancellation</h2>
+        <ul>
+            <li>You may cancel your Premium subscription at any time by contacting us via email.</li>
+            <li>Upon cancellation, you will continue to have access to Premium features until the end of your current billing period.</li>
+            <li>No partial refunds will be provided for the remaining days of the billing period after cancellation.</li>
+            <li>After cancellation takes effect, your account will revert to the Free Tier.</li>
+        </ul>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">8. Modifications</h2>
+        <p>We reserve the right to update this policy at any time. Changes will be reflected on this page with an updated "Last updated" date. Continued use of the platform after changes constitutes acceptance.</p>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">9. Contact</h2>
+        <p>For refund or cancellation inquiries, please reach out to:</p>
+        <p><strong>Email:</strong> <a href="mailto:vilasagarammahesh90@gmail.com" class="text-violet-600 hover:text-violet-700">vilasagarammahesh90@gmail.com</a></p>
+        <p><strong>Response Time:</strong> Within 24–48 hours on business days.</p>
+
+        <!-- Navigation -->
+        <div class="mt-8 pt-6 border-t border-gray-100 flex flex-wrap gap-3 not-prose">
+            <a href="/contact" class="px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">Contact Us</a>
+            <a href="/terms" class="px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">Terms & Conditions</a>
+            <a href="/privacy-policy" class="px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">Privacy Policy</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

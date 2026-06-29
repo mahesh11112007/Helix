@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Privacy Policy - Helix AI{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto animate-fade-in">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="/" class="text-sm text-gray-500 hover:text-[#1d1d1f] transition flex items-center gap-1 mb-4">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+        </a>
+        <h1 class="text-3xl font-extrabold font-outfit text-[#1d1d1f]">Privacy Policy</h1>
+        <p class="text-gray-500 text-sm mt-1">Last updated: June 29, 2026</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 p-8 prose prose-sm max-w-none text-gray-700">
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f]">1. Introduction</h2>
+        <p><strong>Helix AI</strong> (KiraakStudy), operated by <strong>Mahesh Vilasagaram</strong>, respects your privacy and is committed to protecting your personal data. This Privacy Policy explains how we collect, use, store, and protect your information when you use our platform.</p>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">2. Information We Collect</h2>
+        <h3 class="text-base font-semibold text-[#1d1d1f] mt-4">2.1 Information You Provide</h3>
+        <ul>
+            <li><strong>Account Information:</strong> Name, email address, and password (hashed) when you register.</li>
+            <li><strong>Google Account Data:</strong> Name and email when you sign in with Google (we do not store your Google password).</li>
+            <li><strong>API Keys:</strong> Third-party API keys you voluntarily enter in Settings for AI features (stored securely and encrypted).</li>
+            <li><strong>Academic Content:</strong> Syllabi, notes, documents, and other study materials you upload or create.</li>
+        </ul>
+
+        <h3 class="text-base font-semibold text-[#1d1d1f] mt-4">2.2 Information Collected Automatically</h3>
+        <ul>
+            <li><strong>Usage Data:</strong> Study session durations, feature usage counts, and subscription tier.</li>
+            <li><strong>Session Data:</strong> Cookies used to maintain your login session (essential cookies only).</li>
+        </ul>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">3. How We Use Your Information</h2>
+        <ul>
+            <li>To provide and maintain the Platform's services.</li>
+            <li>To personalize your study experience and AI-generated content.</li>
+            <li>To process payments and manage subscriptions.</li>
+            <li>To communicate important updates about the service.</li>
+            <li>To improve the Platform based on usage patterns.</li>
+        </ul>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">4. Data Sharing</h2>
+        <p>We do <strong>not</strong> sell, rent, or share your personal data with third parties for marketing purposes. We only share data with:</p>
+        <ul>
+            <li><strong>Instamojo:</strong> Payment processing (name and email for transactions).</li>
+            <li><strong>AI Service Providers:</strong> Your study queries are sent to AI models (NVIDIA NIM, OpenAI, or Groq depending on your configuration) for processing. No personally identifiable information is included in AI requests.</li>
+            <li><strong>Supabase:</strong> Database hosting provider — your data is stored securely in their infrastructure.</li>
+            <li><strong>Google:</strong> If you use Google Sign-In, authentication is handled by Google's OAuth service.</li>
+        </ul>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">5. Data Storage and Security</h2>
+        <ul>
+            <li>Your data is stored in a secure PostgreSQL database hosted on <strong>Supabase</strong> (AWS ap-south-1 region, India).</li>
+            <li>Passwords are hashed using industry-standard algorithms and are never stored in plain text.</li>
+            <li>API keys are stored securely in your profile and are only used server-side.</li>
+            <li>All data transmission occurs over HTTPS (TLS encryption).</li>
+        </ul>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">6. Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+            <li><strong>Access:</strong> View your personal data through the Settings page.</li>
+            <li><strong>Update:</strong> Modify your name, API keys, and AI preferences at any time.</li>
+            <li><strong>Delete:</strong> Reset your account data using the "Reset Account Data" feature in Settings, which permanently deletes all your study plans, notes, and generated content.</li>
+            <li><strong>Account Deletion:</strong> Request complete account deletion by emailing us.</li>
+        </ul>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">7. Cookies</h2>
+        <p>We use <strong>essential cookies only</strong> to maintain your login session. We do not use advertising cookies, analytics trackers, or any third-party tracking scripts.</p>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">8. Children's Privacy</h2>
+        <p>The Platform is intended for users aged 13 and above. We do not knowingly collect information from children under 13. If we learn that we have collected data from a child under 13, we will delete it promptly.</p>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">9. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated "Last updated" date. We encourage you to review this page periodically.</p>
+
+        <h2 class="text-lg font-bold font-outfit text-[#1d1d1f] mt-8">10. Contact</h2>
+        <p>If you have questions about this Privacy Policy or wish to exercise your data rights, please contact:</p>
+        <p><strong>Email:</strong> <a href="mailto:vilasagarammahesh90@gmail.com" class="text-violet-600 hover:text-violet-700">vilasagarammahesh90@gmail.com</a></p>
+
+        <!-- Navigation -->
+        <div class="mt-8 pt-6 border-t border-gray-100 flex flex-wrap gap-3 not-prose">
+            <a href="/contact" class="px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">Contact Us</a>
+            <a href="/terms" class="px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">Terms & Conditions</a>
+            <a href="/refund-policy" class="px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">Refund Policy</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

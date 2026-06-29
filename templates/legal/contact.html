@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - Helix AI{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto animate-fade-in">
+    <!-- Header -->
+    <div class="mb-8">
+        <a href="/" class="text-sm text-gray-500 hover:text-[#1d1d1f] transition flex items-center gap-1 mb-4">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Home
+        </a>
+        <h1 class="text-3xl font-extrabold font-outfit text-[#1d1d1f]">Contact Us</h1>
+        <p class="text-gray-500 text-sm mt-1">Get in touch with the Helix AI team.</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 p-8 space-y-8">
+        <!-- Business Info -->
+        <div>
+            <h2 class="text-xl font-bold font-outfit text-[#1d1d1f] mb-4 flex items-center gap-2">
+                <i data-lucide="building-2" class="w-5 h-5 text-gray-400"></i>
+                Business Information
+            </h2>
+            <div class="space-y-3 text-sm text-gray-700">
+                <div class="flex items-start gap-3">
+                    <i data-lucide="briefcase" class="w-4 h-4 text-gray-400 mt-0.5 shrink-0"></i>
+                    <div>
+                        <p class="font-semibold text-[#1d1d1f]">Business Name</p>
+                        <p>Helix AI (KiraakStudy)</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <i data-lucide="user" class="w-4 h-4 text-gray-400 mt-0.5 shrink-0"></i>
+                    <div>
+                        <p class="font-semibold text-[#1d1d1f]">Proprietor</p>
+                        <p>Mahesh Vilasagaram</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-gray-100">
+
+        <!-- Contact Methods -->
+        <div>
+            <h2 class="text-xl font-bold font-outfit text-[#1d1d1f] mb-4 flex items-center gap-2">
+                <i data-lucide="mail" class="w-5 h-5 text-gray-400"></i>
+                Contact Details
+            </h2>
+            <div class="space-y-3 text-sm text-gray-700">
+                <div class="flex items-start gap-3">
+                    <i data-lucide="mail" class="w-4 h-4 text-gray-400 mt-0.5 shrink-0"></i>
+                    <div>
+                        <p class="font-semibold text-[#1d1d1f]">Email</p>
+                        <a href="mailto:vilasagarammahesh90@gmail.com" class="text-violet-600 hover:text-violet-700 transition">vilasagarammahesh90@gmail.com</a>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <i data-lucide="globe" class="w-4 h-4 text-gray-400 mt-0.5 shrink-0"></i>
+                    <div>
+                        <p class="font-semibold text-[#1d1d1f]">Website</p>
+                        <a href="https://helix-drab-zeta.vercel.app" target="_blank" class="text-violet-600 hover:text-violet-700 transition">helix-drab-zeta.vercel.app</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="border-gray-100">
+
+        <!-- Support Hours -->
+        <div>
+            <h2 class="text-xl font-bold font-outfit text-[#1d1d1f] mb-4 flex items-center gap-2">
+                <i data-lucide="clock" class="w-5 h-5 text-gray-400"></i>
+                Support Hours
+            </h2>
+            <div class="text-sm text-gray-700 space-y-1">
+                <p><span class="font-semibold text-[#1d1d1f]">Monday – Saturday:</span> 10:00 AM – 6:00 PM IST</p>
+                <p><span class="font-semibold text-[#1d1d1f]">Sunday:</span> Closed</p>
+                <p class="text-gray-500 mt-2">We typically respond to emails within 24–48 hours on business days.</p>
+            </div>
+        </div>
+
+        <hr class="border-gray-100">
+
+        <!-- Quick Links -->
+        <div>
+            <h2 class="text-xl font-bold font-outfit text-[#1d1d1f] mb-4 flex items-center gap-2">
+                <i data-lucide="link" class="w-5 h-5 text-gray-400"></i>
+                Legal
+            </h2>
+            <div class="flex flex-wrap gap-3">
+                <a href="/terms" class="px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">Terms & Conditions</a>
+                <a href="/refund-policy" class="px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">Refund Policy</a>
+                <a href="/privacy-policy" class="px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">Privacy Policy</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

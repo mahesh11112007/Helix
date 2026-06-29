@@ -29,6 +29,7 @@ def create_app():
     from routes.study import study_bp
     from routes.billing import billing_bp
     from routes.chat import chat_bp
+    from routes.legal import legal_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -37,14 +38,20 @@ def create_app():
     app.register_blueprint(study_bp)
     app.register_blueprint(billing_bp)
     app.register_blueprint(chat_bp)
+    app.register_blueprint(legal_bp)
     
     @app.route("/debug_session")
     def debug_session():
         from flask import session, request
         import os
         from services.db_service import db_service
+        profile = None
+        if session.get("user_id"):
+            profile = db_service.query("SELECT * FROM profiles WHERE id = ?", (session["user_id"],), one=True)
+            
         return {
             "session_data": dict(session),
+            "profile_in_db": dict(profile) if profile else None,
             "env_keys": list(os.environ.keys()),
             "use_postgres_flag": getattr(db_service, "use_postgres", False),
             "db_url_starts_with": str(getattr(db_service, "database_url", ""))[:15],
