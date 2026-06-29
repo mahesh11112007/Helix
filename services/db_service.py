@@ -7,7 +7,10 @@ class DBService:
         self.supabase_url = os.getenv("SUPABASE_URL")
         self.supabase_key = os.getenv("SUPABASE_KEY")
         self.use_supabase = bool(self.supabase_url and self.supabase_key)
-        self.sqlite_db = "kiraak_study.db"
+        if os.environ.get("VERCEL"):
+            self.sqlite_db = "/tmp/kiraak_study.db"
+        else:
+            self.sqlite_db = "kiraak_study.db"
         
         if not self.use_supabase:
             self._init_sqlite()
