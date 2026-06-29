@@ -10,6 +10,8 @@ def create_app():
     from werkzeug.middleware.proxy_fix import ProxyFix
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "supersecretkey")
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     
     # Configure Uploads
     app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "../uploads")
