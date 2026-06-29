@@ -7,7 +7,19 @@ from supabase import create_client, Client
 class DBService:
     def __init__(self):
         # Vercel Supabase Integration automatically injects POSTGRES_URL
-        self.database_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or os.getenv("DATABASE_POSTGRES_URL")
+        url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or os.getenv("DATABASE_POSTGRES_URL")
+        if url and "?" in url:
+            # psycopg2 does not support unknown query params like ?supa=... injected by Vercel
+            import urllib.parse as urlparse
+            parsed = urlparse.urlparse(url)
+            query = urlparse.parse_qs(parsed.query)
+            # Remove unsupported params
+            query.pop("supa", None)
+            query.pop("pgbouncer", None)
+            new_query = urlparse.urlencode(query, doseq=True)
+            url = urlparse.urlunparse(parsed._replace(query=new_query))
+        
+        self.database_url = url
         self.use_postgres = bool(self.database_url)
         
         # Keep supabase init just in case it's used elsewhere for storage
