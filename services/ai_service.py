@@ -31,19 +31,7 @@ class AIService:
         
         keys_str = ""
         ai_platform = "nvidia"
-        # Try to get from database first if in a request context
         is_fallback = True
-        try:
-            if "user_id" in session:
-                profile = db_service.query("SELECT api_keys, ai_platform FROM profiles WHERE id = ?", (session["user_id"],), one=True)
-                if profile:
-                    if profile["api_keys"]:
-                        keys_str = profile["api_keys"]
-                        is_fallback = False
-                    if "ai_platform" in profile.keys() and profile["ai_platform"]:
-                        ai_platform = profile["ai_platform"]
-        except RuntimeError:
-            pass
             
         # Fallback to env
         if not keys_str:
