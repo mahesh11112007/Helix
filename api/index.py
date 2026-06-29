@@ -45,9 +45,9 @@ def create_app():
         from services.db_service import db_service
         return {
             "session_data": dict(session),
-            "has_database_url": bool(os.getenv("DATABASE_URL")),
-            "has_postgres_url": bool(os.getenv("POSTGRES_URL")),
+            "env_keys": list(os.environ.keys()),
             "use_postgres_flag": getattr(db_service, "use_postgres", False),
+            "db_url_starts_with": str(getattr(db_service, "database_url", ""))[:15],
             "cookies": getattr(request, "cookies", {})
         }
     
