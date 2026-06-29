@@ -11,9 +11,9 @@ class UsageService:
                 "daily_chats": 5
             },
             "premium": {
-                "study_decks": 999999,
-                "planner_commands": 999999,
-                "daily_chats": 999999
+                "study_decks": 20,
+                "planner_commands": 20,
+                "daily_chats": 50
             }
         }
 
