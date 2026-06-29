@@ -38,6 +38,19 @@ def create_app():
     app.register_blueprint(billing_bp)
     app.register_blueprint(chat_bp)
     
+    @app.route("/debug_session")
+    def debug_session():
+        from flask import session, request
+        import os
+        from services.db_service import db_service
+        return {
+            "session_data": dict(session),
+            "has_database_url": bool(os.getenv("DATABASE_URL")),
+            "has_postgres_url": bool(os.getenv("POSTGRES_URL")),
+            "use_postgres_flag": getattr(db_service, "use_postgres", False),
+            "cookies": getattr(request, "cookies", {})
+        }
+    
     # Streak updater moved to specific actions in routes/study.py
     
     # Simple global context processor for user sessions
