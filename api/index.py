@@ -66,12 +66,23 @@ def create_app():
         from flask import session
         from services.ai_service import ai_service
         is_invalid = session.get("api_key_invalid", False)
-        return {
-            "current_user": {
-                "id": session.get("user_id"),
+        if "user_id" in session:
+            from services.usage_service import usage_service
+            try:
+                tier = usage_service.get_tier(session["user_id"])
+            except Exception:
+                tier = "free"
+            user_data = {
+                "id": session["user_id"],
                 "email": session.get("email"),
-                "full_name": session.get("full_name")
-            } if "user_id" in session else None,
+                "full_name": session.get("full_name"),
+                "subscription_tier": tier
+            }
+        else:
+            user_data = None
+            
+        return {
+            "current_user": user_data,
             "has_api_key": bool(ai_service.api_key) and not is_invalid,
             "api_key_invalid": is_invalid
         }

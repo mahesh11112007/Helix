@@ -9,6 +9,24 @@
         <p class="text-gray-500 text-sm">Manage your account preferences and API connections.</p>
     </div>
 
+    <!-- Subscription Section -->
+    <div class="glass-card bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-1 text-[#1d1d1f]">
+                <i data-lucide="sparkles" class="w-5 h-5 {% if current_user.subscription_tier == 'premium' %}text-violet-500{% else %}text-gray-500{% endif %}"></i>
+                <h2 class="text-xl font-bold font-outfit">Subscription Plan</h2>
+            </div>
+            <p class="text-sm text-gray-500">
+                Current Plan: <span class="font-bold {% if current_user.subscription_tier == 'premium' %}text-violet-600{% else %}text-gray-700{% endif %} capitalize">{{ current_user.subscription_tier }}</span>
+            </p>
+        </div>
+        {% if current_user.subscription_tier != 'premium' %}
+        <a href="{{ url_for('billing.upgrade_page') }}" class="px-5 py-2.5 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-semibold hover:opacity-90 transition-all shadow-md shadow-violet-500/20 whitespace-nowrap text-center">
+            Upgrade to Premium
+        </a>
+        {% endif %}
+    </div>
+
     <!-- Profile Section -->
     <div class="glass-card bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100">
         <div class="flex items-center gap-2 mb-4 text-[#1d1d1f]">
