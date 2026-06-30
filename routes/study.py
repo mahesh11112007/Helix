@@ -272,8 +272,8 @@ def mini_quiz(topic_id):
     from services.ai_service import ai_service
     from flask import session, jsonify, request
     
-    user = session.get("user")
-    if not user:
+    user_id = session.get("user_id")
+    if not user_id:
         return jsonify({"error": "Not authenticated"}), 401
         
     topic = db_service.query("SELECT * FROM topics WHERE id = ?", (topic_id,), one=True)
@@ -281,7 +281,7 @@ def mini_quiz(topic_id):
         return jsonify({"error": "Topic not found"}), 404
         
     try:
-        profile = db_service.query("SELECT api_keys, ai_platform, is_premium FROM profiles WHERE id = ?", (user["id"],), one=True)
+        profile = db_service.query("SELECT api_keys, ai_platform, is_premium FROM profiles WHERE id = ?", (user_id,), one=True)
         if profile:
             profile = dict(profile)
         key = profile["api_keys"] if profile else None
