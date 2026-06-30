@@ -81,6 +81,11 @@ class TaskService:
                     else:
                         base_url = "https://integrate.api.nvidia.com/v1"
                         chat_model = "meta/llama-3.1-8b-instruct"
+                else:
+                    # Fallback to system default config
+                    key, base_url, chat_model, _ = ai_service._get_config()
+                    if profile and profile.get("custom_instructions"):
+                        custom_instr = profile["custom_instructions"]
             
             completed = 0
             
