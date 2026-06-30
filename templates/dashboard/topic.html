@@ -1,103 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ topic.name }} - KiraakStudy AI
-<!-- Floating Chat Widget -->
-<div id="floating-chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end no-print">
-    <!-- Chat Window -->
-    <div id="floating-chat-window" class="hidden bg-white/90 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-2xl w-[380px] h-[550px] mb-4 flex flex-col overflow-hidden transition-all duration-300 transform scale-95 origin-bottom-right">
-        <!-- Header -->
-        <div id="floating-chat-header" class="p-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center cursor-move">
-            <h3 class="font-bold text-[#1d1d1f] flex items-center gap-2"><span>💬</span> Notes Chat</h3>
-            <div class="flex items-center gap-2">
-                <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}" class="text-xs text-[#0071e3] hover:underline font-semibold">New Chat</a>
-                <button onclick="toggleChatWindow()" class="text-gray-400 hover:text-gray-600">✖</button>
-            </div>
-        </div>
-        
-        <!-- Chat Body -->
-        <div id="chat-box" class="flex-1 p-4 overflow-y-auto custom-scroll space-y-4">
-            {% if chat_history %}
-            {% for msg in chat_history %}
-            {% if msg.role == 'user' %}
-            <div class="flex justify-end">
-                <div class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm">{{ msg.content }}</div>
-            </div>
-            {% else %}
-            <div class="flex justify-start relative group">
-                <div class="ai-message p-3 rounded-2xl rounded-bl-sm bg-gray-50 border border-gray-200 text-gray-800 text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto" data-markdown="{{ msg.content | escape }}"></div>
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% else %}
-            <div class="flex justify-start">
-                <div class="p-3 rounded-2xl rounded-bl-sm bg-gray-50 border border-gray-200 text-gray-800 text-sm max-w-[85%] shadow-sm">
-                    Hello! Ask me anything about this topic or attached files.
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        
-        <!-- Chat Input -->
-        <form id="chat-form" class="p-3 bg-white border-t border-gray-200">
-            <input type="hidden" id="chat-session-id" name="session_id" value="{{ active_session_id or '' }}">
-            <div class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl p-1">
-                <textarea id="chat-input" rows="1" placeholder="Ask a question..." required class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none min-h-[36px] max-h-[100px]"></textarea>
-                <button type="submit" class="p-2 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] text-white transition-all shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
-            </div>
-        </form>
-    </div>
-    
-    <!-- Floating Button -->
-    <button onclick="toggleChatWindow()" id="floating-chat-btn" class="w-14 h-14 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white shadow-lg shadow-[#0071e3]/30 flex items-center justify-center text-2xl transition-transform hover:scale-110 active:scale-95 border-2 border-white/20">
-        💬
-    </button>
-</div>
 
-<script>
-    function toggleChatWindow() {
-        const win = document.getElementById('floating-chat-window');
-        if (win.classList.contains('hidden')) {
-            win.classList.remove('hidden');
-            setTimeout(() => {
-                win.classList.remove('scale-95', 'opacity-0');
-                win.classList.add('scale-100', 'opacity-100');
-            }, 10);
-            document.getElementById('chat-input').focus();
-        } else {
-            win.classList.remove('scale-100', 'opacity-100');
-            win.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                win.classList.add('hidden');
-            }, 300);
-        }
-    }
-    
-    // Draggable Logic
-    const header = document.getElementById('floating-chat-header');
-    const widget = document.getElementById('floating-chat-widget');
-    let isDragging = false;
-    let offsetX, offsetY;
-    
-    header.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        const rect = widget.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        widget.style.bottom = 'auto';
-        widget.style.right = 'auto';
-    });
-    
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        widget.style.left = (e.clientX - offsetX) + 'px';
-        widget.style.top = (e.clientY - offsetY) + 'px';
-    });
-    
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
-</script>
 
 {% endblock %}
 
@@ -331,26 +234,44 @@
                     </select>
                 </div>
 
-                <!-- AI Tutor -->
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500">Ask AI Assistant</h3>
-                        <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}" class="text-xs text-[#0071e3] hover:underline">+ New Chat</a>
+                <!-- AI Tutor Chat Embed -->
+                <div class="flex flex-col h-[500px] border border-gray-200 rounded-2xl overflow-hidden mt-4 shadow-sm bg-gray-50">
+                    <div class="p-4 border-b border-gray-200 bg-white flex justify-between items-center">
+                        <h3 class="font-bold text-[#1d1d1f] flex items-center gap-2"><span>💬</span> AI Assistant</h3>
+                        <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}" class="text-xs px-2 py-1 bg-gray-100 rounded text-[#0071e3] hover:bg-gray-200 font-semibold transition-colors">+ New</a>
                     </div>
-                    <div class="space-y-2">
-                        {% if chat_sessions %}
-                            {% for session in chat_sessions[:3] %}
-                                <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, session_id=session.id) }}" class="block p-3 rounded-xl bg-gray-50 hover:bg-[#333] border border-gray-200 text-sm text-gray-600 truncate">
-                                    💬 {{ session.title }}
-                                </a>
-                            {% endfor %}
+                    
+                    <div id="chat-box" class="flex-1 p-4 overflow-y-auto custom-scroll space-y-4">
+                        {% if chat_history %}
+                        {% for msg in chat_history %}
+                        {% if msg.role == 'user' %}
+                        <div class="flex justify-end">
+                            <div class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm">{{ msg.content }}</div>
+                        </div>
                         {% else %}
-                            <p class="text-sm text-gray-500 italic">No chats yet. Click "AI Tutor Explain" to ask questions.</p>
+                        <div class="flex justify-start relative group">
+                            <div class="ai-message p-3 rounded-2xl rounded-bl-sm bg-white border border-gray-200 text-gray-800 text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto" data-markdown="{{ msg.content | escape }}"></div>
+                        </div>
                         {% endif %}
-                        <a href="{{ url_for('study.explain_topic_ai', topic_id=topic.id) }}" class="block w-full text-center mt-2 px-4 py-3 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-all">
-                            Start AI Tutor
-                        </a>
+                        {% endfor %}
+                        {% else %}
+                        <div class="flex justify-start">
+                            <div class="p-3 rounded-2xl rounded-bl-sm bg-white border border-gray-200 text-gray-800 text-sm max-w-[85%] shadow-sm">
+                                Hello! Ask me anything about this topic or attached files.
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
+                    
+                    <form id="chat-form" class="p-3 bg-white border-t border-gray-200">
+                        <input type="hidden" id="chat-session-id" name="session_id" value="{{ active_session_id or '' }}">
+                        <div class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl p-1">
+                            <textarea id="chat-input" rows="1" placeholder="Ask a question..." required class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none min-h-[36px] max-h-[100px]"></textarea>
+                            <button type="submit" class="p-2 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] text-white transition-all shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </aside>
@@ -825,103 +746,6 @@ const chatForm = document.getElementById('chat-form');
 
 </script>
 
-<!-- Floating Chat Widget -->
-<div id="floating-chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end no-print">
-    <!-- Chat Window -->
-    <div id="floating-chat-window" class="hidden bg-white/90 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-2xl w-[380px] h-[550px] mb-4 flex flex-col overflow-hidden transition-all duration-300 transform scale-95 origin-bottom-right">
-        <!-- Header -->
-        <div id="floating-chat-header" class="p-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center cursor-move">
-            <h3 class="font-bold text-[#1d1d1f] flex items-center gap-2"><span>💬</span> Notes Chat</h3>
-            <div class="flex items-center gap-2">
-                <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}" class="text-xs text-[#0071e3] hover:underline font-semibold">New Chat</a>
-                <button onclick="toggleChatWindow()" class="text-gray-400 hover:text-gray-600">✖</button>
-            </div>
-        </div>
-        
-        <!-- Chat Body -->
-        <div id="chat-box" class="flex-1 p-4 overflow-y-auto custom-scroll space-y-4">
-            {% if chat_history %}
-            {% for msg in chat_history %}
-            {% if msg.role == 'user' %}
-            <div class="flex justify-end">
-                <div class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm">{{ msg.content }}</div>
-            </div>
-            {% else %}
-            <div class="flex justify-start relative group">
-                <div class="ai-message p-3 rounded-2xl rounded-bl-sm bg-gray-50 border border-gray-200 text-gray-800 text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto" data-markdown="{{ msg.content | escape }}"></div>
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% else %}
-            <div class="flex justify-start">
-                <div class="p-3 rounded-2xl rounded-bl-sm bg-gray-50 border border-gray-200 text-gray-800 text-sm max-w-[85%] shadow-sm">
-                    Hello! Ask me anything about this topic or attached files.
-                </div>
-            </div>
-            {% endif %}
-        </div>
-        
-        <!-- Chat Input -->
-        <form id="chat-form" class="p-3 bg-white border-t border-gray-200">
-            <input type="hidden" id="chat-session-id" name="session_id" value="{{ active_session_id or '' }}">
-            <div class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl p-1">
-                <textarea id="chat-input" rows="1" placeholder="Ask a question..." required class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none min-h-[36px] max-h-[100px]"></textarea>
-                <button type="submit" class="p-2 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] text-white transition-all shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
-            </div>
-        </form>
-    </div>
-    
-    <!-- Floating Button -->
-    <button onclick="toggleChatWindow()" id="floating-chat-btn" class="w-14 h-14 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white shadow-lg shadow-[#0071e3]/30 flex items-center justify-center text-2xl transition-transform hover:scale-110 active:scale-95 border-2 border-white/20">
-        💬
-    </button>
-</div>
 
-<script>
-    function toggleChatWindow() {
-        const win = document.getElementById('floating-chat-window');
-        if (win.classList.contains('hidden')) {
-            win.classList.remove('hidden');
-            setTimeout(() => {
-                win.classList.remove('scale-95', 'opacity-0');
-                win.classList.add('scale-100', 'opacity-100');
-            }, 10);
-            document.getElementById('chat-input').focus();
-        } else {
-            win.classList.remove('scale-100', 'opacity-100');
-            win.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                win.classList.add('hidden');
-            }, 300);
-        }
-    }
-    
-    // Draggable Logic
-    const header = document.getElementById('floating-chat-header');
-    const widget = document.getElementById('floating-chat-widget');
-    let isDragging = false;
-    let offsetX, offsetY;
-    
-    header.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        const rect = widget.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        widget.style.bottom = 'auto';
-        widget.style.right = 'auto';
-    });
-    
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        widget.style.left = (e.clientX - offsetX) + 'px';
-        widget.style.top = (e.clientY - offsetY) + 'px';
-    });
-    
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
-</script>
 
 {% endblock %}
