@@ -1,4 +1,5 @@
 import uuid
+import random
 import os
 import requests
 from datetime import datetime
@@ -25,13 +26,67 @@ def signup():
             flash("Email already registered.", "error")
             return redirect(url_for("auth.signup"))
             
-        user_id = str(uuid.uuid4())
-        hashed_pw = generate_password_hash(password)
+        # Generate OTP
+        otp_code = f"{random.randint(100000, 999999)}"
         
-        # Insert profile
+        # Store in session (temp)
+        session["temp_signup"] = {
+            "email": email,
+            "password": password,
+            "full_name": full_name,
+            "otp": otp_code,
+            "expires_at": datetime.now().timestamp() + 900 # 15 minutes
+        }
+        
+        # Send Email
+        success = email_service.send_signup_verification_otp(email, otp_code)
+        if not success:
+            flash("Failed to send verification email. Please try again.", "error")
+            return redirect(url_for("auth.signup"))
+            
+        return redirect(url_for("auth.verify_signup"))
+        
+    return render_template("auth/signup.html")
+
+@auth_bp.route("/signup/verify", methods=["GET", "POST"])
+def verify_signup():
+    temp_user = session.get("temp_signup")
+    if not temp_user:
+        flash("Verification session expired. Please sign up again.", "error")
+        return redirect(url_for("auth.signup"))
+        
+    if request.method == "POST":
+        action = request.form.get("action")
+        
+        if action == "resend":
+            # Generate new OTP
+            otp_code = f"{random.randint(100000, 999999)}"
+            temp_user["otp"] = otp_code
+            temp_user["expires_at"] = datetime.now().timestamp() + 900
+            session["temp_signup"] = temp_user
+            
+            email_service.send_signup_verification_otp(temp_user["email"], otp_code)
+            flash("A new verification code has been sent.", "success")
+            return redirect(url_for("auth.verify_signup"))
+            
+        # Validate OTP
+        entered_otp = request.form.get("otp_code")
+        
+        if datetime.now().timestamp() > temp_user.get("expires_at", 0):
+            flash("OTP expired. Please request a new one.", "error")
+            return redirect(url_for("auth.verify_signup"))
+            
+        if entered_otp != temp_user.get("otp"):
+            flash("Invalid verification code. Please try again.", "error")
+            return redirect(url_for("auth.verify_signup"))
+            
+        # Success! Insert into DB
+        user_id = str(uuid.uuid4())
+        hashed_pw = generate_password_hash(temp_user["password"])
+        
         db_service.execute(
             "INSERT INTO profiles (id, email, full_name, study_streak, password_hash, last_active) VALUES (?, ?, ?, 0, ?, ?)",
-            (user_id, email, full_name, hashed_pw, datetime.now().isoformat())
+            (user_id, temp_user["email"], temp_user["full_name"], hashed_pw, datetime.now().isoformat())
         )
         
         # Generate custom API key
@@ -51,15 +106,17 @@ def signup():
                         db_service.execute("UPDATE profiles SET api_keys = ? WHERE id = ?", (new_key, user_id))
         except Exception as e:
             print(f"Failed to generate custom API key: {e}")
-        
+            
+        # Log them in
+        session.pop("temp_signup", None)
         session["user_id"] = user_id
-        session["email"] = email
-        session["full_name"] = full_name
+        session["email"] = temp_user["email"]
+        session["full_name"] = temp_user["full_name"]
         
-        flash("Welcome to Helix AI!", "success")
+        flash("Email verified! Welcome to Helix AI!", "success")
         return redirect(url_for("dashboard.index"))
         
-    return render_template("auth/signup.html")
+    return render_template("auth/verify_signup.html", email=temp_user["email"])
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
