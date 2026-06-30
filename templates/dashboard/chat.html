@@ -131,6 +131,27 @@
     </div>
 </div>
 
+<!-- Upgrade Modal -->
+<div id="upgradeModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeUpgradeModal()"></div>
+    <!-- Modal Content -->
+    <div class="relative bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full border border-gray-100 animate-slide-up">
+        <button onclick="closeUpgradeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition p-2 rounded-full hover:bg-gray-50">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <div class="w-16 h-16 rounded-full bg-violet-100 flex items-center justify-center mb-6 text-violet-600 mx-auto">
+            <i data-lucide="sparkles" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-center text-[#1d1d1f] mb-3 font-outfit">Quota Exceeded</h3>
+        <p id="upgradeModalMessage" class="text-gray-500 text-center mb-8">You have reached your free daily chat limit. Please upgrade to Premium to continue!</p>
+        <div class="flex gap-3">
+            <button onclick="closeUpgradeModal()" class="flex-1 py-3 px-4 rounded-xl bg-gray-100 text-[#1d1d1f] font-semibold hover:bg-gray-200 transition">Cancel</button>
+            <a href="{{ url_for('billing.upgrade_page') }}" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-semibold hover:opacity-90 transition shadow-md shadow-violet-500/20 text-center">Upgrade Now</a>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -312,10 +333,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: bodyParams.toString()
                 });
+                
+                // If it's a 403 limit error, show modal
+                if (response.status === 403) {
+                    typingWrapper.remove();
+                    const errorData = await response.json();
+                    showUpgradeModal(errorData.error);
+                    return;
+                }
+                
                 const data = await response.json();
                 
                 // Remove typing indicator
                 typingWrapper.remove();
+                
+                if (data.error) {
+                    showUpgradeModal(data.error);
+                    return;
+                }
                 
                 const aiWrapper = document.createElement('div');
                 aiWrapper.className = 'flex justify-start relative group';
@@ -367,5 +402,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function showUpgradeModal(message) {
+    if (message) {
+        document.getElementById('upgradeModalMessage').innerText = message;
+    }
+    const modal = document.getElementById('upgradeModal');
+    modal.classList.remove('hidden');
+}
+function closeUpgradeModal() {
+    document.getElementById('upgradeModal').classList.add('hidden');
+}
 </script>
 {% endblock %}

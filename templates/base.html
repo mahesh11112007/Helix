@@ -175,11 +175,6 @@
                 <a href="{{ url_for('planner.view_planner') }}" class="inline-flex p-2 md:px-4 md:py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition items-center justify-center" aria-label="Planner">
                     <i data-lucide="calendar" class="w-4 h-4 md:mr-1.5"></i> <span class="hidden md:inline">Planner</span>
                 </a>
-                {% if current_user.subscription_tier != 'premium' %}
-                <a href="{{ url_for('billing.upgrade_page') }}" class="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-xs md:text-sm font-semibold hover:opacity-90 transition inline-flex items-center shadow-md shadow-violet-500/20 whitespace-nowrap">
-                    <i data-lucide="sparkles" class="w-3.5 h-3.5 md:w-4 md:h-4 mr-1 md:mr-1.5"></i> Upgrade
-                </a>
-                {% endif %}
                 <a href="/settings" class="p-2 rounded-full bg-gray-100 text-gray-600 hover:text-[#1d1d1f] hover:bg-gray-200 transition flex items-center justify-center" aria-label="Settings">
                     <i data-lucide="settings" class="w-5 h-5"></i>
                 </a>
