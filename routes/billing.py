@@ -62,3 +62,47 @@ def success():
             return redirect(url_for("billing.upgrade_page"))
             
     return render_template("dashboard/upgrade.html", user=user, success=True)
+
+@billing_bp.route("/proof", methods=["POST"])
+def upload_proof():
+    user = get_current_user()
+    if not user:
+        return redirect(url_for("auth.login"))
+        
+    if "proof_image" not in request.files:
+        flash("No image uploaded.", "error")
+        return redirect(url_for("billing.upgrade_page"))
+        
+    file = request.files["proof_image"]
+    if file.filename == "":
+        flash("No selected file.", "error")
+        return redirect(url_for("billing.upgrade_page"))
+        
+    if file:
+        import uuid
+        import os
+        from werkzeug.utils import secure_filename
+        
+        # Save file to static/uploads/proofs directory
+        upload_dir = os.path.join(current_app.root_path, "../static/uploads/proofs")
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        filename = secure_filename(file.filename)
+        ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else 'jpg'
+        new_filename = f"{uuid.uuid4()}.{ext}"
+        filepath = os.path.join(upload_dir, new_filename)
+        
+        file.save(filepath)
+        
+        # Insert into DB
+        from services.db_service import db_service
+        proof_id = str(uuid.uuid4())
+        db_path = f"static/uploads/proofs/{new_filename}"
+        
+        db_service.execute(
+            "INSERT INTO payment_proofs (id, user_id, file_path, status) VALUES (?, ?, ?, 'pending')",
+            (proof_id, user["id"], db_path)
+        )
+        
+        flash("Payment proof uploaded successfully! Our team will verify it shortly.", "success")
+        return redirect(url_for("billing.upgrade_page"))

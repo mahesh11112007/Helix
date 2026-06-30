@@ -293,6 +293,28 @@ class DBService:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"""))
             
+            # Payment Proofs Table
+            cursor.execute(self._translate_schema("""
+            CREATE TABLE IF NOT EXISTS payment_proofs (
+                id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                file_path TEXT NOT NULL,
+                status TEXT DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )"""))
+            
+            # Support Requests Table
+            cursor.execute(self._translate_schema("""
+            CREATE TABLE IF NOT EXISTS support_requests (
+                id TEXT PRIMARY KEY,
+                user_id TEXT NOT NULL,
+                message TEXT NOT NULL,
+                ai_response TEXT,
+                is_genuine INTEGER DEFAULT 0,
+                status TEXT DEFAULT 'open',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )"""))
+            
             # Clear stale completed/failed tasks on startup to prevent timezone layout loops
             try:
                 cursor.execute("DELETE FROM background_tasks WHERE status IN ('completed', 'failed')")

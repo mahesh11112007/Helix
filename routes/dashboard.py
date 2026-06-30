@@ -385,3 +385,36 @@ def reset_account():
     
     flash("Account data and active background tasks reset successfully.", "success")
     return redirect(url_for("dashboard.settings"))
+
+@dashboard_bp.route("/support", methods=["GET", "POST"])
+def support():
+    user = get_current_user()
+    if not user:
+        return redirect(url_for("auth.login"))
+        
+    if request.method == "POST":
+        message = request.form.get("message")
+        if not message:
+            flash("Message cannot be empty.", "error")
+            return redirect(url_for("dashboard.support"))
+            
+        # Call AI Triage
+        triage_result = ai_service.triage_support_request(message)
+        
+        is_genuine = triage_result.get("needs_admin", False)
+        ai_response = triage_result.get("answer", "Thank you for reaching out. An admin will review your request.")
+        
+        # Save to DB
+        import uuid
+        req_id = str(uuid.uuid4())
+        db_service.execute(
+            "INSERT INTO support_requests (id, user_id, message, ai_response, is_genuine, status) VALUES (?, ?, ?, ?, ?, 'open')",
+            (req_id, user["id"], message, ai_response, 1 if is_genuine else 0)
+        )
+        
+        if is_genuine:
+            flash("Your request has been forwarded to the Admin team. You will be contacted soon.", "success")
+        
+        return render_template("dashboard/support.html", ai_response=ai_response, user_message=message)
+        
+    return render_template("dashboard/support.html")

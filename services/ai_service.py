@@ -9,6 +9,7 @@ def _handle_auth_error(e):
     if hasattr(e, 'response') and e.response is not None:
         if e.response.status_code in (401, 403):
             try:
+                # pyrefly: ignore [missing-import]
                 from flask import session
                 session['api_key_invalid'] = True
                 session.modified = True
@@ -25,6 +26,7 @@ class AIService:
     @property
     def api_config(self):
         """Returns a tuple of (api_key, ai_platform)"""
+        # pyrefly: ignore [missing-import]
         from flask import session
         from services.db_service import db_service
         import os
@@ -113,6 +115,7 @@ class AIService:
 
     def _get_custom_instructions(self):
         try:
+            # pyrefly: ignore [missing-import]
             from flask import session
             if "user_id" in session:
                 from services.db_service import db_service
@@ -203,7 +206,7 @@ class AIService:
                 return parsed_json
             return json.loads(content)
         except Exception as e:
-            print(f"Error in Vision NIM API: {e}")
+            print(f"Error in Vision: {e}")
             return self._get_mock_vision_response()
 
     def _normalize_text(self, text):
@@ -1536,5 +1539,55 @@ Understanding {topic_name} requires working through real examples and practice p
                 {"question": f"Explain the significance of {topic_name}.", "answer": f"{topic_name} is significant because it forms the basis for understanding more advanced concepts and has wide practical applications."},
             ],
         }
+
+    def triage_support_request(self, user_message):
+        """Triages user support requests, classifies if admin intervention is needed, and provides an initial answer."""
+        key, base_url, chat_model, _ = self._get_config()
+        if not key:
+            return {"answer": "Our AI support is temporarily offline. We have forwarded your request to the admin team.", "needs_admin": True}
+            
+        system_prompt = """
+        You are the official Customer Support AI for KiraakStudy AI. 
+        Your primary role is to assist users with billing, platform issues, and account management. 
+        
+        CRITICAL RULES:
+        1. YOU MUST STRICTLY REFUSE TO ANSWER ANY STUDY-RELATED QUESTIONS, HOMEWORK, OR ACADEMIC TOPICS.
+           If a user asks a study question, reply: "I am the Support AI and can only help with account, billing, and platform issues. For study help, please use your Dashboard study tools."
+        2. TERMS & CONDITIONS: Users are responsible for their API keys if they use the free tier. 
+        3. REFUND POLICY: Refunds are only provided if there is a double charge or platform error. Issues caused by the user's API key or third-party service downtime are NON-REFUNDABLE.
+        4. If the user's issue involves a refund request, a bug report, a missing premium upgrade, or account deletion, set `needs_admin` to true.
+        5. For simple questions about how the platform works, answer them nicely and set `needs_admin` to false.
+        
+        Output MUST be valid JSON only (no markdown wrapping) in this format:
+        {
+            "answer": "Your detailed response to the user here.",
+            "needs_admin": true/false
+        }
+        """
+        
+        payload = {
+            "model": chat_model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
+            ],
+            "temperature": 0.1,
+            "response_format": {"type": "json_object"}
+        }
+        
+        try:
+            import requests, json
+            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+            response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=20)
+            response.raise_for_status()
+            content = response.json()["choices"][0]["message"]["content"]
+            parsed = json.loads(content)
+            return {
+                "answer": parsed.get("answer", "Thank you for your message. An admin will review it."),
+                "needs_admin": parsed.get("needs_admin", True)
+            }
+        except Exception as e:
+            print(f"Error in support triage: {e}")
+            return {"answer": "An error occurred while processing your request. It has been forwarded to our admin team.", "needs_admin": True}
 
 ai_service = AIService()

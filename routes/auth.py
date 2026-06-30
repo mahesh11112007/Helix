@@ -244,7 +244,11 @@ def verify_otp():
             (email,), one=True
         )
         if record and check_password_hash(record['otp_hash'], otp_code):
-            if datetime.fromisoformat(record['expires_at']) > datetime.now():
+            expires_at = record['expires_at']
+            if isinstance(expires_at, str):
+                expires_at = datetime.fromisoformat(expires_at)
+                
+            if expires_at > datetime.now():
                 session['otp_verified'] = True
                 return redirect(url_for('auth.reset_password'))
             else:

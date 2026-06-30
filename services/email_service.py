@@ -58,4 +58,53 @@ class EmailService:
                 print(f"Resend API Response: {e.response.text}")
             return False
 
+    def send_support_reply(self, to_email, user_name, reply_message):
+        if not self.api_key:
+            print("WARNING: RESEND_API_KEY is not set. Cannot send email.")
+            return False
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        # HTML Template for the email
+        html_content = f"""
+        <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h1 style="color: #1d1d1f; margin: 0;">Helix AI Support</h1>
+            </div>
+            <h2 style="color: #1d1d1f; font-size: 18px;">Hi {user_name},</h2>
+            <p style="color: #555; font-size: 16px; line-height: 1.6;">
+                Our team has reviewed your support request and here is the response:
+            </p>
+            <div style="background-color: #f4f4f5; padding: 16px; border-radius: 8px; margin: 24px 0; font-size: 15px; color: #333; line-height: 1.6; white-space: pre-wrap;">{reply_message}</div>
+            <p style="color: #555; font-size: 14px;">
+                If you have any further questions, feel free to reply to this email or open a new request on the platform.
+            </p>
+            <hr style="border: none; border-top: 1px solid #eaeaea; margin: 30px 0;" />
+            <p style="color: #888; font-size: 12px; text-align: center;">
+                &copy; 2026 Helix AI. All rights reserved.
+            </p>
+        </div>
+        """
+
+        payload = {
+            "from": f"Helix AI Support <{self.sender_email}>",
+            "to": [to_email],
+            "subject": "Response to your Support Request",
+            "html": html_content
+        }
+
+        try:
+            response = requests.post("https://api.resend.com/emails", headers=headers, json=payload)
+            response.raise_for_status()
+            print(f"Support reply sent to {to_email}")
+            return True
+        except requests.exceptions.RequestException as e:
+            print(f"Error sending support reply via Resend: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Resend API Response: {e.response.text}")
+            return False
+
 email_service = EmailService()

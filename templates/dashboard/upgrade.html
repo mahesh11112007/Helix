@@ -85,6 +85,28 @@
             </form>
         </div>
     </div>
+
+    <!-- Payment Proof Upload Section -->
+    <div class="mt-16 max-w-2xl mx-auto glass-card bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center">
+                <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-[#1d1d1f]">Already Paid?</h3>
+                <p class="text-sm text-gray-500">If you completed your payment but your account wasn't upgraded automatically, upload your payment screenshot here.</p>
+            </div>
+        </div>
+        
+        <form action="{{ url_for('billing.upload_proof') }}" method="POST" enctype="multipart/form-data" class="mt-6 flex flex-col sm:flex-row items-center gap-4">
+            <div class="flex-1 w-full relative">
+                <input type="file" id="proof_image" name="proof_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 transition-all border border-gray-200 rounded-xl bg-gray-50 p-1" required>
+            </div>
+            <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-semibold transition-all shadow-md whitespace-nowrap">
+                Submit Proof
+            </button>
+        </form>
+    </div>
     {% endif %}
 </div>
 {% endblock %}
