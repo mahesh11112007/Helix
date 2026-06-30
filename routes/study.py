@@ -236,8 +236,11 @@ def increment_daily_streak(user_id):
     
     if last_active_str:
         try:
-            clean_iso = last_active_str[:19]
-            last_dt = datetime.fromisoformat(clean_iso)
+            if isinstance(last_active_str, datetime):
+                last_dt = last_active_str
+            else:
+                clean_iso = last_active_str[:19]
+                last_dt = datetime.fromisoformat(clean_iso)
             if last_dt.tzinfo is None:
                 last_dt = last_dt.replace(tzinfo=timezone.utc)
             last_dt_ist = last_dt.astimezone(ist).date()
