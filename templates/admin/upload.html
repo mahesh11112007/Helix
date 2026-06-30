@@ -1,46 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Admin - Upload Syllabus PDF
-<!-- Premium Requests Section -->
-<div class="max-w-2xl mx-auto mt-8 bg-[#1A1A1A] p-8 rounded-2xl shadow-lg border border-[#333]">
-    <h2 class="text-2xl font-semibold mb-6 text-white flex items-center justify-between">
-        Pending Premium Requests
-        {% if pending_requests %}
-        <span class="bg-indigo-600 text-white text-xs px-3 py-1 rounded-full">{{ pending_requests|length }}</span>
-        {% endif %}
-    </h2>
-    
-    {% if pending_requests %}
-    <div class="space-y-4">
-        {% for req in pending_requests %}
-        <div class="bg-[#242424] border border-[#333] rounded-xl p-4 flex items-center justify-between">
-            <div>
-                <h3 class="text-white font-bold">{{ req.full_name }}</h3>
-                <p class="text-sm text-gray-400">{{ req.email }}</p>
-                <p class="text-xs text-gray-500 mt-1">Requested: {{ req.created_at[:10] if req.created_at else 'Unknown Date' }}</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <form action="{{ url_for('admin.approve_premium', user_id=req.id) }}" method="POST">
-                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg transition-colors" title="Approve">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    </button>
-                </form>
-                <form action="{{ url_for('admin.reject_premium', user_id=req.id) }}" method="POST">
-                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors" title="Reject">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                </form>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="text-center py-8">
-        <p class="text-gray-500">No pending premium requests.</p>
-    </div>
-    {% endif %}
-</div>
-
-{% endblock %}
+{% block title %}Admin - Dashboard{% endblock %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto mt-12 bg-[#1A1A1A] p-8 rounded-2xl shadow-lg border border-[#333]">
@@ -55,7 +14,7 @@
         
         const toast = document.createElement('div');
         toast.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white px-6 py-4 rounded-xl shadow-lg flex flex-col gap-1 z-50 animate-bounce';
-        toast.innerHTML = '<div class=\\'font-bold text-sm flex items-center gap-2\\'><svg class=\\'animate-spin h-4 w-4\\' viewBox=\\'0 0 24 24\\'><circle class=\\'opacity-25\\' cx=\\'12\\' cy=\\'12\\' r=\\'10\\' stroke=\\'currentColor\\' stroke-width=\\'4\\' fill=\\'none\\'></circle><path class=\\'opacity-75\\' fill=\\'currentColor\\' d=\\'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z\\'></path></svg> Extracting and Formatting...</div><div class=\\'text-xs opacity-80\\'>Please do not refresh the page.</div>';
+        toast.innerHTML = '<div class=\'font-bold text-sm flex items-center gap-2\'><svg class=\'animate-spin h-4 w-4\' viewBox=\'0 0 24 24\'><circle class=\'opacity-25\' cx=\'12\' cy=\'12\' r=\'10\' stroke=\'currentColor\' stroke-width=\'4\' fill=\'none\'></circle><path class=\'opacity-75\' fill=\'currentColor\' d=\'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z\'></path></svg> Extracting and Formatting...</div><div class=\'text-xs opacity-80\'>Please do not refresh the page.</div>';
         document.body.appendChild(toast);
     ">
         
@@ -129,5 +88,4 @@
     </div>
     {% endif %}
 </div>
-
 {% endblock %}
