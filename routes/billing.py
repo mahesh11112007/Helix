@@ -7,16 +7,9 @@ billing_bp = Blueprint("billing", __name__)
 
 @billing_bp.route("/upgrade", methods=["GET"])
 def upgrade_page():
-    from services.db_service import db_service
     user = get_current_user()
     if not user:
         return redirect(url_for("auth.login"))
-        
-    profile = db_service.query("SELECT premium_request_status, is_premium FROM profiles WHERE id = ?", (user["id"],), one=True)
-    if profile:
-        profile = dict(profile)
-        user["premium_request_status"] = profile.get("premium_request_status")
-        user["is_premium"] = profile.get("is_premium")
         
     return render_template("dashboard/upgrade.html", user=user)
 
@@ -114,18 +107,4 @@ def upload_proof():
         flash("Payment proof uploaded successfully! Our team will verify it shortly.", "success")
         return redirect(url_for("billing.upgrade_page"))
 
-@billing_bp.route("/request-premium", methods=["POST"])
-def request_premium():
-    from services.db_service import db_service
-    user = get_current_user()
-    if not user:
-        return redirect(url_for("auth.login"))
-        
-    try:
-        db_service.execute("UPDATE profiles SET premium_request_status = 'pending' WHERE id = ?", (user["id"],))
-        flash("Your request for Premium has been submitted to the Admin!", "success")
-    except Exception as e:
-        print(f"Error requesting premium: {e}")
-        flash("Could not submit request at this time.", "error")
-        
-    return redirect(url_for("billing.upgrade_page"))
+

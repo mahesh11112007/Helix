@@ -123,7 +123,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-[#1d1d1f] text-sm">{{ req.full_name or 'Unknown User' }}</h3>
-                                <p class="text-xs text-gray-500">{{ req.email }} • {{ req.created_at[:16] }}</p>
+                                <p class="text-xs text-gray-500">{{ req.email }} â€¢ {{ req.created_at[:16] }}</p>
                             </div>
                         </div>
                         {% if req.status == 'open' %}
@@ -277,6 +277,51 @@
         </div>
     </div>
 </div>
+
+
+    <!-- Syllabus Tab -->
+    <div id="syllabus-tab" class="tab-content hidden">
+        <div class="glass-card bg-[#1A1A1A] p-8 rounded-3xl border border-[#333] shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+            <h2 class="text-2xl font-bold text-white mb-2">Upload Syllabus PDF</h2>
+            <p class="text-gray-400 text-sm mb-6">Upload a raw syllabus PDF to automatically parse and insert it into the global database structure.</p>
+
+            <form method="POST" action="{{ url_for('admin.upload_syllabus') }}" enctype="multipart/form-data" class="space-y-5" onsubmit="
+                const btn = document.getElementById('submitBtn');
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-wait');
+                btn.innerHTML = '⚙️ AI is processing PDF... ~20s';
+            ">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Education Level (e.g. "Diploma")</label>
+                    <input type="text" name="education" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="Diploma">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Board (e.g. "SBTET TG")</label>
+                    <input type="text" name="board" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="SBTET TG">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Semester / Year (e.g. "c24_1st_sem")</label>
+                    <input type="text" name="year" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="c24_1st_sem">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Group / Branch (e.g. "EEE")</label>
+                    <input type="text" name="group" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="EEE">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Upload Syllabus PDF</label>
+                    <input type="file" name="pdf_file" accept=".pdf" required class="w-full text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors mt-2">
+                    Upload and Parse PDF
+                </button>
+            </form>
+        </div>
+    </div>
 
 <script>
 function switchTab(tabId) {
