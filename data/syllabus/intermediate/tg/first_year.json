@@ -1,0 +1,284 @@
+{
+  "year": "First Year",
+  "groups": {
+    "MPC": [
+      {
+        "subject": "Mathematics IA",
+        "chapters": [
+          {
+            "name": "Functions",
+            "topics": [
+              "Types of Functions",
+              "Inverse Functions"
+            ]
+          },
+          {
+            "name": "Mathematical Induction",
+            "topics": [
+              "Principle of Mathematical Induction"
+            ]
+          },
+          {
+            "name": "Matrices",
+            "topics": [
+              "Types of Matrices",
+              "Determinants",
+              "Inverse of a Matrix"
+            ]
+          },
+          {
+            "name": "Addition of Vectors",
+            "topics": [
+              "Classification of Vectors",
+              "Vector Addition"
+            ]
+          },
+          {
+            "name": "Product of Vectors",
+            "topics": [
+              "Scalar Product",
+              "Vector Product"
+            ]
+          },
+          {
+            "name": "Trigonometry",
+            "topics": [
+              "Trigonometric Ratios",
+              "Trigonometric Equations"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Mathematics IB",
+        "chapters": [
+          {
+            "name": "Locus",
+            "topics": [
+              "Equation of Locus"
+            ]
+          },
+          {
+            "name": "Transformation of Axes",
+            "topics": [
+              "Translation",
+              "Rotation"
+            ]
+          },
+          {
+            "name": "The Straight Line",
+            "topics": [
+              "Forms of Straight Line",
+              "Angle Between Lines"
+            ]
+          },
+          {
+            "name": "Limits and Continuity",
+            "topics": [
+              "Standard Limits",
+              "Continuity"
+            ]
+          },
+          {
+            "name": "Differentiation",
+            "topics": [
+              "Derivative Methods",
+              "Second Order Derivatives"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Physics",
+        "chapters": [
+          {
+            "name": "Physical World",
+            "topics": [
+              "Scope of Physics",
+              "Fundamental Forces"
+            ]
+          },
+          {
+            "name": "Units and Measurements",
+            "topics": [
+              "SI Units",
+              "Dimensional Analysis"
+            ]
+          },
+          {
+            "name": "Motion in a Straight Line",
+            "topics": [
+              "Velocity",
+              "Acceleration",
+              "Kinematic Equations"
+            ]
+          },
+          {
+            "name": "Laws of Motion",
+            "topics": [
+              "Newton's Laws",
+              "Conservation of Momentum"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Chemistry",
+        "chapters": [
+          {
+            "name": "Atomic Structure",
+            "topics": [
+              "Bohr's Model",
+              "Quantum Numbers"
+            ]
+          },
+          {
+            "name": "Chemical Bonding",
+            "topics": [
+              "VSEPR Theory",
+              "Hybridisation"
+            ]
+          },
+          {
+            "name": "States of Matter",
+            "topics": [
+              "Gas Laws",
+              "Ideal Gas Equation"
+            ]
+          },
+          {
+            "name": "Thermodynamics",
+            "topics": [
+              "Internal Energy",
+              "Enthalpy",
+              "Hess's Law"
+            ]
+          }
+        ]
+      }
+    ],
+    "BiPC": [
+      {
+        "subject": "Botany",
+        "chapters": [
+          {
+            "name": "The Living World",
+            "topics": [
+              "Diversity",
+              "Taxonomy"
+            ]
+          },
+          {
+            "name": "Biological Classification",
+            "topics": [
+              "Kingdom Monera",
+              "Kingdom Protista"
+            ]
+          },
+          {
+            "name": "Plant Kingdom",
+            "topics": [
+              "Algae",
+              "Bryophytes",
+              "Pteridophytes"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Zoology",
+        "chapters": [
+          {
+            "name": "Diversity of Living World",
+            "topics": [
+              "Classification",
+              "Biodiversity"
+            ]
+          },
+          {
+            "name": "Structural Organisation",
+            "topics": [
+              "Epithelial Tissue",
+              "Connective Tissue"
+            ]
+          },
+          {
+            "name": "Animal Diversity",
+            "topics": [
+              "Invertebrate Phyla",
+              "Phylum Chordata"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Physics",
+        "chapters": [
+          {
+            "name": "Physical World",
+            "topics": [
+              "Scope of Physics",
+              "Fundamental Forces"
+            ]
+          },
+          {
+            "name": "Units and Measurements",
+            "topics": [
+              "SI Units",
+              "Dimensional Analysis"
+            ]
+          },
+          {
+            "name": "Motion in a Straight Line",
+            "topics": [
+              "Velocity",
+              "Acceleration",
+              "Kinematic Equations"
+            ]
+          },
+          {
+            "name": "Laws of Motion",
+            "topics": [
+              "Newton's Laws",
+              "Conservation of Momentum"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Chemistry",
+        "chapters": [
+          {
+            "name": "Atomic Structure",
+            "topics": [
+              "Bohr's Model",
+              "Quantum Numbers"
+            ]
+          },
+          {
+            "name": "Chemical Bonding",
+            "topics": [
+              "VSEPR Theory",
+              "Hybridisation"
+            ]
+          },
+          {
+            "name": "States of Matter",
+            "topics": [
+              "Gas Laws",
+              "Ideal Gas Equation"
+            ]
+          },
+          {
+            "name": "Thermodynamics",
+            "topics": [
+              "Internal Energy",
+              "Enthalpy",
+              "Hess's Law"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

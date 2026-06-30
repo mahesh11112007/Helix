@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Setup Your Syllabus - KiraakStudy AI{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-12 bg-[#1A1A1A] p-8 rounded-2xl shadow-lg border border-[#333]">
+    <h2 class="text-3xl font-semibold mb-2 text-white">Let's set up your syllabus</h2>
+    <p class="text-gray-400 mb-8">Select your course details to automatically load your entire syllabus, subjects, and topics.</p>
+
+    <form method="POST" action="{{ url_for('dashboard.setup') }}" class="space-y-6">
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Education Level</label>
+            <select id="education" name="education" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors appearance-none">
+                <option value="">Select Education</option>
+                {% for edu in educations %}
+                <option value="{{ edu }}">{{ edu | title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Board / University</label>
+            <select id="board" name="board" required disabled class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none">
+                <option value="">Select Board</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Year / Semester</label>
+            <select id="year" name="year" required disabled class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none">
+                <option value="">Select Year</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Group / Branch</label>
+            <select id="group" name="group" required disabled class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none">
+                <option value="">Select Group</option>
+            </select>
+        </div>
+
+        <button type="submit" id="submitBtn" disabled class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Load My Syllabus
+        </button>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const eduSelect = document.getElementById("education");
+    const boardSelect = document.getElementById("board");
+    const yearSelect = document.getElementById("year");
+    const groupSelect = document.getElementById("group");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function checkSubmit() {
+        submitBtn.disabled = !(eduSelect.value && boardSelect.value && yearSelect.value && groupSelect.value);
+    }
+
+    eduSelect.addEventListener("change", async function() {
+        boardSelect.innerHTML = '<option value="">Select Board</option>';
+        yearSelect.innerHTML = '<option value="">Select Year</option>';
+        groupSelect.innerHTML = '<option value="">Select Group</option>';
+        boardSelect.disabled = true;
+        yearSelect.disabled = true;
+        groupSelect.disabled = true;
+        
+        if (this.value) {
+            const res = await fetch(`/api/syllabus/boards/${this.value}`);
+            const boards = await res.json();
+            boards.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b;
+                opt.textContent = b.toUpperCase();
+                boardSelect.appendChild(opt);
+            });
+            boardSelect.disabled = false;
+        }
+        checkSubmit();
+    });
+
+    boardSelect.addEventListener("change", async function() {
+        yearSelect.innerHTML = '<option value="">Select Year</option>';
+        groupSelect.innerHTML = '<option value="">Select Group</option>';
+        yearSelect.disabled = true;
+        groupSelect.disabled = true;
+
+        if (this.value) {
+            const res = await fetch(`/api/syllabus/years/${eduSelect.value}/${this.value}`);
+            const years = await res.json();
+            years.forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y;
+                // format like "first_year" -> "First Year"
+                opt.textContent = y.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                yearSelect.appendChild(opt);
+            });
+            yearSelect.disabled = false;
+        }
+        checkSubmit();
+    });
+
+    yearSelect.addEventListener("change", async function() {
+        groupSelect.innerHTML = '<option value="">Select Group</option>';
+        groupSelect.disabled = true;
+
+        if (this.value) {
+            const res = await fetch(`/api/syllabus/groups/${eduSelect.value}/${boardSelect.value}/${this.value}`);
+            const groups = await res.json();
+            groups.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g;
+                opt.textContent = g;
+                groupSelect.appendChild(opt);
+            });
+            groupSelect.disabled = false;
+        }
+        checkSubmit();
+    });
+
+    groupSelect.addEventListener("change", checkSubmit);
+});
+</script>
+{% endblock %}

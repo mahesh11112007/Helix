@@ -1,0 +1,248 @@
+{
+  "year": "Second Year",
+  "groups": {
+    "MPC": [
+      {
+        "subject": "Mathematics IIA",
+        "chapters": [
+          {
+            "name": "Complex Numbers",
+            "topics": [
+              "Algebraic Operations",
+              "Argand Plane"
+            ]
+          },
+          {
+            "name": "De Moivre's Theorem",
+            "topics": [
+              "Statement and Proof",
+              "Roots of Complex Numbers"
+            ]
+          },
+          {
+            "name": "Probability",
+            "topics": [
+              "Random Experiments",
+              "Addition Theorem",
+              "Bayes' Theorem"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Mathematics IIB",
+        "chapters": [
+          {
+            "name": "Circles",
+            "topics": [
+              "Standard Form",
+              "Tangent and Normal"
+            ]
+          },
+          {
+            "name": "Integration",
+            "topics": [
+              "Methods of Integration",
+              "Integration by Parts"
+            ]
+          },
+          {
+            "name": "Differential Equations",
+            "topics": [
+              "Formation",
+              "Variable Separable Method"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Physics",
+        "chapters": [
+          {
+            "name": "Waves",
+            "topics": [
+              "Transverse Waves",
+              "Doppler Effect"
+            ]
+          },
+          {
+            "name": "Ray Optics",
+            "topics": [
+              "Reflection",
+              "Refraction",
+              "Total Internal Reflection"
+            ]
+          },
+          {
+            "name": "Electric Charges",
+            "topics": [
+              "Coulomb's Law",
+              "Gauss's Law"
+            ]
+          },
+          {
+            "name": "Current Electricity",
+            "topics": [
+              "Ohm's Law",
+              "Kirchhoff's Rules"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Chemistry",
+        "chapters": [
+          {
+            "name": "Solid State",
+            "topics": [
+              "Crystal Lattices",
+              "Packing Efficiency"
+            ]
+          },
+          {
+            "name": "Solutions",
+            "topics": [
+              "Raoult's Law",
+              "Colligative Properties"
+            ]
+          },
+          {
+            "name": "Electrochemistry",
+            "topics": [
+              "Galvanic Cells",
+              "Nernst Equation"
+            ]
+          },
+          {
+            "name": "Chemical Kinetics",
+            "topics": [
+              "Rate of Reaction",
+              "Order of Reaction"
+            ]
+          }
+        ]
+      }
+    ],
+    "BiPC": [
+      {
+        "subject": "Botany",
+        "chapters": [
+          {
+            "name": "Plant Physiology",
+            "topics": [
+              "Transport in Plants",
+              "Photosynthesis"
+            ]
+          },
+          {
+            "name": "Microbiology",
+            "topics": [
+              "Bacteria",
+              "Viruses"
+            ]
+          },
+          {
+            "name": "Genetics",
+            "topics": [
+              "Mendelian Inheritance",
+              "Molecular Basis of Inheritance"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Zoology",
+        "chapters": [
+          {
+            "name": "Human Anatomy",
+            "topics": [
+              "Digestive System",
+              "Respiratory System"
+            ]
+          },
+          {
+            "name": "Human Reproduction",
+            "topics": [
+              "Male Reproductive System",
+              "Female Reproductive System"
+            ]
+          },
+          {
+            "name": "Genetics",
+            "topics": [
+              "Human Genetics",
+              "Evolution"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Physics",
+        "chapters": [
+          {
+            "name": "Waves",
+            "topics": [
+              "Transverse Waves",
+              "Doppler Effect"
+            ]
+          },
+          {
+            "name": "Ray Optics",
+            "topics": [
+              "Reflection",
+              "Refraction",
+              "Total Internal Reflection"
+            ]
+          },
+          {
+            "name": "Electric Charges",
+            "topics": [
+              "Coulomb's Law",
+              "Gauss's Law"
+            ]
+          },
+          {
+            "name": "Current Electricity",
+            "topics": [
+              "Ohm's Law",
+              "Kirchhoff's Rules"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Chemistry",
+        "chapters": [
+          {
+            "name": "Solid State",
+            "topics": [
+              "Crystal Lattices",
+              "Packing Efficiency"
+            ]
+          },
+          {
+            "name": "Solutions",
+            "topics": [
+              "Raoult's Law",
+              "Colligative Properties"
+            ]
+          },
+          {
+            "name": "Electrochemistry",
+            "topics": [
+              "Galvanic Cells",
+              "Nernst Equation"
+            ]
+          },
+          {
+            "name": "Chemical Kinetics",
+            "topics": [
+              "Rate of Reaction",
+              "Order of Reaction"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

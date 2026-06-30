@@ -65,6 +65,10 @@ def index():
         "Create a quiz for Computer Networks to test your retention."
     ]
 
+    # If no semesters, redirect to setup wizard
+    if not semesters:
+        return redirect(url_for("dashboard.setup"))
+
     return render_template(
         "dashboard/index.html",
         profile=profile,
@@ -74,6 +78,73 @@ def index():
         recent_files=recent_files,
         ai_suggestions=ai_suggestions
     )
+
+@dashboard_bp.route("/setup", methods=["GET", "POST"])
+def setup():
+    user = get_current_user()
+    if not user:
+        return redirect(url_for("auth.login"))
+        
+    from services.syllabus_service import syllabus_service
+    
+    if request.method == "POST":
+        education = request.form.get("education")
+        board = request.form.get("board")
+        group = request.form.get("group")
+        year = request.form.get("year")
+        
+        if not all([education, board, group, year]):
+            flash("Please fill all fields", "error")
+            return redirect(url_for("dashboard.setup"))
+            
+        sem_id = str(uuid.uuid4())
+        db_service.execute(
+            "INSERT INTO semesters (id, user_id, name) VALUES (?, ?, ?)",
+            (sem_id, user["id"], f"{year} - {group} ({board.upper()})")
+        )
+        
+        subjects = syllabus_service.get_subjects_for_group(education, board, year, group)
+        for sub in subjects:
+            sub_id = str(uuid.uuid4())
+            db_service.execute(
+                "INSERT INTO subjects (id, semester_id, name, code) VALUES (?, ?, ?, ?)",
+                (sub_id, sem_id, sub["subject"], sub.get("code", ""))
+            )
+            
+            for i, chapter in enumerate(sub.get("chapters", []), start=1):
+                unit_id = str(uuid.uuid4())
+                db_service.execute(
+                    "INSERT INTO units (id, subject_id, name, number) VALUES (?, ?, ?, ?)",
+                    (unit_id, sub_id, chapter["name"], i)
+                )
+                
+                for topic in chapter.get("topics", []):
+                    topic_id = str(uuid.uuid4())
+                    db_service.execute(
+                        "INSERT INTO topics (id, unit_id, name) VALUES (?, ?, ?)",
+                        (topic_id, unit_id, topic)
+                    )
+                    
+        flash("Your syllabus has been successfully imported!", "success")
+        return redirect(url_for("dashboard.index"))
+
+    educations = syllabus_service.get_available_education_levels()
+    return render_template("dashboard/setup.html", educations=educations)
+
+@dashboard_bp.route("/api/syllabus/boards/<education>")
+def api_get_boards(education):
+    from services.syllabus_service import syllabus_service
+    return jsonify(syllabus_service.get_available_boards(education))
+
+@dashboard_bp.route("/api/syllabus/years/<education>/<board>")
+def api_get_years(education, board):
+    from services.syllabus_service import syllabus_service
+    return jsonify(syllabus_service.get_available_years(education, board))
+
+@dashboard_bp.route("/api/syllabus/groups/<education>/<board>/<year>")
+def api_get_groups(education, board, year):
+    from services.syllabus_service import syllabus_service
+    return jsonify(syllabus_service.get_available_groups(education, board, year))
 
 @dashboard_bp.route("/semester/add", methods=["POST"])
 def add_semester():
