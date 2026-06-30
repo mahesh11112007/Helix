@@ -70,6 +70,7 @@ class DBService:
                 last_active TEXT,
                 math_learning_level TEXT,
                 is_premium BOOLEAN DEFAULT 0,
+                premium_request_status TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"""))
             

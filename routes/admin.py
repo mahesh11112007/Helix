@@ -24,9 +24,14 @@ def index():
     if not is_admin(user):
         flash("Unauthorized", "error")
         return redirect(url_for("auth.login"))
+        
+    # Fetch pending premium requests
+    pending_requests = db_service.query(
+        "SELECT id, email, full_name, created_at FROM profiles WHERE premium_request_status = 'pending'"
+    )
     
     # We allow manual typing of education, board, year, group to create new folders/files if they don't exist
-    return render_template("admin/upload.html")
+    return render_template("admin/upload.html", pending_requests=pending_requests)
 
 @admin_bp.route("/upload-syllabus", methods=["POST"])
 def upload_syllabus():
@@ -95,3 +100,31 @@ def upload_syllabus():
         print(f"Error processing PDF: {e}")
         flash(f"An error occurred: {str(e)}", "error")
         return redirect(url_for("admin.index"))
+
+@admin_bp.route("/approve-premium/<user_id>", methods=["POST"])
+def approve_premium(user_id):
+    user = get_current_user()
+    if not is_admin(user):
+        return redirect(url_for("auth.login"))
+        
+    from services.billing_service import billing_service
+    # Reuse the billing_service function which updates user_usage and profiles.is_premium
+    success = billing_service.upgrade_user_to_premium(user_id)
+    if success:
+        db_service.execute("UPDATE profiles SET premium_request_status = 'approved' WHERE id = ?", (user_id,))
+        flash("User successfully upgraded to Premium!", "success")
+    else:
+        flash("Error upgrading user.", "error")
+        
+    return redirect(url_for("admin.index"))
+
+@admin_bp.route("/reject-premium/<user_id>", methods=["POST"])
+def reject_premium(user_id):
+    user = get_current_user()
+    if not is_admin(user):
+        return redirect(url_for("auth.login"))
+        
+    db_service.execute("UPDATE profiles SET premium_request_status = 'rejected' WHERE id = ?", (user_id,))
+    flash("Premium request rejected.", "success")
+    
+    return redirect(url_for("admin.index"))
