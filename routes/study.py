@@ -289,9 +289,13 @@ def mini_quiz(topic_id):
         chat_model = None
         
         is_premium = bool(profile.get("is_premium")) if profile else False
-        if is_premium and not key:
-            key, base_url, chat_model, _ = ai_service._get_config()
-            
+        
+        if not key:
+            if is_premium:
+                key, base_url, chat_model, _ = ai_service._get_config()
+            else:
+                return jsonify({"error": "Upgrade to Premium to generate mini quizzes."}), 403
+                
         import json
         prompt = f'''Generate exactly ONE multiple choice question based on the topic: {topic['name']}.
 Return ONLY valid JSON in this exact format, with no markdown code blocks or other text:
@@ -306,9 +310,6 @@ Return ONLY valid JSON in this exact format, with no markdown code blocks or oth
         if not base_url:
             base_url = "https://integrate.api.nvidia.com/v1"
             chat_model = "meta/llama-3.1-8b-instruct"
-            
-        if not key:
-            key, base_url, chat_model, _ = ai_service._get_config()
             
         headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
             
