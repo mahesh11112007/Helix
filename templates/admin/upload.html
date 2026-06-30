@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Admin - Upload Syllabus PDF{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-12 bg-[#1A1A1A] p-8 rounded-2xl shadow-lg border border-[#333]">
+    <h2 class="text-3xl font-semibold mb-2 text-white">Upload Syllabus PDF (Admin)</h2>
+    <p class="text-gray-400 mb-8">Upload a raw syllabus PDF to automatically parse and insert it into the global database structure for all users to access.</p>
+
+    <form method="POST" action="{{ url_for('admin.upload_syllabus') }}" enctype="multipart/form-data" class="space-y-6" onsubmit="
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-wait');
+        btn.innerHTML = '⚙️ AI is processing PDF... ~20s';
+        
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white px-6 py-4 rounded-xl shadow-lg flex flex-col gap-1 z-50 animate-bounce';
+        toast.innerHTML = '<div class=\\'font-bold text-sm flex items-center gap-2\\'><svg class=\\'animate-spin h-4 w-4\\' viewBox=\\'0 0 24 24\\'><circle class=\\'opacity-25\\' cx=\\'12\\' cy=\\'12\\' r=\\'10\\' stroke=\\'currentColor\\' stroke-width=\\'4\\' fill=\\'none\\'></circle><path class=\\'opacity-75\\' fill=\\'currentColor\\' d=\\'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z\\'></path></svg> Extracting and Formatting...</div><div class=\\'text-xs opacity-80\\'>Please do not refresh the page.</div>';
+        document.body.appendChild(toast);
+    ">
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Education Level (e.g. "Diploma")</label>
+            <input type="text" name="education" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="Diploma">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Board (e.g. "SBTET TG")</label>
+            <input type="text" name="board" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="SBTET TG">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Semester / Year (e.g. "c24_1st_sem")</label>
+            <input type="text" name="year" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="c24_1st_sem">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Group / Branch (e.g. "EEE")</label>
+            <input type="text" name="group" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="EEE">
+        </div>
+        
+        <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Upload Syllabus PDF</label>
+            <input type="file" name="pdf_file" accept=".pdf" required class="w-full text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+            Upload and Parse PDF
+        </button>
+    </form>
+</div>
+{% endblock %}

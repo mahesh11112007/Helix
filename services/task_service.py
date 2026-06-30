@@ -56,11 +56,13 @@ class TaskService:
             custom_instr = ""
             
             if user_id:
-                profile = db_service.query("SELECT api_keys, ai_platform, custom_instructions FROM profiles WHERE id = ?", (user_id,), one=True)
+                profile = db_service.query("SELECT api_keys, ai_platform, custom_instructions, math_learning_level, is_premium FROM profiles WHERE id = ?", (user_id,), one=True)
                 if profile and profile["api_keys"]:
                     key = profile["api_keys"]
                     platform = profile["ai_platform"] or "custom"
                     custom_instr = profile["custom_instructions"] or ""
+                    math_learning_level = profile.get("math_learning_level") or ""
+                    is_premium = bool(profile.get("is_premium"))
                     
                     import os
                     if platform == "openai":
@@ -84,15 +86,34 @@ class TaskService:
                 else:
                     # Fallback to system default config
                     key, base_url, chat_model, _ = ai_service._get_config()
-                    if profile and profile["custom_instructions"]:
+                    if profile and profile.get("custom_instructions"):
                         custom_instr = profile["custom_instructions"]
+                    is_premium = bool(profile.get("is_premium")) if profile else False
+            else:
+                is_premium = False
             
             completed = 0
             
+            import time
             for topic_data in topics_to_generate:
-                tid = topic_data[0]
-                tname = topic_data[1]
-                sname = topic_data[2] if len(topic_data) > 2 else ""
+                # API Limit Queue logic for free users
+                if not is_premium and completed > 0 and completed % 15 == 0:
+                    db_service.execute(
+                        "UPDATE background_tasks SET status = 'processing', message = 'Waiting 15 minutes due to API rate limits (15 topics generated). Please do not close this window.', updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                        (task_id,)
+                    )
+                    time.sleep(900)  # Wait 15 minutes
+                    db_service.execute(
+                        "UPDATE background_tasks SET status = 'processing', message = 'Resuming generation...', updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+                        (task_id,)
+                    )
+                
+                # Dynamic Key Rotation for Premium Users using Admin Pool
+                if is_premium and (not profile or not profile.get("api_keys")):
+                    key, base_url, chat_model, _ = ai_service._get_config()
+                tid = topic_data["id"]
+                tname = topic_data["name"]
+                sname = topic_data["subject_name"] if "subject_name" in topic_data.keys() else ""
                 
                 # Check if task was cancelled by user
                 task_status = db_service.query("SELECT status FROM background_tasks WHERE id = ?", (task_id,), one=True)
@@ -101,13 +122,23 @@ class TaskService:
                     return
                     
                 try:
+                    topic_custom_instr = custom_instr
+                    if "math" in sname.lower() and profile and profile.get("math_learning_level"):
+                        level = profile["math_learning_level"]
+                        if level == "beginner":
+                            topic_custom_instr += "\n[MATH STUDENT LEVEL: BEGINNER] Use very simple language. Explain every symbol before using it. Assume no prior knowledge. Show every calculation step. Use many worked examples and diagrams. Introduce mathematical terminology gradually. Frequently check understanding."
+                        elif level == "intermediate":
+                            topic_custom_instr += "\n[MATH STUDENT LEVEL: INTERMEDIATE] Skip only obvious basics. Focus on conceptual understanding. Explain formulas and their derivations. Include standard exam questions. Provide medium-difficulty practice. Point out common mistakes."
+                        elif level == "advanced":
+                            topic_custom_instr += "\n[MATH STUDENT LEVEL: ADVANCED] Keep explanations concise but complete. Include mathematical proofs where appropriate. Show multiple solving methods. Teach shortcuts after the standard method. Include higher-order thinking questions. Add Olympiad/competitive-level problems. Explain links to other mathematical topics."
+
                     materials = ai_service.generate_topic_materials_for_name(
                         tname, 
                         subject_name=sname, 
                         key=key, 
                         base_url=base_url, 
                         chat_model=chat_model, 
-                        custom_instr=custom_instr
+                        custom_instr=topic_custom_instr
                     )
                     
                     # Check if generation failed

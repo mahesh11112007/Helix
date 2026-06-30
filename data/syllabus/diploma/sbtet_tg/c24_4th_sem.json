@@ -1,0 +1,1210 @@
+{
+  "year": "IV Semester",
+  "groups": {
+    "AI & ML": [
+      {
+        "subject": "Advanced Engineering Mathematics",
+        "code": "SC-401",
+        "chapters": [
+          {
+            "name": "Unit - I: Differential Equations of First Order and First Degree",
+            "topics": [
+              "Definition of a Differential Equation",
+              "Order and Degree of Differential Equations",
+              "Formation of Differential Equations",
+              "Variable Separable Method",
+              "Homogeneous Differential Equations",
+              "Exact Differential Equations",
+              "Linear Differential Equations",
+              "Bernoulli's Equation",
+              "Engineering applications"
+            ]
+          },
+          {
+            "name": "Unit - II: Higher order Homogeneous Linear Differential Equations",
+            "topics": [
+              "Homogenous Linear Differential Equations with constant coefficients",
+              "Second and higher order equations",
+              "Engineering applications"
+            ]
+          },
+          {
+            "name": "Unit - III: Higher order Non-Homogeneous Linear Differential Equations",
+            "topics": [
+              "Complimentary Function (C.F)",
+              "Particular Integral (P.I)",
+              "General Solution (G.S)",
+              "Equations of the form f(D)y=X",
+              "Second order Non-Homogeneous equations"
+            ]
+          },
+          {
+            "name": "Unit - IV: Fourier Series",
+            "topics": [
+              "Periodic functions",
+              "Orthogonality Property of Trigonometric functions",
+              "Fourier series representation",
+              "Euler's formulae",
+              "Fourier series of odd and even functions"
+            ]
+          },
+          {
+            "name": "Unit - V: Laplace Transformations",
+            "topics": [
+              "Definition of Laplace Transform",
+              "Laplace Transform of elementary functions",
+              "Linearity Property",
+              "First Shifting Theorem",
+              "Laplace Transforms of Derivatives and Integrals",
+              "Multiplication by t, Division by t"
+            ]
+          },
+          {
+            "name": "Unit - VI: Inverse Laplace transforms and Applications",
+            "topics": [
+              "Definition of Inverse Laplace Transform",
+              "Partial fractions method",
+              "Convolution Theorem",
+              "Solving Second order Linear Differential Equations using Laplace transforms"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Java Programming",
+        "code": "CS-402",
+        "chapters": [
+          {
+            "name": "Unit I: Fundamentals of Java",
+            "topics": [
+              "Java history and Features",
+              "Java Program Structure",
+              "Java Tokens and Data types",
+              "Selection and Iteration statements",
+              "Classes and Objects",
+              "Method overloading and Constructors",
+              "String classes and Command-line arguments"
+            ]
+          },
+          {
+            "name": "Unit II: Inheritance and Interfaces",
+            "topics": [
+              "Types of inheritance",
+              "Super keyword",
+              "Method overriding and Final keyword",
+              "Interfaces",
+              "Multiple inheritance using interfaces"
+            ]
+          },
+          {
+            "name": "Unit III: Packages and Applets",
+            "topics": [
+              "Java API Packages",
+              "Creating and Accessing packages",
+              "Applet Life cycle",
+              "Creation of Applets"
+            ]
+          },
+          {
+            "name": "Unit IV: AWT and Event handling",
+            "topics": [
+              "AWT classes and controls",
+              "Delegation Event model",
+              "Event Classes and Listener interfaces",
+              "Mouse and Keyboard events"
+            ]
+          },
+          {
+            "name": "Unit V: Exception Handling",
+            "topics": [
+              "Types of errors and Exceptions",
+              "Exception-handling block",
+              "Multi-catch statements",
+              "Nested try statements",
+              "User-defined exceptions"
+            ]
+          },
+          {
+            "name": "Unit VI: Multithreaded programming and JDBC",
+            "topics": [
+              "Thread Life cycle",
+              "Thread Priorities and Synchronization",
+              "Inter-thread communication",
+              "JDBC Architecture",
+              "Establishing database connection",
+              "ResultSet, DDL and DML operations"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Python Programming",
+        "code": "CS-403",
+        "chapters": [
+          {
+            "name": "Unit 1: Introduction & Basics of Python",
+            "topics": [
+              "Introduction to python",
+              "Variable declaration",
+              "Operators",
+              "Indentation and Expressions"
+            ]
+          },
+          {
+            "name": "Unit 2: Conditionals and Loops",
+            "topics": [
+              "If-else statements",
+              "Elif statement",
+              "While loop",
+              "For loop",
+              "Break and Continue"
+            ]
+          },
+          {
+            "name": "Unit 3: Functions, Strings and Data Structures",
+            "topics": [
+              "Defining & Calling functions",
+              "Mutable & Immutable Data Types",
+              "Recursion",
+              "Strings indexing and slicing",
+              "Tuples, Lists, Sets, Dictionaries"
+            ]
+          },
+          {
+            "name": "Unit 4: Classes and Packages",
+            "topics": [
+              "Class definition",
+              "Inheritance",
+              "Creating and importing Modules and Packages",
+              "Virtual environment",
+              "Installing packages"
+            ]
+          },
+          {
+            "name": "Unit 5: Exception handling and Multithreading",
+            "topics": [
+              "Types of errors",
+              "Exception handling (try/except)",
+              "Creating threads",
+              "Thread Synchronization"
+            ]
+          },
+          {
+            "name": "Unit 6: File Processing, GUI, Database, Regular expressions",
+            "topics": [
+              "File handling",
+              "MySQL connectivity",
+              "Tkinter GUI design",
+              "Regular expressions",
+              "NumPy, Pandas, Matplotlib"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Relational Database Management Systems",
+        "code": "CS-404",
+        "chapters": [
+          {
+            "name": "Unit 1: Concepts of Database",
+            "topics": [
+              "Database characteristics",
+              "Three-Schema Architecture",
+              "Data Independence",
+              "Database Languages and Interfaces"
+            ]
+          },
+          {
+            "name": "Unit 2: Data Modeling Using ER Model, Relational data Model",
+            "topics": [
+              "Entity Types and Relationship Sets",
+              "ER Diagrams",
+              "Relational Model constraints",
+              "Relational database schemas"
+            ]
+          },
+          {
+            "name": "Unit 3: Normalization, Transaction Processing, SQL Concepts",
+            "topics": [
+              "Functional dependencies",
+              "Normal forms (1NF, 2NF, 3NF, BCNF)",
+              "Transaction States and ACID properties",
+              "DDL, DML, TCL, DCL statements"
+            ]
+          },
+          {
+            "name": "Unit 4: SQL functions, Sub queries, Joins",
+            "topics": [
+              "SQL functions (numeric, string, aggregate)",
+              "Sub queries",
+              "Types of JOINs"
+            ]
+          },
+          {
+            "name": "Unit 5: Management of schema objects and Concepts of PL/SQL",
+            "topics": [
+              "Indexes, Sequences, Synonyms, Views",
+              "PL/SQL Introduction",
+              "PL/SQL Control statements"
+            ]
+          },
+          {
+            "name": "Unit 6: Advanced PL/SQL",
+            "topics": [
+              "Subprograms, Functions, Stored Procedures",
+              "Recursion",
+              "Exceptions, Cursors, Triggers",
+              "Packages"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Fundamentals of Data Science",
+        "code": "AI-405",
+        "chapters": [
+          {
+            "name": "Unit I: Introduction to Data Science",
+            "topics": [
+              "Evolution of Data Science",
+              "Data Scientist skills and Roles",
+              "Challenges and Security",
+              "Applications of Data Science"
+            ]
+          },
+          {
+            "name": "Unit II: Statistics and Probability",
+            "topics": [
+              "Sampling Techniques",
+              "Probability distributions",
+              "Normal and Gaussian distributions",
+              "Mean, Median, Mode, Variance"
+            ]
+          },
+          {
+            "name": "Unit III: Basic Machine Learning",
+            "topics": [
+              "Supervised Machine Learning",
+              "Unsupervised Machine Learning",
+              "Reinforcement Machine Learning"
+            ]
+          },
+          {
+            "name": "Unit IV: Data Visualization",
+            "topics": [
+              "Visual Encoding",
+              "Data Visualization tools",
+              "Histograms, Bar Charts, Scatter plots",
+              "Heat Maps"
+            ]
+          },
+          {
+            "name": "Unit V: Data Mining",
+            "topics": [
+              "Data Preprocessing",
+              "Mining frequent patterns",
+              "Cluster Analysis",
+              "Outlier Analysis"
+            ]
+          },
+          {
+            "name": "Unit VI: EDA, Analytics and Databases",
+            "topics": [
+              "Exploratory Data Analysis",
+              "Data Science Process",
+              "Data Analytics Life Cycle",
+              "SQL and NoSQL"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Operating Systems",
+        "code": "CS-406",
+        "chapters": [
+          {
+            "name": "Unit 1: Introduction to operating systems",
+            "topics": [
+              "Evolution of OS",
+              "Types of Operating Systems",
+              "OS Components and Services",
+              "System Calls"
+            ]
+          },
+          {
+            "name": "Unit 2: Process management",
+            "topics": [
+              "Process State Diagram",
+              "Process Control Block",
+              "Threads and Multi Threading",
+              "CPU scheduling algorithms"
+            ]
+          },
+          {
+            "name": "Unit 3: Synchronization and Deadlocks",
+            "topics": [
+              "Inter Process Communications",
+              "Semaphores and Monitors",
+              "Deadlock detection and prevention",
+              "Bankers Algorithm"
+            ]
+          },
+          {
+            "name": "Unit 4: Memory management",
+            "topics": [
+              "Address binding",
+              "Fragmentation",
+              "Paging",
+              "Segmentation"
+            ]
+          },
+          {
+            "name": "Unit 5: Virtual memory management",
+            "topics": [
+              "Demand paging",
+              "Page replacement algorithms",
+              "Thrashing"
+            ]
+          },
+          {
+            "name": "Unit 6: Disk Scheduling and File management",
+            "topics": [
+              "Disk performance parameters",
+              "Disk scheduling policies",
+              "File Operations",
+              "Directory structure"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Java Programming Lab",
+        "code": "CS-407",
+        "chapters": [
+          {
+            "name": "Fundamental java Programs",
+            "topics": [
+              "Control statements",
+              "Arrays",
+              "Command line arguments"
+            ]
+          },
+          {
+            "name": "Programs on inheritance and interfaces",
+            "topics": [
+              "Inheritance types",
+              "Interfaces",
+              "Super and This keywords"
+            ]
+          },
+          {
+            "name": "Programs Packages and Applets",
+            "topics": [
+              "User-defined packages",
+              "Applet life cycle"
+            ]
+          },
+          {
+            "name": "AWT Controls and Event handling",
+            "topics": [
+              "AWT components",
+              "Mouse and Keyboard events"
+            ]
+          },
+          {
+            "name": "Exception handling",
+            "topics": [
+              "Exception handling blocks",
+              "User-defined exceptions"
+            ]
+          },
+          {
+            "name": "Multithreaded Programming and JDBC",
+            "topics": [
+              "Thread creation",
+              "Synchronization",
+              "JDBC connectivity"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Python Programming Lab",
+        "code": "CS-408",
+        "chapters": [
+          {
+            "name": "Introduction & Basics of Python",
+            "topics": [
+              "Python IDE setup",
+              "Basic programs"
+            ]
+          },
+          {
+            "name": "Conditionals and Loops",
+            "topics": [
+              "Looping constructs",
+              "Matrix operations"
+            ]
+          },
+          {
+            "name": "Functions, Strings and Data Structures",
+            "topics": [
+              "Data structure exercises"
+            ]
+          },
+          {
+            "name": "Classes, Modules and Packages",
+            "topics": [
+              "Class implementation"
+            ]
+          },
+          {
+            "name": "Exception handling and Multithreading",
+            "topics": [
+              "Multithreading",
+              "Exception handling exercises"
+            ]
+          },
+          {
+            "name": "File, GUI, Database, Packages",
+            "topics": [
+              "File processing",
+              "GUI design",
+              "MySQL connection",
+              "Numpy/Pandas"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Relational Database Management Systems Lab",
+        "code": "CS-409",
+        "chapters": [
+          {
+            "name": "RDBMS Lab Exercises",
+            "topics": [
+              "ER Diagram implementation",
+              "SQL DDL/DML queries",
+              "SQL Functions and Joins",
+              "PL/SQL Control statements",
+              "PL/SQL Cursors and Triggers"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Employability Skills Lab",
+        "code": "HU-410",
+        "chapters": [
+          {
+            "name": "Modules",
+            "topics": [
+              "Presentation Skills",
+              "JAM (Just A Minute)",
+              "Group Discussion",
+              "Interview Skills",
+              "Workplace Awareness and Professional Ethics",
+              "Writing Skills at Workplace"
+            ]
+          }
+        ]
+      }
+    ],
+    "CSE": [
+      {
+        "subject": "Advanced Engineering Mathematics",
+        "code": "SC-401",
+        "chapters": [
+          {
+            "name": "Unit - I: Differential Equations of First Order and First Degree",
+            "topics": [
+              "Definition, Order and Degree",
+              "Formation of Differential Equations",
+              "Variable Separable Method",
+              "Homogeneous Differential Equations",
+              "Exact Differential Equations",
+              "Linear Differential Equations and Bernoulli's Equation"
+            ]
+          },
+          {
+            "name": "Unit - II: Higher order Homogeneous Linear Differential Equations",
+            "topics": [
+              "Homogenous Linear Differential Equations with constant coefficients of second and higher order"
+            ]
+          },
+          {
+            "name": "Unit - III: Higher order Non-Homogeneous Linear Differential Equations",
+            "topics": [
+              "Complementary Function (C.F), Particular Integral (P.I) and General Solution (G.S)",
+              "Non-Homogeneous Linear Differential Equations of the form f(D)y=X"
+            ]
+          },
+          {
+            "name": "Unit - IV: Fourier Series",
+            "topics": [
+              "Periodic functions and Orthogonality Property",
+              "Fourier series representation over interval (c, c+2\u00cf\u20ac)",
+              "Euler's formulae",
+              "Fourier series for odd and even functions"
+            ]
+          },
+          {
+            "name": "Unit - V: Laplace Transformations",
+            "topics": [
+              "Definition and existence conditions",
+              "Elementary functions and Linearity Property",
+              "First Shifting Theorem",
+              "Laplace Transforms of Derivatives and Integrals"
+            ]
+          },
+          {
+            "name": "Unit - VI: Inverse Laplace transforms and Applications",
+            "topics": [
+              "Definition of Inverse Laplace Transform",
+              "Partial fractions",
+              "Convolution Theorem",
+              "Solving Second order Linear Differential Equations"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Java Programming",
+        "code": "CS-402",
+        "chapters": [
+          {
+            "name": "Unit - I: Fundamentals of Java",
+            "topics": [
+              "Java history and Features",
+              "Java Program Structure and Tokens",
+              "Data types, variables, arrays, operators",
+              "Selection and iteration statements",
+              "Classes, objects, constructors, method overloading"
+            ]
+          },
+          {
+            "name": "Unit - II: Inheritance and Interfaces",
+            "topics": [
+              "Types of inheritance",
+              "Super keyword and method overriding",
+              "Interfaces vs Classes",
+              "Multiple inheritance using interface"
+            ]
+          },
+          {
+            "name": "Unit - III: Packages and Applets",
+            "topics": [
+              "Java API Packages",
+              "Creating and accessing packages",
+              "Applet life cycle and creation"
+            ]
+          },
+          {
+            "name": "Unit - IV: AWT and Event handling",
+            "topics": [
+              "AWT classes and controls",
+              "Delegation Event model",
+              "Mouse and Keyboard events"
+            ]
+          },
+          {
+            "name": "Unit - V: Exception Handling",
+            "topics": [
+              "Types of errors and Exceptions",
+              "Exception-handling blocks",
+              "Multi-catch and Nested try statements",
+              "User-defined exceptions"
+            ]
+          },
+          {
+            "name": "Unit - VI: Multithreaded programming and JDBC",
+            "topics": [
+              "Thread life cycle and creation",
+              "Synchronization, Priority, and Deadlocks",
+              "JDBC Architecture and database connectivity"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Python Programming",
+        "code": "CS-403",
+        "chapters": [
+          {
+            "name": "Unit - I: Introduction & Basics of Python",
+            "topics": [
+              "Python versions and IDE",
+              "Variable declaration, Comments, Indentation",
+              "Operators and Expressions"
+            ]
+          },
+          {
+            "name": "Unit - II: Conditionals and Loops",
+            "topics": [
+              "If-else, Nested-if, Elif statements",
+              "While and For loops",
+              "Break and Continue"
+            ]
+          },
+          {
+            "name": "Unit - III: Functions, Strings and Data Structures",
+            "topics": [
+              "Defining & Calling functions",
+              "Mutable & Immutable Data Types",
+              "Recursion and Scope of variables",
+              "Strings, Tuples, Lists, Sets, Dictionaries"
+            ]
+          },
+          {
+            "name": "Unit - IV: Classes and Packages",
+            "topics": [
+              "Class definition, data members, methods, constructors",
+              "Inheritance",
+              "Modules and Packages"
+            ]
+          },
+          {
+            "name": "Unit - V: Exception handling and Multithreading",
+            "topics": [
+              "Error types and Exception handling",
+              "Multithreading creation and synchronization"
+            ]
+          },
+          {
+            "name": "Unit - VI: File Processing, GUI, Database, Regular expressions",
+            "topics": [
+              "File handling",
+              "MySQL database connectivity",
+              "Tkinter GUI design",
+              "Regular expressions and NumPy, Pandas, Matplotlib"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Relational Database Management Systems",
+        "code": "CS-404",
+        "chapters": [
+          {
+            "name": "Unit - I: Concepts of Database",
+            "topics": [
+              "DBMS characteristics and applications",
+              "Data Models, Schemas, and Instances",
+              "Three-Schema Architecture"
+            ]
+          },
+          {
+            "name": "Unit - II: Data Modeling (ER Model) and Relational Data Model",
+            "topics": [
+              "Entity Types, Attributes, and Keys",
+              "ER Diagrams and Relationship sets",
+              "Relational Model Constraints"
+            ]
+          },
+          {
+            "name": "Unit - III: Normalization and Transaction Processing",
+            "topics": [
+              "Functional dependencies",
+              "Normal forms (1NF, 2NF, 3NF, BCNF)",
+              "Transaction processing and ACID properties"
+            ]
+          },
+          {
+            "name": "Unit - IV: SQL functions, Sub queries, Joins",
+            "topics": [
+              "SQL operators and functions",
+              "Sub queries and Joins"
+            ]
+          },
+          {
+            "name": "Unit - V: Management of schema objects and PL/SQL",
+            "topics": [
+              "Indexes, Sequences, Synonyms, Views",
+              "PL/SQL Introduction and control statements"
+            ]
+          },
+          {
+            "name": "Unit - VI: Advanced PL/SQL",
+            "topics": [
+              "Subprograms, Functions, Procedures",
+              "Exceptions, Cursors, Triggers, Packages"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Cryptography & Network Security",
+        "code": "CS-405",
+        "chapters": [
+          {
+            "name": "Unit - I: Introduction to Cryptography",
+            "topics": [
+              "Security goals and OSI Architecture",
+              "Classic vs Modern Cryptography"
+            ]
+          },
+          {
+            "name": "Unit - II: Classical Encryption Techniques",
+            "topics": [
+              "Symmetric Cipher Model",
+              "Substitution and Transposition Techniques",
+              "Steganography"
+            ]
+          },
+          {
+            "name": "Unit - III: Cryptographic Integrity Techniques",
+            "topics": [
+              "Public Key Cryptosystems",
+              "Hash Functions and Digital Signatures"
+            ]
+          },
+          {
+            "name": "Unit - IV: Network and Internet Security",
+            "topics": [
+              "Web Security (HTTPS)",
+              "Wireless Security",
+              "Email Security and IPSec"
+            ]
+          },
+          {
+            "name": "Unit - V: System Security",
+            "topics": [
+              "Intrusion Detection",
+              "Malware (Viruses, Worms, Trojans)",
+              "Countermeasures"
+            ]
+          },
+          {
+            "name": "Unit - VI: Firewalls and Ethical Issues",
+            "topics": [
+              "Firewall types and characteristics",
+              "Cybercrime and Digital Rights Management"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Operating Systems",
+        "code": "CS-406",
+        "chapters": [
+          {
+            "name": "Unit - I: Introduction to operating systems",
+            "topics": [
+              "OS Evolution and Types",
+              "OS Components and Services",
+              "System Calls"
+            ]
+          },
+          {
+            "name": "Unit - II: Process management",
+            "topics": [
+              "Process State Diagram and PCB",
+              "Threads and Multithreading",
+              "CPU Scheduling algorithms"
+            ]
+          },
+          {
+            "name": "Unit - III: Synchronization and Deadlocks",
+            "topics": [
+              "Inter Process Communication",
+              "Deadlock prevention, avoidance (Banker's Algorithm), and detection"
+            ]
+          },
+          {
+            "name": "Unit - IV: Memory management",
+            "topics": [
+              "Address binding and Allocation",
+              "Fragmentation, Paging, and Segmentation"
+            ]
+          },
+          {
+            "name": "Unit - V: Virtual memory management",
+            "topics": [
+              "Demand paging",
+              "Page replacement algorithms",
+              "Thrashing"
+            ]
+          },
+          {
+            "name": "Unit - VI: Disk Scheduling and File management",
+            "topics": [
+              "Disk scheduling policies",
+              "File operations and Directory structures"
+            ]
+          }
+        ]
+      }
+    ],
+    "ECE": [
+      {
+        "subject": "Advanced Engineering Mathematics",
+        "code": "SC-401",
+        "chapters": [
+          {
+            "name": "Differential Equations of First Order and First Degree",
+            "topics": [
+              "Definition, Order and Degree",
+              "Formation of Differential Equations",
+              "Variable Separable Method",
+              "Homogeneous Differential Equations",
+              "Exact Differential Equations",
+              "Linear Differential Equations and Bernoulli's Equation"
+            ]
+          },
+          {
+            "name": "Higher order Homogeneous Linear Differential Equations with constant coefficients",
+            "topics": [
+              "Homogenous Linear Differential Equations with constant coefficients of second and higher order"
+            ]
+          },
+          {
+            "name": "Higher order Non-Homogeneous Linear Differential Equations with constant coefficients",
+            "topics": [
+              "Complementary Function (C.F)",
+              "Particular Integral (P.I)",
+              "General Solution (G.S)",
+              "Equations of the form f(D)y=X where X is k, e^ax, Sin(ax), Cos(ax), x^n"
+            ]
+          },
+          {
+            "name": "Fourier Series",
+            "topics": [
+              "Periodic functions",
+              "Orthogonality Property",
+              "Euler's formulae",
+              "Fourier series of functions over (0, 2\u03c0) and (-\u03c0, \u03c0)",
+              "Fourier series of odd and even functions"
+            ]
+          },
+          {
+            "name": "Laplace Transformations",
+            "topics": [
+              "Definition and Existence",
+              "Laplace Transform of elementary functions",
+              "Linearity Property",
+              "First Shifting Theorem",
+              "Laplace Transforms of Derivatives and Integrals",
+              "Multiplication by t and Division by t"
+            ]
+          },
+          {
+            "name": "Inverse Laplace transforms and Applications",
+            "topics": [
+              "Definition of Inverse Laplace Transform",
+              "Partial fractions",
+              "Inverse Laplace Transform of Derivatives and Integrals",
+              "Convolution Theorem",
+              "Applications in solving Second order Linear Differential Equations"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Microprocessors & Microcontrollers",
+        "code": "EC-402",
+        "chapters": [
+          {
+            "name": "Architecture of 8085 Microprocessor",
+            "topics": [
+              "Block Diagram of Microcomputer",
+              "Functional block diagram of 8085",
+              "Buses in microprocessor system",
+              "Demultiplexing of Address/ Data Bus",
+              "Fetch, Execution, Instruction, and Machine Cycles"
+            ]
+          },
+          {
+            "name": "Architecture of 8051 Microcontroller",
+            "topics": [
+              "Differences between Microprocessors and Microcontrollers",
+              "Features of 8051",
+              "Functional block diagram of 8051",
+              "Organization of Program and Data memories",
+              "Operation of Timers, Serial Ports, and Interrupt system",
+              "Pin diagram of 8051"
+            ]
+          },
+          {
+            "name": "Addressing modes and Instruction set of 8051",
+            "topics": [
+              "Machine Language and Assembly Language",
+              "Addressing modes",
+              "Instruction Format (Opcode and Operand)",
+              "Data Transfer, Arithmetic, Logical, Boolean, and Branch Instructions"
+            ]
+          },
+          {
+            "name": "Programming of 8051",
+            "topics": [
+              "Flowcharts",
+              "Arithmetic, Logical, and Boolean programs",
+              "Finding largest/smallest numbers",
+              "Counter techniques",
+              "Subroutines and Debugging"
+            ]
+          },
+          {
+            "name": "Interfacing Devices",
+            "topics": [
+              "Need for Interfacing",
+              "8255 PPI",
+              "8251 USART",
+              "8257 DMA Controller",
+              "Interrupt handling"
+            ]
+          },
+          {
+            "name": "Applications of 8051 Microcontroller",
+            "topics": [
+              "Interfacing Push Buttons, LEDs, Relays",
+              "4X4 matrix Key Board",
+              "7-Segment display unit",
+              "LCD interfacing"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Python Programming",
+        "code": "CS-403",
+        "chapters": [
+          {
+            "name": "Introduction & Basics of Python",
+            "topics": [
+              "Introduction to python, versions, IDE",
+              "Variables, comments, Indentation",
+              "Operators and Expressions"
+            ]
+          },
+          {
+            "name": "Conditionals and Loops",
+            "topics": [
+              "if-else, Nested-if, Elif",
+              "While loop, For Loop, Nested Loops",
+              "Break and Continue"
+            ]
+          },
+          {
+            "name": "Functions, Strings and Data Structures",
+            "topics": [
+              "Defining & Calling a function",
+              "Arguments, Recursion, Scope",
+              "String operations (Indexing and Slicing)",
+              "Tuples, Lists, Sets, Dictionaries"
+            ]
+          },
+          {
+            "name": "Classes, Modules and Packages",
+            "topics": [
+              "Defining Class, Inheritance",
+              "Modules and Packages",
+              "Virtual environment",
+              "Datetime and Math packages"
+            ]
+          },
+          {
+            "name": "Exception handling and Multithreading",
+            "topics": [
+              "Compile time, runtime, and logical errors",
+              "Try/except, finally",
+              "Multithreading and Thread Synchronization"
+            ]
+          },
+          {
+            "name": "File Processing, Design GUI, Connect to Database, Regular expressions",
+            "topics": [
+              "Working with files and folders",
+              "MySQL connectivity",
+              "TKinter library for GUI",
+              "Regular expressions",
+              "numpy, pandas, matplotlib, sklearn"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Data Communications & Computer Networks",
+        "code": "EC-404",
+        "chapters": [
+          {
+            "name": "Basic data Communication and networking",
+            "topics": [
+              "Data communication characteristics and components",
+              "Simplex, half-duplex and full-duplex",
+              "Network topologies (Bus, Star, Ring)",
+              "ISO: OSI reference model"
+            ]
+          },
+          {
+            "name": "Physical and Data link layer protocols",
+            "topics": [
+              "Physical media (UTP, STP, Fiber optic)",
+              "Switching techniques",
+              "Networking devices (Hub, Bridge, Router)",
+              "CSMA/CD, CSMA/CA",
+              "Ethernet frame format"
+            ]
+          },
+          {
+            "name": "Network and Transport layer protocols",
+            "topics": [
+              "Internet and Intranet",
+              "IPv4 and IPv6 addressing",
+              "TCP/IP reference model",
+              "TCP and UDP features"
+            ]
+          },
+          {
+            "name": "Application layer protocols",
+            "topics": [
+              "DNS server",
+              "Email (POP, SMTP)",
+              "FTP, HTTP",
+              "Web browser",
+              "Remote login"
+            ]
+          },
+          {
+            "name": "Wireless LAN protocols",
+            "topics": [
+              "Wireless LAN topology",
+              "IEEE 802.11 frame format",
+              "Bluetooth, Zigbee, LoRaWAN"
+            ]
+          },
+          {
+            "name": "Network security",
+            "topics": [
+              "Security services",
+              "Key management",
+              "Digital signature",
+              "Firewalls",
+              "Cyber security"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Microwave Communication",
+        "code": "EC-405",
+        "chapters": [
+          {
+            "name": "Transmission Lines",
+            "topics": [
+              "Types of Transmission Lines",
+              "Electrical equivalent circuit",
+              "Primary and Secondary constants",
+              "Reflection coefficient and SWR"
+            ]
+          },
+          {
+            "name": "Antennas",
+            "topics": [
+              "Principle and radiation pattern",
+              "Half wave dipole",
+              "Antenna arrays (Broadside and End fire)",
+              "Yagi-Uda antenna",
+              "Parabolic reflector"
+            ]
+          },
+          {
+            "name": "Wave Propagation",
+            "topics": [
+              "Properties of EM waves",
+              "Ground, Sky, and Space wave propagation",
+              "Layers in ionosphere",
+              "Fading and Diversity methods"
+            ]
+          },
+          {
+            "name": "Microwave Components",
+            "topics": [
+              "Waveguides and modes",
+              "Rectangular waveguide parameters",
+              "T-Junctions (E-Plane, H-Plane, Magic Tee)",
+              "Isolators and Circulators"
+            ]
+          },
+          {
+            "name": "Microwave Tubes and Solid State Devices",
+            "topics": [
+              "Klystron amplifier and Reflex Klystron",
+              "Travelling Wave Tube (TWT)",
+              "Gunn diode",
+              "IMPATT diode",
+              "Microwave Integrated Circuits (MICs)"
+            ]
+          },
+          {
+            "name": "Colour Television and Digital TV",
+            "topics": [
+              "Scanning (Progressive and Interlaced)",
+              "Composite video signal",
+              "Color TV transmitter and receiver blocks",
+              "DTH, Set Top Box, HDTV, SMART TV"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Semiconductor Technology",
+        "code": "EC-406",
+        "chapters": [
+          {
+            "name": "Introduction to MOS Transistor",
+            "topics": [
+              "Moore's Law",
+              "MOS and VLSI Technology",
+              "IC fabrication Process",
+              "nMOS and CMOS fabrication (p-well, n-well, Twin tube)"
+            ]
+          },
+          {
+            "name": "Basic Electrical Properties of MOS Transistor",
+            "topics": [
+              "Drain to source current (Ids) vs Voltage (Vds)",
+              "Threshold voltage",
+              "Transconductance and Output conductance",
+              "nMOS inverter pull-up to pull-down ratio"
+            ]
+          },
+          {
+            "name": "CMOS and BiCMOS inverters",
+            "topics": [
+              "CMOS inverter regions of operation",
+              "BiCMOS Technology",
+              "Latch-up in CMOS and remedies",
+              "FinFET Technology"
+            ]
+          },
+          {
+            "name": "Basic circuit concepts",
+            "topics": [
+              "Sheet resistance",
+              "Area capacitances",
+              "Inverter delays",
+              "Driving large capacitive loads"
+            ]
+          },
+          {
+            "name": "Design Rules of MOS Circuits",
+            "topics": [
+              "Stick diagrams and Layout diagrams",
+              "nMOS and CMOS design styles",
+              "Lambda based design rules",
+              "Contact cuts"
+            ]
+          },
+          {
+            "name": "Logic gate design",
+            "topics": [
+              "CMOS circuits for basic gates (Inverter, NAND, NOR, AND, OR)",
+              "Compound gates design",
+              "Stick diagram and layout design"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

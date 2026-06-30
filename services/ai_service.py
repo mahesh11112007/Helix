@@ -35,39 +35,22 @@ class AIService:
         ai_platform = "nvidia"
         is_fallback = True
             
-        # Fallback to env
-        if not keys_str:
-            from services.usage_service import usage_service
-            tier = "free"
-            try:
-                if "user_id" in session:
-                    tier = usage_service.get_tier(session["user_id"])
-            except RuntimeError:
-                pass
-                
-            if tier == "premium":
-                # For premium, we don't fall back to free global keys, but they might be the same. 
-                # Let's just collect all keys from the env.
-                env_vars = ["GLOBAL_AI_API_KEYS", "NVIDIA_NIM_PAID_API_KEY", "NVIDIA_NIM_API_KEYS", "NVIDIA_NIM_API_KEY", "GEMINI_API_KEYS", "GROQ_API_KEYS", "OPENROUTER_API_KEYS"]
-            else:
-                env_vars = ["GLOBAL_AI_API_KEYS", "NVIDIA_NIM_API_KEYS", "NVIDIA_NIM_API_KEY", "GEMINI_API_KEYS", "GROQ_API_KEYS", "OPENROUTER_API_KEYS"]
-                
-            combined = []
+        combined = []
+        # Fetch from DB system_settings
+        try:
+            rows = db_service.query("SELECT key_name, key_value FROM system_settings")
+            if rows:
+                for row in rows:
+                    if row["key_value"]:
+                        combined.append(row["key_value"])
+        except Exception:
+            pass
             
-            # Fetch from DB system_settings
-            try:
-                rows = db_service.query("SELECT key_name, key_value FROM system_settings")
-                if rows:
-                    for row in rows:
-                        if row["key_value"]:
-                            combined.append(row["key_value"])
-            except RuntimeError:
-                pass
-                
-            for ev in env_vars:
-                val = os.getenv(ev)
-                if val: combined.append(val)
-            keys_str = ",".join(combined)
+        env_vars = ["GLOBAL_AI_API_KEYS", "NVIDIA_NIM_PAID_API_KEY", "NVIDIA_NIM_API_KEYS", "NVIDIA_NIM_API_KEY", "GEMINI_API_KEYS", "GROQ_API_KEYS", "OPENROUTER_API_KEYS"]
+        for ev in env_vars:
+            val = os.getenv(ev)
+            if val: combined.append(val)
+        keys_str = ",".join(combined)
             
         if not keys_str:
             return None, ai_platform
@@ -195,19 +178,34 @@ class AIService:
             "max_tokens": 1024
         }
 
-        try:
-            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
-            response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=60)
-            response.raise_for_status()
-            result = response.json()
-            content = result["choices"][0]["message"]["content"]
-            parsed_json = self._extract_json(content)
-            if parsed_json:
-                return parsed_json
-            return json.loads(content)
-        except Exception as e:
-            print(f"Error in Vision: {e}")
-            return self._get_mock_vision_response()
+        for attempt in range(6):
+            try:
+                headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+                response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=60)
+                response.raise_for_status()
+                result = response.json()
+                content = result["choices"][0]["message"]["content"]
+                parsed_json = self._extract_json(content)
+                if parsed_json:
+                    return parsed_json
+                return json.loads(content)
+            except requests.exceptions.HTTPError as e:
+                import time
+                if e.response and e.response.status_code in [429, 401, 403]:
+                    new_key, new_base_url, new_chat_model, new_vision_model = self._get_config()
+                    if new_key and new_key != key:
+                        key, base_url, vision_model = new_key, new_base_url, new_vision_model
+                        payload["model"] = vision_model
+                        headers["Authorization"] = f"Bearer {key}"
+                    time.sleep(1)
+                    continue
+                else:
+                    break
+            except Exception as e:
+                print(f"Error in Vision: {e}")
+                break
+                
+        return self._get_mock_vision_response()
 
     def _normalize_text(self, text):
         import re
@@ -338,42 +336,44 @@ Document Context:
             "max_tokens": 2048
         }
 
-        try:
-            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
-            response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=300)
-            response.raise_for_status()
-            result = response.json()
-            content = result["choices"][0]["message"]["content"]
-            # Strip <think>...</think> tags if present, even if unclosed
-            content = re.sub(r'<think>.*?(?:</think>|$)', '', content, flags=re.DOTALL).strip()
-            
-            # Save to cache
-            self._set_cached_response(user_prompt, content, topic_id=topic_id)
-            
-            return content
-        except requests.exceptions.HTTPError as e:
-            _handle_auth_error(e)
-            status = e.response.status_code if e.response else 'unknown'
-            print(f"Error in Chat NIM API (HTTP {status}): {e}")
-            if status == 429:
-                return "The AI service is currently rate-limited. Please wait a moment and try again."
-            if isinstance(status, int) and status >= 500:
-                # Retry once for server errors
-                try:
-                    time.sleep(2)
-                    response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=60)
-                    response.raise_for_status()
-                    content = response.json()["choices"][0]["message"]["content"]
-                    content = re.sub(r'<think>.*?(?:</think>|$)', '', content, flags=re.DOTALL).strip()
-                    return content
-                except Exception:
-                    pass
-            return "Apologies, the AI server is temporarily unavailable. Please try again in a few seconds."
-        except requests.exceptions.Timeout:
-            return "The AI request timed out. Please try again with a shorter question."
-        except Exception as e:
-            print(f"Error in Chat NIM API: {e}")
-            return "Apologies, I encountered an error communicating with the AI model. Please try again."
+        for attempt in range(6):
+            try:
+                headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+                response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=120)
+                response.raise_for_status()
+                result = response.json()
+                content = result["choices"][0]["message"]["content"]
+                # Strip <think>...</think> tags if present, even if unclosed
+                content = re.sub(r'<think>.*?(?:</think>|$)', '', content, flags=re.DOTALL).strip()
+                
+                # Save to cache
+                self._set_cached_response(user_prompt, content, topic_id=topic_id)
+                
+                return content
+            except requests.exceptions.HTTPError as e:
+                _handle_auth_error(e)
+                status = e.response.status_code if e.response is not None else 'unknown'
+                print(f"Error in Chat NIM API (HTTP {status}): {e}")
+                
+                if status in [429, 401, 403, 500, 502, 503]:
+                    # Fetch next key for rotation
+                    new_key, new_base_url, new_chat_model, new_vision_model = self._get_config()
+                    if new_key and new_key != key:
+                        key, base_url = new_key, new_base_url
+                        model_to_use = new_vision_model if image_base64 else new_chat_model
+                        payload["model"] = model_to_use
+                        headers["Authorization"] = f"Bearer {key}"
+                    time.sleep(1 + attempt)
+                    continue
+                else:
+                    return f"Apologies, I encountered an error communicating with the AI model ({status}). Please try again."
+            except requests.exceptions.Timeout:
+                return "The AI request timed out. Please try again with a shorter question."
+            except Exception as e:
+                print(f"Error in Chat NIM API: {e}")
+                return "Apologies, I encountered an error communicating with the AI model. Please try again."
+                
+        return "The AI service is currently unavailable or rate-limited. Please wait a moment and try again."
 
     def explain_topic(self, topic_name, level="beginner", language="English"):
         """
@@ -431,18 +431,29 @@ Document Context:
             "max_tokens": 1024
         }
 
-        try:
-            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
-            response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload)
-            response.raise_for_status()
-            content = response.json()["choices"][0]["message"]["content"]
-            
-            cache_query = f"explain {topic_name} at {level} level in {language}"
-            self._set_cached_response(cache_query, content)
-            
-            return content
-        except Exception as e:
-            return f"Error generating topic explanation: {e}"
+        import time
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+                response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=60)
+                
+                if response.status_code == 429 and attempt < max_retries - 1:
+                    time.sleep(2 ** attempt)  # Exponential backoff: 1s, 2s, 4s
+                    continue
+                    
+                response.raise_for_status()
+                content = response.json()["choices"][0]["message"]["content"]
+                
+                cache_query = f"explain {topic_name} at {level} level in {language}"
+                self._set_cached_response(cache_query, content)
+                
+                return content
+            except Exception as e:
+                if attempt == max_retries - 1:
+                    if "429" in str(e) or (hasattr(response, "status_code") and response.status_code == 429):
+                        return "### ⏳ AI is resting (Rate Limit Exceeded)\n\nYou have made too many requests in a short time. Please wait 1-2 minutes before trying again. \n\n*If you are using the free Gemini API tier, you are limited to 15 requests per minute.*"
+                    return f"### ❌ Error\nAn error occurred while generating the explanation: `{e}`"
 
     def parse_syllabus(self, syllabus_text):
         """
@@ -453,9 +464,13 @@ Document Context:
             return self._get_mock_syllabus_response()
 
         prompt = f"""
-        Analyze the following syllabus text.
-        Extract and structure it into Subjects, Units, and Topics.
-        Create clear, logical names.
+        You are an expert academic data extractor. Your job is to strictly parse the provided raw syllabus text into a specific JSON schema.
+        
+        RULES:
+        1. Extract all valid Subjects, Chapters (or Units), and Topics accurately based on the text.
+        2. Do NOT invent or hallucinate topics (e.g., do not generate "Topic 1", "Topic 2"). Extract exactly what is written in the text.
+        3. If a chapter has no explicit topics, break the chapter description into logical topic chunks, or leave the topics array empty if no sub-topics exist.
+        4. Preserve subject codes if they exist.
         
         Syllabus Text:
         {syllabus_text}
@@ -464,13 +479,12 @@ Document Context:
         {{
           "subjects": [
             {{
-              "name": "Subject Name",
+              "subject": "Subject Name",
               "code": "Optional Code",
-              "units": [
+              "chapters": [
                 {{
-                  "name": "Unit Title",
-                  "number": 1,
-                  "topics": ["Topic 1", "Topic 2", "Topic 3"]
+                  "name": "Unit/Chapter Title",
+                  "topics": ["Exact Topic string 1", "Exact Topic string 2"]
                 }}
               ]
             }}
@@ -606,7 +620,7 @@ Document Context:
                 return [clean_strings(item) for item in data]
             elif isinstance(data, str):
                 s = data.replace('\\n', '\n')
-                return _clean_latex(s)
+                return s
             return data
 
         # --- Phase 1: Sanitize LaTeX backslashes that break JSON ---
@@ -681,11 +695,12 @@ Rules:
 - Build understanding before introducing technical details.
 
 Mathematics Strategy:
-- Teach mathematical reasoning, not just the answer.
-- Explain what each formula means and why it works.
-- Show every calculation step. Never skip intermediate steps.
-- Explain symbols, variables, and notation.
-- Mention common mistakes and misconceptions.
+- **Comprehensive and Long**: Do not generate short summaries. Provide deep, comprehensive coverage of the topic.
+- **Minimal Theory**: Keep introductory theory to a bare minimum.
+- **Theorems & Proofs**: Heavily emphasize core theorems, their exact statements, and their step-by-step proofs.
+- **Problem Solving Focus**: Provide a large number of solved numerical problems. Show every calculation step clearly. Never skip intermediate steps.
+- **Notation**: Explain symbols, variables, and mathematical notation clearly.
+- Mention common mistakes and misconceptions explicitly.
 
 Programming Strategy:
 - Explain the underlying concept first.
@@ -698,7 +713,7 @@ Other Subjects:
 - Use examples and analogies whenever they improve understanding.
 - Expand difficult concepts instead of summarizing them."""
 
-    def _generate_partial(self, prompt, max_tokens=4096, retries=2, key=None, base_url=None, chat_model=None, custom_instr=""):
+    def _generate_partial(self, prompt, max_tokens=4096, retries=5, key=None, base_url=None, chat_model=None, custom_instr=""):
         """Call the LLM API with retry logic and robust JSON extraction."""
         if not key:
             key, base_url, chat_model, vision_model = self._get_config()
@@ -765,6 +780,14 @@ CRITICAL JSON OUTPUT RULES:
             except requests.exceptions.HTTPError as e:
                 _handle_auth_error(e)
                 print(f"HTTP Error in partial generation attempt {attempt + 1}: {e}")
+                
+                # Fetch next key for rotation
+                new_key, new_base_url, new_chat_model, _ = self._get_config()
+                if new_key and new_key != key:
+                    key, base_url, chat_model = new_key, new_base_url, new_chat_model
+                    headers["Authorization"] = f"Bearer {key}"
+                    payload["model"] = chat_model
+                    
                 if e.response and e.response.status_code == 429:
                     time.sleep(2 ** attempt)
                     continue
@@ -850,6 +873,8 @@ Return JSON: {{"viva_questions": [{{"question": "...", "answer": "..."}}]}}"""
             
             CRITICAL JSON RULE: Because you are outputting JSON, you MUST double-escape all LaTeX backslashes so the JSON is valid. For example, write \\\\frac instead of \\frac.
             
+            LENGTH CONSTRAINT: Keep the notes concise and highly condensed. You MUST finish the entire response within 1500 words to prevent truncation. Do not ramble.
+            
             Also generate a separate concise revision summary (200-300 words).
             
             Return a strict JSON object:
@@ -892,8 +917,8 @@ Return JSON: {{"viva_questions": [{{"question": "...", "answer": "..."}}]}}"""
                     tokens = 1200 if pkey == "notes_summary" else 400
                 else:
                     # Higher token limits for cloud APIs
-                    tokens = 3072 if pkey == "notes_summary" else 1536
-                future_to_key[executor.submit(self._generate_partial, prompt, tokens, 2, key, base_url, chat_model, custom_instr)] = pkey
+                    tokens = 6144 if pkey == "notes_summary" else 2048
+                future_to_key[executor.submit(self._generate_partial, prompt, tokens, 6, key, base_url, chat_model, custom_instr)] = pkey
             for future in concurrent.futures.as_completed(future_to_key):
                 try:
                     data = future.result()
@@ -1277,22 +1302,11 @@ Understanding {topic_name} requires working through real examples and practice p
                 "viva_questions": viva,
             }
 
-    SUBJECT_DATA = {
-        "dbms": {
-            "name": "Database Management Systems",
-            "code": "CS-302",
-            "aliases": ["dbms", "database", "sql"],
     def process_natural_language_command(self, user_command):
         """
         AI Planner is deprecated in favor of Centralized JSON Syllabus Setup.
         """
         return {"error": "AI Planner is deprecated. Please use the Setup Wizard to load your syllabus."}
-                    ],
-                }
-            ],
-            "generate_materials": generate_materials,
-            "focus_topics": focus_topics,
-        }
 
     def generate_topic_materials_for_name(self, topic_name, subject_name="", key=None, base_url=None, chat_model=None, custom_instr=""):
         """

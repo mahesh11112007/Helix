@@ -33,6 +33,12 @@ def index():
         session.clear()
         flash("Your session is invalid or database was reset. Please log in again.", "error")
         return redirect(url_for("auth.login"))
+        
+    from routes.study import increment_daily_streak
+    increment_daily_streak(user["id"])
+    
+    # Refresh profile to get updated streak
+    profile = db_service.query("SELECT * FROM profiles WHERE id = ?", (user["id"],), one=True)
     
     # Get semesters
     semesters = db_service.query("SELECT * FROM semesters WHERE user_id = ? ORDER BY created_at DESC", (user["id"],))
@@ -69,6 +75,13 @@ def index():
     if not semesters:
         return redirect(url_for("dashboard.setup"))
 
+    # Check and generate weekly tests (runs async in background)
+    from services.weekly_test_service import weekly_test_service
+    weekly_test_service.check_and_generate(user["id"])
+    
+    # Get pending weekly tests
+    pending_tests = db_service.query("SELECT * FROM weekly_tests WHERE user_id = ? AND status = 'pending' ORDER BY created_at DESC", (user["id"],))
+
     return render_template(
         "dashboard/index.html",
         profile=profile,
@@ -76,7 +89,8 @@ def index():
         sessions=sessions,
         exams=exams,
         recent_files=recent_files,
-        ai_suggestions=ai_suggestions
+        ai_suggestions=ai_suggestions,
+        pending_tests=pending_tests
     )
 
 @dashboard_bp.route("/setup", methods=["GET", "POST"])

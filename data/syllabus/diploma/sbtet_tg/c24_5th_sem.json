@@ -1,0 +1,788 @@
+{
+  "year": "V Semester",
+  "groups": {
+    "AI & ML": [
+      {
+        "subject": "Entrepreneurship & Startups",
+        "code": "EC-501",
+        "chapters": [
+          {
+            "name": "Management Practices",
+            "topics": [
+              "Industry ownership models",
+              "Functions of management",
+              "Leadership models"
+            ]
+          },
+          {
+            "name": "Introduction to Entrepreneurship and Start-Ups",
+            "topics": [
+              "Entrepreneurship characteristics and functions",
+              "Entrepreneur vs Intrapreneur",
+              "Entrepreneur vs Managers",
+              "7-M Resources",
+              "MSME & Startup India",
+              "Startup Telangana schemes, eligibility, and benefits"
+            ]
+          },
+          {
+            "name": "Business Ideas and their implementation",
+            "topics": [
+              "Ideation canvas and business model canvas",
+              "Market research and marketing mix",
+              "Product terminologies",
+              "Innovation, Risk and SWOT Analysis"
+            ]
+          },
+          {
+            "name": "Finance Management",
+            "topics": [
+              "Objectives of Financial Management",
+              "Sources of capital and Start-up funding types",
+              "Budgeting",
+              "Profit and loss Account and balance sheet",
+              "Types of taxes (GST, Income Tax, etc.)"
+            ]
+          },
+          {
+            "name": "Support Agencies and Incubators",
+            "topics": [
+              "Central and State Government institutions (NSIC, SIDO, SSIDC, etc.)",
+              "Telangana State industry policy",
+              "Support Banks (SIDBI, APSFC)",
+              "Legal Issues (IPR, Patents, Trademarks)"
+            ]
+          },
+          {
+            "name": "Project Proposal & Exit Strategy",
+            "topics": [
+              "Project Planning and Feasibility study",
+              "Breakeven analysis",
+              "Return on investment and sales",
+              "Business Ethics and CSR",
+              "Ex-Im Policies",
+              "Succession and harvesting strategies"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": ".Net Programming Through C#",
+        "code": "CS-502",
+        "chapters": [
+          {
+            "name": "Basics of .NET Framework and Visual Studio",
+            "topics": [
+              "CLR architecture",
+              "Framework and base class Library",
+              "Visual Studio IDE"
+            ]
+          },
+          {
+            "name": "Introduction to C#.net and oops concepts",
+            "topics": [
+              "Features of C#.net",
+              "Primitive datatypes and interfaces",
+              "Inheritance, Overloading, and Overriding"
+            ]
+          },
+          {
+            "name": "Exception Handling and Multithreading",
+            "topics": [
+              "Exception handling mechanism",
+              "Thread properties and methods",
+              "Thread life cycle and priorities"
+            ]
+          },
+          {
+            "name": "Advanced concepts of C#",
+            "topics": [
+              "Indexers and Properties",
+              "Lambda expressions and Delegates",
+              "Generic Programming"
+            ]
+          },
+          {
+            "name": "Windows Applications development",
+            "topics": [
+              "UI controls (text box, label, button, list box)",
+              "Event handling",
+              "Menus"
+            ]
+          },
+          {
+            "name": "Web Based Applications and Database access",
+            "topics": [
+              "Asp.net server controls",
+              "ADO.NET features",
+              "Data binding and Dataset objects"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Mobile Application Development",
+        "code": "CS-503",
+        "chapters": [
+          {
+            "name": "Introduction to Mobile Application Development",
+            "topics": [
+              "Mobile ecosystem",
+              "Native, web and hybrid apps",
+              "System on Chip (SoC) components"
+            ]
+          },
+          {
+            "name": "Introduction to Mobile Operating Systems",
+            "topics": [
+              "iOS Architecture and versions",
+              "Android OS Architecture and versions",
+              "iOS vs. Android OS"
+            ]
+          },
+          {
+            "name": "Android development environment setup",
+            "topics": [
+              "Android Studio, Eclipse, and Visual Studio IDE",
+              "Android Virtual Devices (AVDs)",
+              "Android development frameworks"
+            ]
+          },
+          {
+            "name": "Programming Components of Android",
+            "topics": [
+              "Activities, Services, Content Providers, Broadcast Receivers",
+              "Project structure (Manifest, R file, Gradle)",
+              "Intents and Lifecycle of Activities"
+            ]
+          },
+          {
+            "name": "Android User Interface and Fragments",
+            "topics": [
+              "Layouts (Linear, Relative, Frame, Constraint, Table)",
+              "UI Controls (TextView, Button, Checkbox, Spinner, etc.)",
+              "Fragments lifecycle"
+            ]
+          },
+          {
+            "name": "Android Services and Storage",
+            "topics": [
+              "Android services lifecycle",
+              "SQLite database operations (CRUD)"
+            ]
+          }
+        ]
+      }
+    ],
+    "CSE": [
+      {
+        "subject": "Entrepreneurship & Startups",
+        "code": "EC-501",
+        "chapters": [
+          {
+            "name": "Management Practices",
+            "topics": [
+              "Industry and Commerce",
+              "Ownership Models",
+              "Functions of Management",
+              "Leadership Models"
+            ]
+          },
+          {
+            "name": "Introduction to Entrepreneurship and Start-ups",
+            "topics": [
+              "Characteristics of Entrepreneurship",
+              "Entrepreneur vs Intrapreneur",
+              "7-M Resources",
+              "MSME & Startup India",
+              "Startup Telangana Schemes"
+            ]
+          },
+          {
+            "name": "Business Ideas and their implementation",
+            "topics": [
+              "Ideation Canvas",
+              "Business Model Canvas",
+              "Market Research",
+              "Innovation",
+              "SWOT Analysis"
+            ]
+          },
+          {
+            "name": "Finance Management",
+            "topics": [
+              "Objectives of Financial Management",
+              "Funding Types",
+              "Budgets",
+              "Profit & Loss Account",
+              "Balance Sheet",
+              "Taxes (GST, etc.)"
+            ]
+          },
+          {
+            "name": "Support Agencies and Incubators",
+            "topics": [
+              "Central Government Institutions",
+              "Telangana State Industry Policy",
+              "Banks supporting SSIs",
+              "IPR, Patents, Trademarks"
+            ]
+          },
+          {
+            "name": "Project Proposal & Exit Strategy",
+            "topics": [
+              "Project Planning",
+              "Feasibility Study",
+              "Breakeven Analysis",
+              "Ex-Im Policies",
+              "Succession and Harvesting"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": ".Net Programming Through C#",
+        "code": "CS-502",
+        "chapters": [
+          {
+            "name": "Basics of .NET Framework and Visual Studio",
+            "topics": [
+              "CLR Architecture",
+              "Base Class Library",
+              "Visual Studio IDE",
+              ".NET Languages"
+            ]
+          },
+          {
+            "name": "Introduction to C#.net and oops concepts",
+            "topics": [
+              "Features of C#.net",
+              "Primitive Datatypes",
+              "Constructors",
+              "Inheritance",
+              "Arrays",
+              "Method Overloading/Overriding"
+            ]
+          },
+          {
+            "name": "Exception Handling and Multithreading",
+            "topics": [
+              "Predefined Exception Classes",
+              "User Defined Exceptions",
+              "Thread Class Properties",
+              "Thread Life Cycle"
+            ]
+          },
+          {
+            "name": "Advanced concepts of C#",
+            "topics": [
+              "Indexers and Properties",
+              "Anonymous Methods",
+              "Lambda expressions",
+              "Delegates",
+              "Generic Programming"
+            ]
+          },
+          {
+            "name": "Windows Applications development",
+            "topics": [
+              "Windows Forms",
+              "UI Controls (TextBox, Button, etc.)",
+              "Event Handling",
+              "Menus"
+            ]
+          },
+          {
+            "name": "Web Based Applications and Database access",
+            "topics": [
+              "ASP.net Server Controls",
+              "ADO.NET",
+              "Data Binding",
+              "Typed and Untyped Datasets"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Mobile Application Development",
+        "code": "CS-503",
+        "chapters": [
+          {
+            "name": "Introduction to Mobile Application Development",
+            "topics": [
+              "Mobile Ecosystem",
+              "Native, Web, and Hybrid Apps",
+              "System on Chip (SoC)",
+              "Smartphone Evolution"
+            ]
+          },
+          {
+            "name": "Introduction to Mobile Operating Systems",
+            "topics": [
+              "iOS Architecture",
+              "Android OS Architecture",
+              "iOS vs Android OS"
+            ]
+          },
+          {
+            "name": "Android development environment setup",
+            "topics": [
+              "Android Studio IDE",
+              "AVD Creation",
+              "Physical Device Setup",
+              "Android Frameworks"
+            ]
+          },
+          {
+            "name": "Programming Components of Android",
+            "topics": [
+              "Activities",
+              "Services",
+              "Content Providers",
+              "Broadcast Receivers",
+              "Intents",
+              "Activity Lifecycle"
+            ]
+          },
+          {
+            "name": "Android User Interface Designing",
+            "topics": [
+              "Layouts (LinearLayout, ConstraintLayout)",
+              "UI Controls",
+              "Fragments"
+            ]
+          },
+          {
+            "name": "Android Services and Storage using SQLite",
+            "topics": [
+              "Service Lifecycle",
+              "SQLite Database Creation",
+              "CRUD Operations"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Software Engineering",
+        "code": "CS-504",
+        "chapters": [
+          {
+            "name": "Introduction to Software Engineering",
+            "topics": [
+              "Evolution of Software Engineering",
+              "Software Development Projects",
+              "Computer Systems Engineering"
+            ]
+          },
+          {
+            "name": "Software Life Cycle Models",
+            "topics": [
+              "Waterfall Model",
+              "Prototyping Model",
+              "RAD",
+              "Agile Models",
+              "Spiral Model"
+            ]
+          },
+          {
+            "name": "Software Project Management",
+            "topics": [
+              "Project Planning",
+              "Size Estimation (COCOMO)",
+              "CPM and PERT Charts",
+              "Risk Management",
+              "CMMI"
+            ]
+          },
+          {
+            "name": "Requirements Analysis and Specification",
+            "topics": [
+              "SRS Document",
+              "Functional Requirements",
+              "Non-Functional Requirements"
+            ]
+          },
+          {
+            "name": "Software Design",
+            "topics": [
+              "Cohesion and Coupling",
+              "Data Flow Diagrams",
+              "UML Diagrams (Class, Sequence, Activity)"
+            ]
+          },
+          {
+            "name": "Coding and Testing",
+            "topics": [
+              "Code Review",
+              "Black-box Testing",
+              "White-box Testing",
+              "Software Reliability"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Internet of Things (IoT)",
+        "code": "CS-505A",
+        "chapters": [
+          {
+            "name": "Introduction to Internet of Things",
+            "topics": [
+              "Physical/Logical Design",
+              "IoT Protocols",
+              "Communication Models",
+              "IoT Enabling Technologies"
+            ]
+          },
+          {
+            "name": "M2M, IoT System Management",
+            "topics": [
+              "IoT vs M2M",
+              "SDN and NFV for IoT",
+              "NETCONF",
+              "YANG"
+            ]
+          },
+          {
+            "name": "Elements of IoT",
+            "topics": [
+              "Raspberry PI",
+              "Arduino",
+              "Sensors and Actuators",
+              "RFID",
+              "Python Packages"
+            ]
+          },
+          {
+            "name": "IoT Application Development",
+            "topics": [
+              "IoT Design Methodology",
+              "Linux on Raspberry PI",
+              "Programming Raspberry PI",
+              "Cloud Data Storage"
+            ]
+          },
+          {
+            "name": "IoT Privacy, Security and Governance",
+            "topics": [
+              "IoT Governance",
+              "Security Life Cycle",
+              "Blockchain in IoT"
+            ]
+          },
+          {
+            "name": "IIoT and Case Studies",
+            "topics": [
+              "IIoT vs IoT",
+              "Home Automation",
+              "Urban Cities",
+              "Agriculture Case Studies"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Artificial Intelligence",
+        "code": "CS-506A",
+        "chapters": [
+          {
+            "name": "Concepts of AI and NLP",
+            "topics": [
+              "Stages of AI",
+              "Domains of Learning",
+              "Google Teachable Machine",
+              "Ethical Challenges"
+            ]
+          },
+          {
+            "name": "Probability and Distribution",
+            "topics": [
+              "Bayes' Theorem",
+              "Probability Distribution",
+              "Bayesian Networks"
+            ]
+          },
+          {
+            "name": "Agent, Environment and Search Strategies",
+            "topics": [
+              "Types of Agents",
+              "State Space Search",
+              "Uninformed Search",
+              "Informed Search",
+              "Hill Climbing"
+            ]
+          },
+          {
+            "name": "Gaming Techniques in AI",
+            "topics": [
+              "Game Theory",
+              "Minimax Algorithm",
+              "Alpha-Beta Pruning",
+              "Monte Carlo Search Tree"
+            ]
+          },
+          {
+            "name": "Knowledge Representation",
+            "topics": [
+              "Types of Knowledge",
+              "Predicate Logic",
+              "Large Language Models"
+            ]
+          },
+          {
+            "name": "Machine Learning, Deep Learning and Neural Networks",
+            "topics": [
+              "Supervised/Unsupervised Learning",
+              "Gradient Descent",
+              "Artificial Neural Networks",
+              "Generative AI"
+            ]
+          }
+        ]
+      }
+    ],
+    "ECE": [
+      {
+        "subject": "Entrepreneurship & Startups",
+        "code": "EC-501",
+        "chapters": [
+          {
+            "name": "Unit-1: Management Practices",
+            "topics": [
+              "Industry, Commerce, and Business",
+              "Types of ownerships",
+              "Leadership models",
+              "Functions of management"
+            ]
+          },
+          {
+            "name": "Unit-2: Introduction to Entrepreneurship and Start-Ups",
+            "topics": [
+              "Entrepreneurship definitions and characteristics",
+              "Entrepreneur vs Intrapreneur",
+              "7-M Resources",
+              "MSME & Startup India/Telangana"
+            ]
+          },
+          {
+            "name": "Unit-3: Business Ideas and their implementation",
+            "topics": [
+              "Ideation and activity mapping",
+              "Business model canvas",
+              "Market research and marketing mix",
+              "Innovation and SWOT Analysis"
+            ]
+          },
+          {
+            "name": "Unit-4: Finance Management",
+            "topics": [
+              "Financial management objectives",
+              "Types of capitals and funding",
+              "Budgets",
+              "Profit and loss account and Balance sheet",
+              "Taxes (GST, Income Tax, etc.)"
+            ]
+          },
+          {
+            "name": "Unit-5: Support Agencies and Incubators",
+            "topics": [
+              "Central and State government institutions",
+              "Telangana State industry policy (TS-IPASS)",
+              "Support banks (SIDBI, APSFC)",
+              "Legal Issues (IPR, Patents, Trademarks)"
+            ]
+          },
+          {
+            "name": "Unit-6: Project Proposal & Exit Strategy",
+            "topics": [
+              "Project planning and cost estimation",
+              "Breakeven analysis",
+              "Business ethics",
+              "Ex-Im Policies",
+              "Succession and harvesting strategies"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Mobile & Optical Fibre Communications",
+        "code": "EC-502",
+        "chapters": [
+          {
+            "name": "Unit-1: Radar",
+            "topics": [
+              "Radar principles and block diagrams",
+              "Radar range equation",
+              "Pulsed vs CW Radar",
+              "MTI Radar and indicators"
+            ]
+          },
+          {
+            "name": "Unit-2: Satellite Communication",
+            "topics": [
+              "Microwave links",
+              "Satellite classifications (LEO, MEO, GEO)",
+              "Apogee and Perigee",
+              "Transponders and Earth stations"
+            ]
+          },
+          {
+            "name": "Unit-3: Basic Concepts of Mobile communication",
+            "topics": [
+              "Cellular systems",
+              "Frequency reuse",
+              "Hand-off procedures",
+              "Channel assignment strategies",
+              "Capacity expansion"
+            ]
+          },
+          {
+            "name": "Unit-4: Modern Mobile Communication Systems",
+            "topics": [
+              "GSM architecture",
+              "EDGE and DECT",
+              "Wireless local loop (WLL)",
+              "3G, 4G, and 5G system features"
+            ]
+          },
+          {
+            "name": "Unit-5: Basics of Optical Fiber Communication",
+            "topics": [
+              "Light wave vs EM wave systems",
+              "Fiber structure and types (SMF/MMF)",
+              "Total internal reflection",
+              "Numerical aperture and losses",
+              "Dispersion and Splicing"
+            ]
+          },
+          {
+            "name": "Unit-6: Optical measuring instruments & wavelength division multiplexing",
+            "topics": [
+              "OTDR",
+              "LASER and APD",
+              "WDM, DWDM",
+              "Optical amplifiers (EDFA)"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Digital Circuit Design using Verilog HDL",
+        "code": "EC-503",
+        "chapters": [
+          {
+            "name": "Unit-1: Introduction to Verilog HDL",
+            "topics": [
+              "VLSI design flow",
+              "HDL features",
+              "Module definitions and instantiation",
+              "Hierarchical modeling"
+            ]
+          },
+          {
+            "name": "Unit-2: Language Constructs and Conventions",
+            "topics": [
+              "Lexical conventions",
+              "Data types (nets, registers, vectors)",
+              "Operators and operands",
+              "System tasks and compiler directives"
+            ]
+          },
+          {
+            "name": "Unit-3: Gate level and Data Flow modeling",
+            "topics": [
+              "Gate primitives",
+              "Delays (rise, fall)",
+              "Data flow assignment statements",
+              "Combinational circuit design"
+            ]
+          },
+          {
+            "name": "Unit-4: Behavioral modeling",
+            "topics": [
+              "Procedural assignments",
+              "Timing controls",
+              "Conditional statements",
+              "Loops",
+              "User Defined Primitives (UDP)"
+            ]
+          },
+          {
+            "name": "Unit-5: Modeling of Combinational and Sequential Logic circuits using Behavioral Modelling",
+            "topics": [
+              "ALU and Comparator design",
+              "Flip-flops (RS, JK, T, D)",
+              "Shift registers",
+              "Counters",
+              "Stimulus/Test bench modules"
+            ]
+          },
+          {
+            "name": "Unit-6: System design concepts",
+            "topics": [
+              "Finite State Machines (Mealy/Moore)",
+              "Programmable Logic Devices (PLA, PAL, FPGA)"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Industrial & Power Electronics",
+        "code": "EC-504",
+        "chapters": [
+          {
+            "name": "Unit-1: Thyristors",
+            "topics": [
+              "SCR construction and characteristics",
+              "Diac and Triac",
+              "Triggering circuits",
+              "Power electronic applications"
+            ]
+          },
+          {
+            "name": "Unit-2: Applications of thyristors",
+            "topics": [
+              "Controlled rectifiers",
+              "Single-phase half/full-wave rectifiers",
+              "3-phase rectifiers"
+            ]
+          },
+          {
+            "name": "Unit-3: Applications of thyristors as choppers and inverters",
+            "topics": [
+              "Chopper principles and configurations",
+              "Inverter types and series inverters"
+            ]
+          },
+          {
+            "name": "Unit-4: Transducers & MEMS",
+            "topics": [
+              "Transducer classification",
+              "Strain gauge, LVDT, Piezoelectric",
+              "Thermocouple",
+              "MEMS"
+            ]
+          },
+          {
+            "name": "Unit-5: PLCs & SCADA Basics",
+            "topics": [
+              "PLC principles and block diagrams",
+              "Ladder diagrams",
+              "PLC timers/counters",
+              "SCADA systems"
+            ]
+          },
+          {
+            "name": "Unit-6: Control Engineering",
+            "topics": [
+              "Control system classification",
+              "Open loop vs Closed loop",
+              "Transfer function",
+              "Block diagram reduction"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

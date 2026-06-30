@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Weekly Assessment: {{ subject.name }} - KiraakStudy AI{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-8">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-[#1d1d1f]">{{ test.title }}</h1>
+            <p class="text-gray-500 mt-2">Subject: {{ subject.name }}</p>
+        </div>
+        <a href="{{ url_for('dashboard.index') }}" class="px-4 py-2 rounded-full bg-gray-100 text-sm font-semibold hover:bg-gray-200 transition">Back to Dashboard</a>
+    </div>
+
+    {% if test.status == 'completed' %}
+    <div class="glass-card p-8 bg-gradient-to-br from-indigo-600 to-violet-600 text-white mb-8 rounded-3xl shadow-lg">
+        <h2 class="text-2xl font-bold mb-2">Test Completed! 🎉</h2>
+        <p class="opacity-90">You scored <span class="text-3xl font-black">{{ test.score }}</span> out of {{ test.total_questions * 10 }}.</p>
+    </div>
+    {% endif %}
+
+    <div class="space-y-8">
+        {% for q in questions %}
+        {% set q_index = loop.index0 %}
+        <div class="glass-card p-6 border {% if q_index in answered_indices %}border-emerald-200 bg-emerald-50/30{% else %}border-gray-200 bg-white{% endif %}">
+            <h3 class="text-lg font-bold text-[#1d1d1f] mb-4">
+                <span class="text-indigo-600">Q{{ loop.index }}.</span> {{ q.question }}
+            </h3>
+            
+            {% if q_index in answered_indices %}
+                <!-- Show User's Answer -->
+                {% for ans in answers %}
+                    {% if ans.question_index == q_index %}
+                        <div class="mt-4 p-4 bg-white border border-emerald-100 rounded-xl shadow-sm">
+                            <p class="text-sm font-semibold text-emerald-700 mb-2">Your Answer:</p>
+                            <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ ans.user_answer }}</p>
+                            
+                            {% if ans.image_path %}
+                                <div class="mt-3">
+                                    <p class="text-xs text-gray-500 mb-1">Uploaded Image:</p>
+                                    <!-- In a real app we'd serve the file properly via route, here we'll assume it exists in uploads/ -->
+                                    <div class="p-2 border border-dashed rounded bg-gray-50 text-xs text-gray-500">Image uploaded: {{ ans.image_path }}</div>
+                                </div>
+                            {% endif %}
+                            
+                            <hr class="my-4 border-gray-100">
+                            
+                            <div class="flex justify-between items-start gap-4">
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-800">AI Feedback:</p>
+                                    <p class="text-sm text-gray-600 mt-1">{{ ans.feedback }}</p>
+                                </div>
+                                <div class="text-center px-4 py-2 bg-emerald-100 rounded-lg">
+                                    <span class="block text-2xl font-black text-emerald-700">{{ ans.score }}<span class="text-sm">/10</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <!-- Show Input Form -->
+                {% if test.status != 'completed' %}
+                <form action="{{ url_for('tests.submit_answer', test_id=test.id) }}" method="POST" enctype="multipart/form-data" class="mt-4"
+                onsubmit="
+                    const btn = this.querySelector('button[type=\\'submit\\']');
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-wait');
+                    btn.innerHTML = '⚙️ Grading via AI... ~5s';
+                ">
+                    <input type="hidden" name="question_index" value="{{ q_index }}">
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Type your answer:</label>
+                        <textarea name="text_answer" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm transition-all" placeholder="Enter your detailed answer here..."></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">OR Upload Handwritten Answer (Image):</label>
+                        <input type="file" name="image_answer" accept="image/*" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    </div>
+                    
+                    <button type="submit" class="px-6 py-2 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-semibold shadow-sm transition">
+                        Submit Answer & Auto-Grade
+                    </button>
+                </form>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

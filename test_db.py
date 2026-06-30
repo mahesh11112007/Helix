@@ -1,11 +1,15 @@
 import sqlite3
 
 conn = sqlite3.connect('kiraak_study.db')
-cursor = conn.cursor()
-cursor.execute("SELECT content FROM notes WHERE content LIKE '%Calculate the Sum of Numbers%' LIMIT 1;")
-row = cursor.fetchone()
-if row:
-    print(repr(row[0][:1000]))
-else:
-    print("No notes found")
+c = conn.cursor()
+c.execute("""
+SELECT t.name, u.name, s.name 
+FROM topics t
+LEFT JOIN units u ON t.unit_id = u.id
+LEFT JOIN subjects s ON u.subject_id = s.id
+WHERE t.name LIKE 'Topic %' OR t.name LIKE 'Topic%'
+""")
+rows = c.fetchall()
+for r in rows:
+    print(r)
 conn.close()

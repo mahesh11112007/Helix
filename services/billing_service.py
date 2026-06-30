@@ -69,6 +69,8 @@ class BillingService:
         try:
             # Update the user's tier to premium in the database
             db_service.execute("UPDATE user_usage SET subscription_tier = 'premium' WHERE user_id = ?", (user_id,))
+            # CRITICAL FIX: Ensure the profile is also marked as premium so the app bypasses limits
+            db_service.execute("UPDATE profiles SET is_premium = 1 WHERE id = ?", (user_id,))
             print(f"Successfully upgraded user {user_id} to Premium!")
             return True
         except Exception as e:

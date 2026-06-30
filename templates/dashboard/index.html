@@ -153,6 +153,23 @@
                 <p class="text-xs text-gray-500">No upcoming exam events found. Schedule one in the Planner!</p>
             {% endif %}
         </div>
+
+        <!-- Pending Weekly Tests -->
+        <div class="glass-card p-8 border border-indigo-200 bg-indigo-50/30">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-700"><i data-lucide="clipboard-list" class="w-5 h-5"></i> Weekly Assessments</h2>
+            {% if pending_tests %}
+                <div class="space-y-3">
+                    {% for test in pending_tests %}
+                        <div class="p-4 rounded-xl bg-white border border-indigo-100 flex flex-col gap-3">
+                            <span class="block font-bold text-sm text-[#1d1d1f]">{{ test.title }}</span>
+                            <a href="/test/{{ test.id }}" class="text-center px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">Take Test</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-xs text-gray-500">No pending tests. Great job!</p>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

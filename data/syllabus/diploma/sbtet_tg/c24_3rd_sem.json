@@ -1,0 +1,1116 @@
+{
+  "year": "III Semester",
+  "groups": {
+    "AI & ML": [
+      {
+        "subject": "Applied Engineering Mathematics",
+        "code": "SC-301",
+        "chapters": [
+          {
+            "name": "Unit-I Indefinite Integration - I",
+            "topics": [
+              "Integration as an inverse process of Differentiation",
+              "Standard functions",
+              "Properties of Indefinite Integral",
+              "Integration by Substitution",
+              "Integrals using Trigonometric identities",
+              "Integrals of tan x, cot x, sec x and cosec x"
+            ]
+          },
+          {
+            "name": "Unit-II Indefinite Integration - II",
+            "topics": [
+              "Nine standard integrals",
+              "Integrals of the form 1/(ax^2+bx+c), 1/sqrt(ax^2+bx+c), etc.",
+              "Integrals of the form 1/(a+bsinx), 1/(a+bcosx), etc."
+            ]
+          },
+          {
+            "name": "Unit-III Indefinite Integration-III",
+            "topics": [
+              "Integration by using Partial fractions",
+              "Integration by parts",
+              "Bernoulli's rule for integration by parts"
+            ]
+          },
+          {
+            "name": "Unit-IV Definite Integral and its Properties",
+            "topics": [
+              "Definite integral Fundamental Theorem of Integral Calculus",
+              "Evaluation of definite integrals by Substitution Method",
+              "Properties of Definite Integrals"
+            ]
+          },
+          {
+            "name": "Unit-V Applications of Definite Integrals",
+            "topics": [
+              "Areas under simple curves",
+              "Area between two curves",
+              "Volumes of solids of revolution"
+            ]
+          },
+          {
+            "name": "Unit-VI Mean, RMS values and Numerical Integration",
+            "topics": [
+              "Mean Values and Root Mean Square (R.M.S) values",
+              "Numerical Integration: Trapezoidal rule and Simpson's 1/3rd rule"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Digital Electronics",
+        "code": "EC-302",
+        "chapters": [
+          {
+            "name": "UNIT 1: NUMBER SYSTEMS AND BINARY CODES",
+            "topics": [
+              "Binary, Octal, Hexadecimal Number systems",
+              "Conversion",
+              "Binary Codes",
+              "Parity Bit"
+            ]
+          },
+          {
+            "name": "UNIT 2: BOOLEAN ALGEBRA, LOGIC GATES & KARNAUGH MAP",
+            "topics": [
+              "Boolean algebra postulates",
+              "Basic logic gates",
+              "Universal logic gates",
+              "De-Morgan's theorems",
+              "Boolean expressions",
+              "Karnaugh map"
+            ]
+          },
+          {
+            "name": "UNIT 3: COMBINATIONAL CIRCUITS-I",
+            "topics": [
+              "Half adder",
+              "Full adder",
+              "Half subtractor",
+              "Full subtractor",
+              "4 Bit parallel adder",
+              "Serial adder"
+            ]
+          },
+          {
+            "name": "UNIT 4: COMBINATIONAL CIRCUITS-II",
+            "topics": [
+              "Multiplexers",
+              "Demultiplexers",
+              "Encoders",
+              "Decoders",
+              "Tri-state buffer",
+              "Digital comparator"
+            ]
+          },
+          {
+            "name": "UNIT 5: FLIP FLOPS AND REGISTERS",
+            "topics": [
+              "Sequential logic circuits",
+              "Latches",
+              "Flip Flops (RS, D, JK, T)",
+              "Master slave JK",
+              "Registers (SISO, SIPO, PISO, PIPO)"
+            ]
+          },
+          {
+            "name": "UNIT 6: COUNTERS AND MEMORIES",
+            "topics": [
+              "Asynchronous and synchronous counters",
+              "Ring counter",
+              "RAM and ROM types",
+              "Memory operations"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Data Structures through C",
+        "code": "CS-303",
+        "chapters": [
+          {
+            "name": "UNIT 1: Pointers",
+            "topics": [
+              "Pointer Declaration and Initialization",
+              "Pointer Arithmetic",
+              "Arrays and Pointers",
+              "Pointers and structures",
+              "Types of pointers"
+            ]
+          },
+          {
+            "name": "UNIT 2: Dynamic Memory allocation functions and introduction to Data structure",
+            "topics": [
+              "Dynamic memory allocation (malloc, calloc, free, realloc)",
+              "Classification of data structures",
+              "Algorithm analysis (space and time complexity)"
+            ]
+          },
+          {
+            "name": "UNIT 3: Sorting and Searching",
+            "topics": [
+              "Sorting Algorithms (Bubble, Selection, Insertion, Quick, Merge sort)",
+              "Searching Techniques (Linear, Binary Search)"
+            ]
+          },
+          {
+            "name": "UNIT 4: Stacks and Queues",
+            "topics": [
+              "Stacks (Infix to postfix)",
+              "Queues",
+              "Circular queue",
+              "Sparse matrix"
+            ]
+          },
+          {
+            "name": "UNIT 5: Linked Lists",
+            "topics": [
+              "Singly linked list operations",
+              "Doubly linked list operations",
+              "Circular singly linked list"
+            ]
+          },
+          {
+            "name": "UNIT 6: Non-Linear Data structures",
+            "topics": [
+              "Trees (Binary tree types, traversals, operations)",
+              "Graphs (Representations, traversals)"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "OOPS through C++",
+        "code": "CS-304",
+        "chapters": [
+          {
+            "name": "UNIT 1: Principles of object oriented programming",
+            "topics": [
+              "Procedure vs Object oriented paradigm",
+              "Basic OOPS concepts",
+              "Structure of C++ program"
+            ]
+          },
+          {
+            "name": "UNIT 2: Introduction to C++",
+            "topics": [
+              "Class and objects",
+              "Array of objects",
+              "Friend function",
+              "Inline functions",
+              "Function overloading"
+            ]
+          },
+          {
+            "name": "UNIT 3: C++ I/O operators",
+            "topics": [
+              "Formatted I/O",
+              "I/O manipulators",
+              "File I/O"
+            ]
+          },
+          {
+            "name": "UNIT 4: Constructors, Destructors and Operator Overloading",
+            "topics": [
+              "Constructors (Default, Parameterized, Copy)",
+              "Destructors",
+              "Operator Overloading (Unary and Binary)"
+            ]
+          },
+          {
+            "name": "UNIT 5: Inheritance",
+            "topics": [
+              "Inheritance types (Single, Multi-level, Multiple, Hybrid, Hierarchical)",
+              "Virtual base class",
+              "Virtual functions"
+            ]
+          },
+          {
+            "name": "UNIT 6: Templates",
+            "topics": [
+              "Function templates",
+              "Class templates"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Computer Organisation and Architecture",
+        "code": "CS-305",
+        "chapters": [
+          {
+            "name": "UNIT 1: Introduction to Computer Organization",
+            "topics": [
+              "Functional block diagram of Digital computer",
+              "Stored program concept",
+              "System bus",
+              "Interrupts"
+            ]
+          },
+          {
+            "name": "UNIT 2: Computer Arithmetic",
+            "topics": [
+              "Information representation",
+              "Complements",
+              "Fixed point addition, subtraction, multiplication, division",
+              "Floating point operations"
+            ]
+          },
+          {
+            "name": "UNIT 3: CPU Organization",
+            "topics": [
+              "Internal Structure of the CPU",
+              "Instruction formats",
+              "Addressing modes"
+            ]
+          },
+          {
+            "name": "UNIT 4: Computer Memory Organization",
+            "topics": [
+              "Memory hierarchy",
+              "Associative Memory",
+              "Virtual memory",
+              "Cache memory",
+              "SSD vs HDD"
+            ]
+          },
+          {
+            "name": "UNIT 5: Input and output organization",
+            "topics": [
+              "Modes of data transfer (Programmed, Interrupted, DMA)",
+              "Priority interrupt"
+            ]
+          },
+          {
+            "name": "UNIT 6: Pipelining and Parallel Processing",
+            "topics": [
+              "Pipelining and hazards",
+              "Flynn's classification",
+              "SMP",
+              "CPU VS GPU",
+              "CISC and RISC"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Fundamentals of Artificial Intelligence",
+        "code": "AI-306",
+        "chapters": [
+          {
+            "name": "Introduction to Artificial Intelligence",
+            "topics": [
+              "AI definition, features, types, applications, challenges",
+              "Expert Systems, Deep Learning, Computer Vision, NLP, Robotics, AI Ethics"
+            ]
+          },
+          {
+            "name": "Mathematics Foundation to Artificial Intelligence",
+            "topics": [
+              "Probability (Conditional, Multiplication rule)",
+              "Probability Distribution",
+              "Random Variables",
+              "Binomial Distribution"
+            ]
+          },
+          {
+            "name": "Problems and State Space Search Methods in AI",
+            "topics": [
+              "Agents and Environment",
+              "State Space Search",
+              "Un-informed Searching",
+              "Informed Searching (Hill climbing)"
+            ]
+          },
+          {
+            "name": "Knowledge Representation, Logic and Inference",
+            "topics": [
+              "Propositional logic",
+              "First Order Logic",
+              "Unification",
+              "Forward and Backward chaining"
+            ]
+          },
+          {
+            "name": "Games and AI",
+            "topics": [
+              "Game theory",
+              "Game Tree",
+              "Min max algorithm",
+              "Alpha_Beta Pruning"
+            ]
+          },
+          {
+            "name": "Reasoning under Uncertainty and AI Applications",
+            "topics": [
+              "Probabilistic Reasoning",
+              "Bayes Belief Network",
+              "Water jug problem, 8-Queen problem",
+              "Applications of AI"
+            ]
+          }
+        ]
+      }
+    ],
+    "CSE": [
+      {
+        "subject": "Applied Engineering Mathematics",
+        "code": "SC-301",
+        "chapters": [
+          {
+            "name": "Indefinite Integration - I",
+            "topics": [
+              "Integration as an inverse process of Differentiation",
+              "Standard functions",
+              "Properties of Indefinite Integral",
+              "Integration by Substitution",
+              "Trigonometric identities",
+              "Integrals of tan x, cot x, sec x and cosec x",
+              "Integrals of sin^m x cos^n x and tan^m x sec^n x"
+            ]
+          },
+          {
+            "name": "Indefinite Integration - II",
+            "topics": [
+              "Nine standard integrals",
+              "Integrals of the type 1/(ax^2+bx+c), 1/sqrt(ax^2+bx+c), sqrt(ax^2+bx+c), (px+q)/(ax^2+bx+c), (px+q)/sqrt(ax^2+bx+c), (px+q)sqrt(ax^2+bx+c)",
+              "Integrals of the type 1/(a+b sin x), 1/(a+b cos x), 1/(a sin x+b cos x+c)"
+            ]
+          },
+          {
+            "name": "Indefinite Integration - III",
+            "topics": [
+              "Integration by Partial fractions",
+              "Integration by parts",
+              "Bernoulli's rule",
+              "Integrals of e^ax sin bx, e^ax cos bx",
+              "Integrals of e^x(f(x)+f'(x))"
+            ]
+          },
+          {
+            "name": "Definite Integral and its Properties",
+            "topics": [
+              "Fundamental Theorem of Integral Calculus",
+              "Evaluation by Substitution Method",
+              "Properties of Definite Integrals"
+            ]
+          },
+          {
+            "name": "Applications of Definite Integrals",
+            "topics": [
+              "Areas under simple curves",
+              "Area of region bounded by curve and line",
+              "Area between two curves",
+              "Volumes of solids of revolution"
+            ]
+          },
+          {
+            "name": "Mean, RMS values and Numerical Integration",
+            "topics": [
+              "Mean and RMS values",
+              "Trapezoidal rule",
+              "Simpson's 1/3rd rule"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Digital Electronics",
+        "code": "EC-302",
+        "chapters": [
+          {
+            "name": "Number Systems and Binary Codes",
+            "topics": [
+              "Binary, Octal, Hexadecimal systems",
+              "Conversions",
+              "Arithmetic operations",
+              "Weighted and Un-weighted codes",
+              "Parity Bit"
+            ]
+          },
+          {
+            "name": "Boolean Algebra, Logic Gates & Karnaugh Map",
+            "topics": [
+              "Boolean postulates",
+              "Basic logic gates",
+              "Universal gates",
+              "Exclusive OR gate",
+              "De-Morgan's theorems",
+              "SOP and POS forms",
+              "Karnaugh map simplification"
+            ]
+          },
+          {
+            "name": "Combinational Circuits - I",
+            "topics": [
+              "Half adder",
+              "Full adder",
+              "Half subtractor",
+              "Full subtractor",
+              "4-bit parallel adder",
+              "2's complement adder/subtractor",
+              "Serial adder"
+            ]
+          },
+          {
+            "name": "Combinational Circuits - II",
+            "topics": [
+              "Multiplexers (4x1)",
+              "Demultiplexers (1x4)",
+              "Encoders (8x3)",
+              "Decoders (3x8)",
+              "Tri-state buffers",
+              "Digital comparator"
+            ]
+          },
+          {
+            "name": "Flip Flops and Registers",
+            "topics": [
+              "RS latch",
+              "Clocked RS, D, JK flip flops",
+              "Race around condition",
+              "Master slave JK FF",
+              "T flip flop",
+              "Shift registers (SISO, SIPO, PISO, PIPO)",
+              "Bi-directional shift register"
+            ]
+          },
+          {
+            "name": "Counters and Memories",
+            "topics": [
+              "Asynchronous and synchronous counters",
+              "Decade counter",
+              "Ring counter",
+              "Memory read/write operations",
+              "ROM, RAM (Static & Dynamic)",
+              "Flash ROM"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Data Structures Through C",
+        "code": "CS-303",
+        "chapters": [
+          {
+            "name": "Pointers",
+            "topics": [
+              "Declaration and Initialization",
+              "Address (&) and De-referencing (*) operators",
+              "Pointer Arithmetic",
+              "Arrays and Pointers",
+              "Pointers as Function Arguments",
+              "Array of Pointers",
+              "Pointers to structures",
+              "Types of pointers"
+            ]
+          },
+          {
+            "name": "Dynamic Memory allocation and Intro to Data structures",
+            "topics": [
+              "malloc(), calloc(), free(), realloc()",
+              "Abstract data type (ADT)",
+              "Classification of data structures",
+              "Space and time complexity",
+              "Asymptotic Notations"
+            ]
+          },
+          {
+            "name": "Sorting and Searching",
+            "topics": [
+              "Bubble sort",
+              "Selection sort",
+              "Insertion sort",
+              "Quick sort",
+              "Merge sort",
+              "Linear Search",
+              "Binary Search"
+            ]
+          },
+          {
+            "name": "Stacks and Queues",
+            "topics": [
+              "Array implementation of stacks",
+              "Infix to postfix conversion",
+              "Evaluation of postfix expression",
+              "Queue implementation",
+              "Circular queue",
+              "Sparse matrix"
+            ]
+          },
+          {
+            "name": "Linked Lists",
+            "topics": [
+              "Singly linked list (Insert/Delete operations)",
+              "Doubly linked list",
+              "Circular singly linked list"
+            ]
+          },
+          {
+            "name": "Non-Linear Data structures",
+            "topics": [
+              "Tree terminology",
+              "Binary trees (complete, full, skewed, strictly binary)",
+              "Binary search tree operations",
+              "Tree traversals (Inorder, Preorder, Postorder)",
+              "Graph terminology",
+              "Graph representations",
+              "Graph traversals (BFS, DFS)"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "OOPS Through C++",
+        "code": "CS-304",
+        "chapters": [
+          {
+            "name": "Principles of Object Oriented Programming",
+            "topics": [
+              "Procedure vs Object oriented paradigm",
+              "Basic concepts of OOPS",
+              "C++ program structure",
+              "I/O Operations",
+              "Dynamic memory allocation"
+            ]
+          },
+          {
+            "name": "Introduction to C++",
+            "topics": [
+              "Class and object",
+              "Array of objects",
+              "Passing/Returning objects to functions",
+              "Friend function",
+              "Inline functions",
+              "Function overloading",
+              "Default arguments"
+            ]
+          },
+          {
+            "name": "C++ I/O operators",
+            "topics": [
+              "Formatted I/O",
+              "I/O manipulators",
+              "File I/O",
+              "Binary I/O functions"
+            ]
+          },
+          {
+            "name": "Constructors, Destructors and Operator Overloading",
+            "topics": [
+              "Constructors (Default, Parameterized, Copy, Dynamic)",
+              "Destructors",
+              "Binary and Unary Operator Overloading"
+            ]
+          },
+          {
+            "name": "Inheritance",
+            "topics": [
+              "Base and Derived class",
+              "Access control",
+              "Types of inheritance (Single, Multilevel, Multiple, Hybrid, Hierarchical)",
+              "Virtual base class",
+              "Virtual functions"
+            ]
+          },
+          {
+            "name": "Templates",
+            "topics": [
+              "Function templates",
+              "Class templates"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Computer Organization and Architecture",
+        "code": "CS-305",
+        "chapters": [
+          {
+            "name": "Introduction to Computer Organization",
+            "topics": [
+              "Functional block diagram",
+              "Accumulator based CPU",
+              "Stored program concept",
+              "System bus",
+              "Interrupts"
+            ]
+          },
+          {
+            "name": "Computer Arithmetic",
+            "topics": [
+              "Floating point and Fixed point representation",
+              "Complements",
+              "Addition, Subtraction, Multiplication, Division operations"
+            ]
+          },
+          {
+            "name": "CPU Organization",
+            "topics": [
+              "Opcode and Operand",
+              "Instruction format",
+              "Addressing modes"
+            ]
+          },
+          {
+            "name": "Computer Memory Organization",
+            "topics": [
+              "Memory hierarchy",
+              "Associative memory",
+              "Virtual memory",
+              "Cache memory",
+              "SSD vs HDD"
+            ]
+          },
+          {
+            "name": "Input and Output Organization",
+            "topics": [
+              "Interface",
+              "Modes of data transfer",
+              "Synchronous/Asynchronous transfer",
+              "Hand shaking",
+              "DMA",
+              "Priority interrupt"
+            ]
+          },
+          {
+            "name": "Pipelining and Parallel Processing",
+            "topics": [
+              "Instruction pipeline",
+              "Pipelining hazards",
+              "Flynn's classification",
+              "SMP",
+              "CPU vs GPU",
+              "CISC vs RISC"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Computer Networks",
+        "code": "CS-306",
+        "chapters": [
+          {
+            "name": "Introduction to Networks and Topologies",
+            "topics": [
+              "Network classification",
+              "Network Topologies",
+              "OSI and TCP/IP models",
+              "Connection Oriented vs Connection Less"
+            ]
+          },
+          {
+            "name": "Network Transmission Media and Network Components",
+            "topics": [
+              "Wired media",
+              "Wireless media",
+              "Network devices",
+              "Switching"
+            ]
+          },
+          {
+            "name": "Data Link Layer and Medium Access Control Protocols",
+            "topics": [
+              "Framing",
+              "Error and Flow control",
+              "Ethernet 802.3",
+              "Wireless LAN 802.11",
+              "Bluetooth"
+            ]
+          },
+          {
+            "name": "Network Addressing, Routing Algorithms and Internet Protocols",
+            "topics": [
+              "Physical vs Logical address",
+              "IP address classes",
+              "Routing algorithms",
+              "IPv4 and IPv6",
+              "Subnetting",
+              "Tunneling"
+            ]
+          },
+          {
+            "name": "Internet Control and TCP/UDP Protocols",
+            "topics": [
+              "ICMP",
+              "ARP",
+              "Transport layer services",
+              "TCP and UDP headers"
+            ]
+          },
+          {
+            "name": "Application Layer Services, Management and Security",
+            "topics": [
+              "DNS",
+              "Email",
+              "World Wide Web",
+              "HTTP",
+              "SNMP",
+              "Security attacks"
+            ]
+          }
+        ]
+      }
+    ],
+    "ECE": [
+      {
+        "subject": "Applied Engineering Mathematics",
+        "code": "SC-301",
+        "chapters": [
+          {
+            "name": "Indefinite Integration - I",
+            "topics": [
+              "Integration as inverse process of differentiation",
+              "Properties of indefinite integral",
+              "Integration by substitution",
+              "Integrals using trigonometric identities",
+              "Integrals of tan x, cot x, sec x, cosec x",
+              "Integrals of sin^m(x).cos^n(x) and tan^m(x).sec^n(x)"
+            ]
+          },
+          {
+            "name": "Indefinite Integration - II",
+            "topics": [
+              "Nine standard integrals",
+              "Integrals of 1/(ax^2+bx+c)",
+              "Integrals of 1/sqrt(ax^2+bx+c)",
+              "Integrals of (px+q)/sqrt(ax^2+bx+c)",
+              "Integrals of 1/(a+/-bsin x) and 1/(a+/-bcos x)"
+            ]
+          },
+          {
+            "name": "Indefinite Integration - III",
+            "topics": [
+              "Integration by partial fractions",
+              "Integration by parts",
+              "Bernoulli's rule",
+              "Integrals of e^ax*sin(bx) and e^ax*cos(bx)",
+              "Integrals of e^x*[f(x)+f'(x)]"
+            ]
+          },
+          {
+            "name": "Definite Integral and its Properties",
+            "topics": [
+              "Fundamental Theorem of Integral Calculus",
+              "Evaluation by substitution",
+              "Properties of definite integrals"
+            ]
+          },
+          {
+            "name": "Applications of Definite Integrals",
+            "topics": [
+              "Areas under simple curves",
+              "Area between two curves",
+              "Volumes of solids of revolution"
+            ]
+          },
+          {
+            "name": "Mean, RMS values and Numerical Integration",
+            "topics": [
+              "Mean and RMS values",
+              "Trapezoidal rule",
+              "Simpson's 1/3 rule"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Digital Electronics",
+        "code": "EC-302",
+        "chapters": [
+          {
+            "name": "Number Systems and Binary Codes",
+            "topics": [
+              "Binary, Octal, Hexadecimal systems",
+              "Conversions",
+              "Arithmetic operations",
+              "Weighted and Un-weighted codes",
+              "Parity bit"
+            ]
+          },
+          {
+            "name": "Boolean Algebra, Logic Gates & Karnaugh Map",
+            "topics": [
+              "Boolean postulates",
+              "Basic and universal logic gates",
+              "De-Morgan's theorems",
+              "SOP and POS forms",
+              "K-map simplification"
+            ]
+          },
+          {
+            "name": "Combinational Circuits - I",
+            "topics": [
+              "Half adder and Full adder",
+              "Half and Full subtractor",
+              "Parallel adders",
+              "Serial adder"
+            ]
+          },
+          {
+            "name": "Combinational Circuits - II",
+            "topics": [
+              "Multiplexers and De-multiplexers",
+              "Encoders and Decoders",
+              "Tri-state buffer",
+              "Digital comparator"
+            ]
+          },
+          {
+            "name": "Flip Flops and Registers",
+            "topics": [
+              "RS, D, JK, T Flip-Flops",
+              "Master-Slave JK",
+              "Registers (SISO, SIPO, PISO, PIPO)",
+              "Shift registers"
+            ]
+          },
+          {
+            "name": "Counters and Memories",
+            "topics": [
+              "Synchronous and Asynchronous counters",
+              "Decade counter",
+              "Ring counter",
+              "RAM and ROM types",
+              "Flash ROM"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Communication Systems",
+        "code": "EC-303",
+        "chapters": [
+          {
+            "name": "Communication System",
+            "topics": [
+              "Block diagram",
+              "Need for modulation",
+              "AM, FM, PM",
+              "Noise classification",
+              "Power relations in AM"
+            ]
+          },
+          {
+            "name": "Transmitters and Receivers",
+            "topics": [
+              "Requirements of transmitters",
+              "SSB Transmitter",
+              "TRF and Superheterodyne receivers",
+              "AGC",
+              "Pre-emphasis and De-emphasis"
+            ]
+          },
+          {
+            "name": "Pulse Modulation Techniques",
+            "topics": [
+              "Sampling Theorem",
+              "PAM, PWM, PPM",
+              "PCM",
+              "Delta Modulation"
+            ]
+          },
+          {
+            "name": "Digital Modulation Techniques",
+            "topics": [
+              "Bit rate and Baud rate",
+              "ASK, FSK, PSK",
+              "4-QAM",
+              "Constellation diagram"
+            ]
+          },
+          {
+            "name": "Multiplexing and Multiple Access Techniques",
+            "topics": [
+              "FDM and TDM",
+              "FDMA, TDMA, CDMA"
+            ]
+          },
+          {
+            "name": "Error Detection & Correction Methods",
+            "topics": [
+              "Parity check",
+              "VRC, LRC",
+              "Checksum",
+              "CRC",
+              "Hamming Code"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Network Analysis",
+        "code": "EC-304",
+        "chapters": [
+          {
+            "name": "Behaviour of RLC elements in AC circuits",
+            "topics": [
+              "Active/Passive/Linear/Non-linear elements",
+              "Complex numbers (j-operator)",
+              "Phasor representation",
+              "Series RL, RC, RLC circuits"
+            ]
+          },
+          {
+            "name": "Mesh current and Node voltage analysis",
+            "topics": [
+              "Mesh analysis",
+              "Nodal analysis",
+              "Super mesh and Super node",
+              "Duality"
+            ]
+          },
+          {
+            "name": "Network Theorems",
+            "topics": [
+              "Superposition Theorem",
+              "Thevenin's Theorem",
+              "Norton's Theorem",
+              "Maximum Power Transfer Theorem",
+              "Reciprocity theorem"
+            ]
+          },
+          {
+            "name": "Resonance and Transient Analysis",
+            "topics": [
+              "Series and Parallel Resonance",
+              "Bandwidth and Selectivity",
+              "Transient response of RL and RC circuits"
+            ]
+          },
+          {
+            "name": "Two Port Networks",
+            "topics": [
+              "Z, Y, h parameters",
+              "Symmetry and Reciprocity conditions",
+              "T and Pi networks"
+            ]
+          },
+          {
+            "name": "Filters, Attenuators and Equalizer",
+            "topics": [
+              "Characteristic Impedance",
+              "Constant-K Filters",
+              "T and Pi Attenuators",
+              "Equalizers"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Linear Integrated Circuits & Applications",
+        "code": "EC-305",
+        "chapters": [
+          {
+            "name": "Wave shaping circuits",
+            "topics": [
+              "Clippers and Clampers",
+              "Sweep voltage generators"
+            ]
+          },
+          {
+            "name": "Operational Amplifier",
+            "topics": [
+              "Differential amplifier",
+              "Ideal Op-Amp characteristics",
+              "IC741 Pin configuration",
+              "Virtual ground"
+            ]
+          },
+          {
+            "name": "Op-amp applications",
+            "topics": [
+              "Inverting and Non-inverting amplifiers",
+              "Summing amplifier",
+              "Integrator and Differentiator",
+              "Active filters"
+            ]
+          },
+          {
+            "name": "Multi-vibrators using Op-amp",
+            "topics": [
+              "Bistable, Monostable, Astable multivibrators",
+              "Schmitt trigger"
+            ]
+          },
+          {
+            "name": "Timers and PLL",
+            "topics": [
+              "555 IC timer",
+              "Phase Locked Loop (PLL)",
+              "VCO"
+            ]
+          },
+          {
+            "name": "Instrumentation amplifiers & Converters",
+            "topics": [
+              "Instrumentation amplifier",
+              "DAC (R-2R, Binary weighted)",
+              "ADC (Counter, Successive approximation)"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Electronic Measuring Instruments",
+        "code": "EC-306",
+        "chapters": [
+          {
+            "name": "Analog instruments",
+            "topics": [
+              "PMMC instrument",
+              "Rectifier type voltmeter",
+              "Ohmmeters",
+              "FET input voltmeter"
+            ]
+          },
+          {
+            "name": "DC & AC bridges",
+            "topics": [
+              "Wheatstone bridge",
+              "Maxwell's bridge",
+              "Schering bridge"
+            ]
+          },
+          {
+            "name": "Digital instruments",
+            "topics": [
+              "Digital Voltmeter",
+              "Digital Frequency meter",
+              "Digital LCR meter"
+            ]
+          },
+          {
+            "name": "Signal Generators",
+            "topics": [
+              "AF Oscillator",
+              "Function generator",
+              "RF signal generator",
+              "Power meters"
+            ]
+          },
+          {
+            "name": "CRO",
+            "topics": [
+              "General purpose CRO block diagram",
+              "Triggered sweep",
+              "Measurement of voltage, frequency, phase",
+              "Pulse parameters"
+            ]
+          },
+          {
+            "name": "Test Instruments",
+            "topics": [
+              "Q meter",
+              "Distortion factor meter",
+              "Digital IC tester",
+              "Spectrum analyser",
+              "Digital Multimeter"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

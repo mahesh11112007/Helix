@@ -1,751 +1,927 @@
 {% extends "base.html" %}
-
-{% block title %}{{ topic.name }} - Helix AI{% endblock %}
-
-{% block content %}
-<div class="space-y-6">
-    <!-- Breadcrumb -->
-    <div class="text-sm text-gray-500 no-print">
-        <a href="{{ url_for('dashboard.index') }}" class="hover:underline">Dashboard</a> &rarr; 
-        <a href="{{ url_for('dashboard.view_subject', sub_id=topic.subject_id) }}" class="hover:underline">{{ topic.subject_name }}</a> &rarr;
-        <span class="font-bold text-[#0071e3]">{{ topic.name }}</span>
-    </div>
-
-    <!-- Header Section -->
-    <div class="glass-card p-6 flex flex-wrap items-center justify-between gap-4 border border-gray-200 bg-white rounded-2xl shadow-sm no-print">
-        <div>
-            <span class="text-xs uppercase font-bold text-[#0071e3] tracking-wider">{{ topic.unit_name }}</span>
-            <h1 class="text-3xl font-extrabold mt-1 text-[#1d1d1f]">{{ topic.name }}</h1>
+{% block title %}{{ topic.name }} - KiraakStudy AI
+<!-- Floating Chat Widget -->
+<div id="floating-chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end no-print">
+    <!-- Chat Window -->
+    <div id="floating-chat-window" class="hidden bg-white/90 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-2xl w-[380px] h-[550px] mb-4 flex flex-col overflow-hidden transition-all duration-300 transform scale-95 origin-bottom-right">
+        <!-- Header -->
+        <div id="floating-chat-header" class="p-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center cursor-move">
+            <h3 class="font-bold text-[#1d1d1f] flex items-center gap-2"><span>💬</span> Notes Chat</h3>
+            <div class="flex items-center gap-2">
+                <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}" class="text-xs text-[#0071e3] hover:underline font-semibold">New Chat</a>
+                <button onclick="toggleChatWindow()" class="text-gray-400 hover:text-gray-600">✖</button>
+            </div>
         </div>
         
-        <div class="flex items-center space-x-3 flex-wrap gap-y-2">
-            <!-- Complete Toggle -->
-            <button
-                id="complete-btn"
-                onclick="toggleComplete('{{ topic.id }}')"
-                class="px-4 py-2 rounded-full text-sm font-bold shadow-sm transition border border-gray-200 hover:border-emerald-500/40 {{ 'bg-emerald-500 text-white border-emerald-500' if topic.is_completed else 'bg-white text-[#1d1d1f]' }}"
-                title="Mark this topic as completed"
-            >
-                <span id="complete-icon">{{ '✅' if topic.is_completed else '⭕' }}</span>
-                <span id="complete-text" class="hidden sm:inline ml-1">{{ 'Completed' if topic.is_completed else 'Mark Complete' }}</span>
-            </button>
-            <!-- Bookmark Toggle -->
-            <button
-                id="bookmark-btn"
-                onclick="toggleBookmark('{{ topic.id }}')"
-                class="px-4 py-2 rounded-full text-sm font-bold shadow-sm transition border border-gray-200 hover:border-[#0071e3]/40 bg-white text-[#1d1d1f]"
-                title="Bookmark this topic"
-            >
-                <span id="bookmark-icon">{{ '🔖' if is_bookmarked else '📑' }}</span>
-                <span id="bookmark-text" class="hidden sm:inline ml-1">{{ 'Bookmarked' if is_bookmarked else 'Bookmark' }}</span>
-            </button>
-            <!-- Print PDF -->
-            <button onclick="printNotes()" class="px-4 py-2 rounded-full text-sm font-bold shadow-sm transition border border-gray-200 hover:border-[#0071e3]/40 bg-white text-[#1d1d1f]" title="Print notes as PDF">
-                🖨️ <span class="hidden sm:inline ml-1">Print PDF</span>
-            </button>
-            <form id="generate-deck-form" action="{{ url_for('study.generate_resources', topic_id=topic.id) }}" method="POST" onsubmit="
-                const btn = document.getElementById('generate-deck-btn');
-                btn.disabled = true;
-                btn.classList.add('opacity-70', 'cursor-not-allowed');
-                btn.innerHTML = '⚙️ Generating... (This takes 20s)';
-            ">
-                <button id="generate-deck-btn" type="submit" class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all">
-                    🤖 Generate AI Study Deck
-                </button>
-            </form>
-            <a href="{{ url_for('study.explain_topic_ai', topic_id=topic.id) }}" class="px-4 py-2 rounded-full bg-[#1d1d1f] hover:bg-black text-sm font-semibold text-white shadow-sm transition-all">
-                💡 AI Tutor Explain
-            </a>
-        </div>
-    </div>
-
-    <!-- Grid Layout for Materials and AI Tools -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Left: Uploaded Documents & Interactive Elements -->
-        <div class="lg:col-span-2 space-y-6 min-w-0">
-            <!-- Files & Upload -->
-            <div class="glass-card p-6">
-                <div class="flex flex-wrap items-center justify-between mb-4 gap-2">
-                    <h2 class="text-lg font-bold">Study Documents & Notes</h2>
-                    <!-- Upload Form -->
-                    <form action="{{ url_for('files.upload_file', topic_id=topic.id) }}" method="POST" enctype="multipart/form-data" class="flex items-center space-x-2">
-                        <input type="file" name="file" required class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3]/10 file:text-[#0071e3] hover:file:bg-[#0071e3]/20 transition-all cursor-pointer">
-                        <button type="submit" class="px-4 py-1.5 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-xs font-semibold text-white shadow-sm transition-all">Upload</button>
-                    </form>
-                </div>
-
-                {% if files %}
-                    <div class="space-y-3">
-                        {% for file in files %}
-                            <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 flex flex-wrap items-center justify-between gap-4 shadow-sm">
-                                <div>
-                                    <h4 class="font-bold text-sm text-[#1d1d1f] break-all">{{ file.name }}</h4>
-                                    <p class="text-[11px] text-gray-500 mt-0.5">Uploaded {{ file.created_at }} | {{ (file.file_size / 1024) | round(1) }} KB</p>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    {% if file.ocr_text %}
-                                        <button onclick="toggleOCR('{{ file.id }}')" class="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs font-semibold hover:border-[#0071e3]/40 text-[#1d1d1f] shadow-sm transition">
-                                            👁️ View Extract
-                                        </button>
-                                    {% else %}
-                                        <form action="{{ url_for('files.extract_pdf', file_id=file.id) }}" method="POST">
-                                            <button type="submit" class="px-3 py-1.5 rounded-full bg-[#0071e3]/10 text-[#0071e3] text-xs font-semibold hover:bg-[#0071e3]/20 transition">
-                                                🧠 Extract Text
-                                            </button>
-                                        </form>
-                                    {% endif %}
-                                    <a href="{{ url_for('files.download_file', file_id=file.id) }}" class="px-3 py-1.5 rounded-full bg-gray-200 text-xs font-bold hover:bg-gray-300 text-gray-700 transition-all">Download</a>
-                                    <form action="{{ url_for('files.delete_file', file_id=file.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this file?');">
-                                        <button type="submit" class="px-3 py-1.5 rounded-full bg-red-50 text-xs font-bold hover:bg-red-100 text-red-600 transition-all">Delete</button>
-                                    </form>
-                                </div>
-                            </div>
-                            {% if file.ocr_text %}
-                                <div id="ocr-{{ file.id }}" class="hidden p-5 rounded-2xl bg-gray-50 border border-gray-200 shadow-inner mt-2">
-                                    <h5 class="text-xs font-bold uppercase tracking-widest text-[#0071e3] mb-3">Extracted Text (OCR)</h5>
-                                    <div class="text-sm font-mono whitespace-pre-wrap text-gray-700 max-h-64 overflow-y-auto break-words">{{ file.ocr_text }}</div>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="text-center py-12 border-2 border-dashed border-gray-200 bg-gray-50 rounded-2xl">
-                        <p class="text-sm text-gray-500 font-medium">No documents uploaded yet.</p>
-                        <p class="text-xs text-gray-400 mt-1">Upload printed notes, handwritten documents, or PDFs for AI Vision processing.</p>
-                    </div>
-                {% endif %}
+        <!-- Chat Body -->
+        <div id="chat-box" class="flex-1 p-4 overflow-y-auto custom-scroll space-y-4">
+            {% if chat_history %}
+            {% for msg in chat_history %}
+            {% if msg.role == 'user' %}
+            <div class="flex justify-end">
+                <div class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm">{{ msg.content }}</div>
             </div>
-
-            <!-- Notes Section -->
-            <div class="glass-card p-6 border border-gray-200 bg-white rounded-2xl shadow-sm overflow-hidden" id="printable-notes">
-                <div class="flex items-center justify-between mb-4 no-print">
-                    <h2 class="text-lg font-extrabold text-[#1d1d1f]">AI Notes & Summaries</h2>
-                    {% if notes %}
-                    <button onclick="printNotes()" class="text-xs text-[#0071e3] font-semibold hover:underline">🖨️ Print</button>
-                    {% endif %}
-                </div>
-                <!-- Print Header (hidden on screen, shown on print) -->
-                <div class="print-header hidden">
-                    <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">{{ topic.name }}</h1>
-                    <p style="font-size: 12px; color: #666; margin-bottom: 16px;">{{ topic.subject_name }} • {{ topic.unit_name }}</p>
-                    <hr style="border-top: 2px solid #0071e3; margin-bottom: 16px;">
-                </div>
-                {% if notes %}
-                    <div class="space-y-4">
-                        {% for note in notes %}
-                            <div class="p-5 rounded-2xl bg-gray-50 border border-gray-200 shadow-sm relative group overflow-hidden">
-                                <h3 class="font-bold text-[#1d1d1f] mb-3 text-lg border-b border-gray-200 pb-2">{{ note.title }}</h3>
-                                <div class="note-content text-sm text-[#1d1d1f] leading-relaxed prose max-w-none overflow-x-auto break-words" data-markdown="{{ note.content | escape }}"></div>
-                                <button onclick="copyToClipboard(this)" data-content="{{ note.content | escape }}" class="absolute right-3 top-3 opacity-0 group-hover:opacity-100 bg-white border border-gray-200 text-gray-500 rounded-full p-2 shadow-sm hover:text-[#0071e3] transition-all text-xs no-print" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p class="text-sm text-gray-400">No generated notes yet. Click "Generate AI Study Deck" above.</p>
-                {% endif %}
+            {% else %}
+            <div class="flex justify-start relative group">
+                <div class="ai-message p-3 rounded-2xl rounded-bl-sm bg-gray-50 border border-gray-200 text-gray-800 text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto" data-markdown="{{ msg.content | escape }}"></div>
             </div>
-        </div>
-
-        <!-- Right: Quizzes, Flashcards, and Topic Chat -->
-        <div class="space-y-6">
-            <!-- Flashcards Review -->
-            <div class="glass-card p-6 text-center">
-                <h2 class="text-lg font-bold mb-2">⚡ Active Flashcards</h2>
-                <p class="text-xs opacity-70 mb-4">Leverage spaced repetition to master this topic.</p>
-                {% if flashcards %}
-                    <a href="{{ url_for('study.review_flashcards', topic_id=topic.id) }}" class="block w-full py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] font-semibold transition-all text-white shadow-sm">
-                        Review {{ flashcards | length }} Cards
-                    </a>
-                {% else %}
-                    <button disabled class="w-full py-3 rounded-full bg-gray-100 text-gray-400 font-semibold cursor-not-allowed border border-gray-200">
-                        No Flashcards Available
-                    </button>
-                {% endif %}
-            </div>
-
-            <!-- Interactive Quizzes -->
-            <div class="glass-card p-6">
-                <h2 class="text-lg font-bold mb-3">📝 Topic Quizzes</h2>
-                {% if quizzes %}
-                    <div class="space-y-3">
-                        {% for quiz in quizzes %}
-                            <div class="p-3 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-between shadow-sm hover:shadow transition-all group">
-                                <span class="text-sm font-medium text-[#1d1d1f] truncate pr-2">{{ quiz.title }}</span>
-                                <a href="{{ url_for('study.play_quiz', quiz_id=quiz.id) }}" class="px-4 py-1.5 rounded-full bg-gray-200 text-xs font-semibold hover:bg-[#0071e3] hover:text-white transition-all text-[#1d1d1f]">Start</a>
-                            </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p class="text-xs opacity-60">No quizzes generated yet. Generate a study deck to create a quiz.</p>
-                {% endif %}
-            </div>
-
-            <!-- Chat with Notes (RAG) -->
-            <div class="glass-card p-6 flex flex-col h-[500px]">
-                <div class="flex items-center justify-between mb-4 flex-shrink-0">
-                    <h2 class="text-lg font-bold">💬 Chat with Notes</h2>
-                    <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}" class="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-xs font-semibold text-[#1d1d1f] transition-all">
-                        + New Chat
-                    </a>
-                </div>
-                <div class="flex flex-1 min-h-0 relative overflow-hidden">
-                    <!-- Sessions Sidebar Overlay -->
-                    <div id="topic-chat-sidebar" class="absolute top-0 left-0 h-full w-64 bg-white/95 backdrop-blur-xl border-r border-gray-200 z-20 transform -translate-x-full transition-transform duration-300 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.1)] flex flex-col rounded-l-2xl">
-                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
-                            <h3 class="font-bold text-[#1d1d1f] text-sm">Chat History</h3>
-                            <button onclick="document.getElementById('topic-chat-sidebar').classList.add('-translate-x-full')" class="p-1 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            </button>
-                        </div>
-                        <div class="flex-1 overflow-y-auto p-3 space-y-1">
-                            {% if chat_sessions %}
-                                {% for session in chat_sessions %}
-                                    <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, session_id=session.id) }}" 
-                                       class="block w-full px-3 py-2 rounded-lg text-xs font-medium truncate transition-all {% if active_session_id == session.id %}bg-[#0071e3] text-white shadow-sm font-bold{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
-                                        {{ session.title }}
-                                    </a>
-                                {% endfor %}
-                            {% else %}
-                                <p class="text-xs text-gray-400 p-2 text-center mt-4">No history found</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                    
-                    <!-- Chat Area -->
-                    <div class="flex-1 flex flex-col min-w-0 bg-white/50 rounded-2xl border border-gray-100 p-0 relative">
-                        <!-- Chat Header with Toggle -->
-                        <div class="absolute top-2 left-2 z-10">
-                            <button onclick="document.getElementById('topic-chat-sidebar').classList.remove('-translate-x-full')" class="p-1.5 rounded-lg bg-white/80 backdrop-blur border border-gray-200 text-gray-500 hover:text-violet-600 hover:bg-white shadow-sm transition-all" title="Toggle History">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
-                            </button>
-                        </div>
-                        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 p-4 pt-12 text-sm flex flex-col">
-                            {% if chat_messages %}
-                                {% for msg in chat_messages %}
-                                    {% if msg.role == 'user' %}
-                                        <div class="flex justify-end">
-                                            <div class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm whitespace-pre-wrap">{{ msg.content }}</div>
-                                        </div>
-                                    {% else %}
-                                        <div class="flex justify-start relative group">
-                                            <div class="ai-message p-4 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto" data-markdown="{{ msg.content | escape }}"></div>
-                                            <button onclick="copyToClipboard(this)" data-content="{{ msg.content | escape }}" class="absolute -right-2 -bottom-2 opacity-0 group-hover:opacity-100 bg-white border border-gray-200 text-gray-500 rounded-full p-1.5 shadow-sm hover:text-violet-600 transition-all text-xs" title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg></button>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <div class="flex justify-start">
-                                    <div class="p-4 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm max-w-[85%] shadow-sm">
-                                        Hello! Ask me anything about the uploaded materials or this topic.
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <form id="chat-form" class="mt-2 flex space-x-2 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm flex-shrink-0">
-                            <input type="hidden" id="chat-session-id" name="session_id" value="{{ active_session_id or '' }}">
-                            <textarea id="chat-input" rows="1" placeholder="Ask a question..." required class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none overflow-hidden min-h-[40px] max-h-[120px] leading-relaxed"></textarea>
-                            <button type="submit" class="px-5 py-2 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all self-end h-[40px]">Send</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── Archived Study Decks ─────────────────────────────────────── -->
-    {% if archived_notes or archived_quizzes %}
-    <div class="glass-card p-6 border border-gray-200 bg-white rounded-2xl shadow-sm no-print">
-        <div class="flex items-center justify-between mb-4 cursor-pointer" onclick="document.getElementById('archive-body').classList.toggle('hidden')">
-            <h2 class="text-lg font-extrabold text-[#1d1d1f] flex items-center gap-2">
-                🗃️ Archived Study Decks
-                <span class="text-xs font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{{ archived_notes|length + archived_quizzes|length }}</span>
-            </h2>
-            <span class="text-gray-400 text-xs font-medium">Click to expand/collapse</span>
-        </div>
-        <div id="archive-body" class="hidden space-y-4">
-            {% for note in archived_notes %}
-            <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 relative group flex items-start justify-between gap-3" id="archive-note-{{ note.id }}">
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Archived Note</span>
-                        <span class="text-[10px] text-gray-400">{{ note.created_at }}</span>
-                    </div>
-                    <h4 class="font-bold text-sm text-gray-600 truncate">{{ note.title }}</h4>
-                    <div class="text-xs text-gray-500 mt-1 line-clamp-2">{{ note.content[:200] }}...</div>
-                </div>
-                <button onclick="deleteArchived('{{ topic.id }}', 'note', '{{ note.id }}')" class="px-3 py-1.5 rounded-full bg-red-50 text-xs font-bold text-red-500 hover:bg-red-100 transition-all flex-shrink-0" title="Delete permanently">
-                    🗑️ Delete
-                </button>
-            </div>
+            {% endif %}
             {% endfor %}
-            {% for quiz in archived_quizzes %}
-            <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 relative group flex items-start justify-between gap-3" id="archive-quiz-{{ quiz.id }}">
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Archived Quiz</span>
-                        <span class="text-[10px] text-gray-400">{{ quiz.created_at }}</span>
-                    </div>
-                    <h4 class="font-bold text-sm text-gray-600 truncate">{{ quiz.title }}</h4>
+            {% else %}
+            <div class="flex justify-start">
+                <div class="p-3 rounded-2xl rounded-bl-sm bg-gray-50 border border-gray-200 text-gray-800 text-sm max-w-[85%] shadow-sm">
+                    Hello! Ask me anything about this topic or attached files.
                 </div>
-                <button onclick="deleteArchived('{{ topic.id }}', 'quiz', '{{ quiz.id }}')" class="px-3 py-1.5 rounded-full bg-red-50 text-xs font-bold text-red-500 hover:bg-red-100 transition-all flex-shrink-0" title="Delete permanently">
-                    🗑️ Delete
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Chat Input -->
+        <form id="chat-form" class="p-3 bg-white border-t border-gray-200">
+            <input type="hidden" id="chat-session-id" name="session_id" value="{{ active_session_id or '' }}">
+            <div class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl p-1">
+                <textarea id="chat-input" rows="1" placeholder="Ask a question..." required class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none min-h-[36px] max-h-[100px]"></textarea>
+                <button type="submit" class="p-2 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] text-white transition-all shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
-            {% endfor %}
-        </div>
+        </form>
     </div>
-    {% endif %}
+    
+    <!-- Floating Button -->
+    <button onclick="toggleChatWindow()" id="floating-chat-btn" class="w-14 h-14 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white shadow-lg shadow-[#0071e3]/30 flex items-center justify-center text-2xl transition-transform hover:scale-110 active:scale-95 border-2 border-white/20">
+        💬
+    </button>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const chatForm = document.getElementById('chat-form');
-    const chatInput = document.getElementById('chat-input');
-    const chatBox = document.getElementById('chat-box');
-    
-    // Set Marked.js options
-    if (typeof marked !== 'undefined') {
-        marked.setOptions({ breaks: true, gfm: true });
-        
-        // Render all existing notes
-        document.querySelectorAll('.note-content').forEach(el => {
-            const md = el.getAttribute('data-markdown');
-            if (md) el.innerHTML = parseMarkdownWithMath(md);
-        });
-        
-        // Render all existing chat messages
-        document.querySelectorAll('.ai-message').forEach(el => {
-            const md = el.getAttribute('data-markdown');
-            if (md) {
-                el.innerHTML = parseMarkdownWithMath(md);
-                if (typeof hljs !== 'undefined') {
-                    el.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-                }
-                addCodeCopyButtons(el);
-            }
-        });
-        
-        // Typeset math equations
-        if (window.typesetMath) {
-            window.typesetMath();
+    function toggleChatWindow() {
+        const win = document.getElementById('floating-chat-window');
+        if (win.classList.contains('hidden')) {
+            win.classList.remove('hidden');
+            setTimeout(() => {
+                win.classList.remove('scale-95', 'opacity-0');
+                win.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.getElementById('chat-input').focus();
+        } else {
+            win.classList.remove('scale-100', 'opacity-100');
+            win.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                win.classList.add('hidden');
+            }, 300);
         }
-        
-        // Scroll to bottom on load
-        chatBox.scrollTop = chatBox.scrollHeight;
     }
     
-    // Auto-expand textarea
-    chatInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
+    // Draggable Logic
+    const header = document.getElementById('floating-chat-header');
+    const widget = document.getElementById('floating-chat-widget');
+    let isDragging = false;
+    let offsetX, offsetY;
+    
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const rect = widget.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        widget.style.bottom = 'auto';
+        widget.style.right = 'auto';
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        widget.style.left = (e.clientX - offsetX) + 'px';
+        widget.style.top = (e.clientY - offsetY) + 'px';
+    });
+    
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+</script>
+
+{% endblock %}
+
+{% block content %}
+<style>
+/* Custom Scrollbar for sidebars */
+.custom-scroll::-webkit-scrollbar { width: 4px; }
+.custom-scroll::-webkit-scrollbar-track { background: transparent; }
+.custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+/* Learning Cards Styles */
+.learning-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.learning-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+}
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 12px;
+}
+.card-icon {
+    font-size: 1.5rem;
+    padding: 8px;
+    border-radius: 12px;
+    background: #2a2a2c;
+}
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+.type-definition .card-icon { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.type-formula .card-icon { color: #a855f7; background: rgba(168, 85, 247, 0.1); }
+.type-example .card-icon { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+.type-warning .card-icon { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.type-important .card-icon { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.type-concept .card-icon { color: #6366f1; background: rgba(99, 102, 241, 0.1); }
+
+/* MathJax Overrides */
+.MathJax { color: #e5e7eb !important; font-size: 110% !important; }
+
+/* Hide original raw notes once JS takes over */
+#raw-notes-container { display: none; }
+
+/* Mini Quiz Styles */
+.mini-quiz {
+    background: linear-gradient(145deg, #1e1e24, #1a1a1f);
+    border: 1px solid #3b82f6;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 32px 0;
+}
+
+    @media print {
+        /* Hide UI elements */
+        nav, aside, footer, .sticky, button, form, .no-print, .mini-quiz, .chat-section, .files-section {
+            display: none !important;
+        }
+        /* Remove height constraints to allow flowing to multiple pages */
+        body, html, main, .flex-col, .h-[calc(100vh-80px)], .overflow-hidden, .overflow-y-auto {
+            height: auto !important;
+            min-height: auto !important;
+            overflow: visible !important;
+            display: block !important;
+        }
+        /* Expand the main content */
+        .flex-1 {
+            flex: none !important;
+            width: 100% !important;
+        }
+        /* Ensure dark text on white background for printing */
+        * {
+            color: black !important;
+            background: white !important;
+            box-shadow: none !important;
+        }
+    }
+</style>
+
+<div class="flex flex-col h-[calc(100vh-80px)] -mt-6 -mx-4 sm:-mx-6 lg:-mx-8">
+    <!-- Top Header Bar (Sticky) -->
+    <div class="sticky top-0 z-40 bg-gray-50/90 backdrop-blur-xl border-b border-gray-200 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-3 text-sm text-gray-500 mb-1">
+                <a href="{{ url_for('dashboard.view_subject', sub_id=topic.subject_id) }}" class="hover:text-[#1d1d1f] transition-colors">{{ topic.subject_name }}</a>
+                <span>/</span>
+                <span class="text-[#0071e3] font-semibold">{{ topic.unit_name }}</span>
+            </div>
+            <h1 class="text-2xl font-bold text-[#1d1d1f] flex items-center gap-3">
+                {{ topic.name }}
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">Intermediate</span>
+            </h1>
+        </div>
+        
+        <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-4 mr-4 text-sm text-gray-500">
+                <div class="flex items-center gap-1.5" title="Estimated Reading Time">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>15 min read</span>
+                </div>
+            </div>
+            
+            <button onclick="toggleComplete('{{ topic.id }}')" id="complete-btn" class="px-4 py-2 rounded-xl text-sm font-bold transition-all border {{ 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' if topic.is_completed else 'bg-gray-50 text-[#1d1d1f] border-gray-200 hover:border-gray-500' }}">
+                <span id="complete-icon">{{ '✅' if topic.is_completed else '⭕' }}</span>
+                <span id="complete-text" class="ml-1">{{ 'Completed' if topic.is_completed else 'Mark Complete' }}</span>
+            </button>
+            <button onclick="toggleBookmark('{{ topic.id }}')" id="bookmark-btn" class="p-2.5 rounded-xl transition-all border {{ 'bg-[#0071e3]/20 text-[#0071e3] border-[#0071e3]/50' if is_bookmarked else 'bg-gray-50 text-[#1d1d1f] border-gray-200 hover:border-gray-500' }}" title="Bookmark">
+                <span id="bookmark-icon">{{ '🔖' if is_bookmarked else '📑' }}</span>
+            </button>
+            <button onclick="printNotes()" class="p-2.5 rounded-xl bg-gray-50 text-[#1d1d1f] border border-gray-200 hover:border-gray-500 transition-all" title="Print">🖨️</button>
+
+            <form action="{{ url_for('files.upload_file', topic_id=topic.id) }}" method="POST" enctype="multipart/form-data" class="inline-flex">
+                <label class="p-2.5 rounded-xl bg-gray-50 text-[#1d1d1f] border border-gray-200 hover:border-gray-500 transition-all cursor-pointer" title="Upload File">
+                    📎
+                    <input type="file" name="file" class="hidden" onchange="this.form.submit()">
+                </label>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- 3-Column Layout -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Left Sidebar: Table of Contents -->
+        <aside class="hidden xl:flex flex-col w-64 border-r border-gray-200 bg-white custom-scroll overflow-y-auto p-6">
+            <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">On This Page</h3>
+            <div class="space-y-4 mb-6">
+                <div class="h-1.5 w-full bg-[#333] rounded-full overflow-hidden">
+                    <div id="reading-progress" class="h-full bg-[#0071e3] w-0 transition-all duration-300"></div>
+                </div>
+                <p class="text-xs text-gray-500 text-right" id="reading-percentage">0% Read</p>
+            </div>
+            <nav id="toc-nav" class="space-y-1.5 text-sm flex flex-col">
+                <!-- TOC injected by JS -->
+                <p class="text-gray-500 text-xs italic">Loading sections...</p>
+            </nav>
+        </aside>
+
+        <!-- Center: Main Learning Content -->
+        <main class="flex-1 custom-scroll overflow-y-auto bg-gray-50 p-6 lg:p-10 relative scroll-smooth" id="main-scroll-area">
+            <div class="max-w-3xl mx-auto pb-32">
+                
+                <!-- Raw Notes Container (Hidden, used as source) -->
+                <div id="raw-notes-container">
+                    {% if notes %}
+                        {% for note in notes %}
+                            <h2>{{ note.title }}</h2>
+                            <div class="markdown-body">{{ note.content | escape }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Structured Learning Cards Container -->
+                <div id="structured-content" class="space-y-8">
+                    {% if not notes %}
+                        <div class="text-center py-20 bg-white rounded-2xl border border-gray-200">
+                            <div class="text-6xl mb-4">📚</div>
+                            <h2 class="text-2xl font-bold text-[#1d1d1f] mb-2">Ready to start learning?</h2>
+                            <p class="text-gray-500 max-w-md mx-auto">Generate AI-powered notes, flashcards, and quizzes customized specifically for your syllabus.</p>
+                            <form action="{{ url_for('study.generate_resources', topic_id=topic.id) }}" method="POST" class="mt-8 flex justify-center gap-3">
+                                <button type="submit" class="px-6 py-3 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-[#1d1d1f] font-bold shadow-lg transition-all transform hover:-translate-y-1">
+                                    Generate Learning Material
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <!-- JS will inject styled cards here -->
+                    {% endif %}
+                </div>
+
+                
+
+
+
+</div></main>
+
+        <!-- Right Sidebar: Learning Assistant -->
+        <aside class="hidden lg:flex flex-col w-80 border-l border-gray-200 bg-white custom-scroll overflow-y-auto">
+            <div class="p-6 space-y-8">
+                
+                <!-- Quick Actions -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">Learning Tools</h3>
+                    <form action="{{ url_for('study.generate_resources', topic_id=topic.id) }}" method="POST" class="grid grid-cols-1 gap-2" onsubmit="this.querySelector('button').innerHTML = 'Generating...'; this.querySelector('button').disabled = true;">
+                        <button type="submit" class="w-full text-left px-4 py-3 rounded-xl bg-gray-50 hover:bg-[#333] border border-gray-200 text-[#1d1d1f] font-medium flex items-center justify-between group transition-all">
+                            <span class="flex items-center gap-3"><span>📝</span> Generate Notes</span>
+                            <span class="opacity-0 group-hover:opacity-100 text-gray-500">→</span>
+                        </button>
+                    </form>
+                    
+                    {% if flashcards %}
+                    <a href="{{ url_for('study.review_flashcards', topic_id=topic.id) }}" class="mt-2 w-full text-left px-4 py-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 font-bold flex items-center justify-between group transition-all">
+                        <span class="flex items-center gap-3"><span>⚡</span> Flashcards ({{ flashcards | length }})</span>
+                        <span>Play</span>
+                    </a>
+                    {% endif %}
+                    
+                    {% if quizzes %}
+                    <div class="mt-2 space-y-2">
+                        {% for quiz in quizzes %}
+                        <a href="{{ url_for('study.play_quiz', quiz_id=quiz.id) }}" class="w-full text-left px-4 py-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-between group transition-all">
+                            <span class="flex items-center gap-3 truncate pr-2"><span>🎯</span> {{ quiz.title[:20] }}...</span>
+                            <span>Play</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Learning Mode Selector -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Experience Level</h3>
+                    <select class="w-full bg-gray-50 border border-gray-200 text-[#1d1d1f] text-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#0071e3] outline-none appearance-none">
+                        <option value="beginner">👶 Beginner (Simple & Detailed)</option>
+                        <option value="intermediate" selected>🧑‍🎓 Intermediate (Standard)</option>
+                        <option value="topper">🧠 Topper (Advanced & PYQs)</option>
+                    </select>
+                </div>
+
+                <!-- AI Tutor -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500">Ask AI Assistant</h3>
+                        <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}" class="text-xs text-[#0071e3] hover:underline">+ New Chat</a>
+                    </div>
+                    <div class="space-y-2">
+                        {% if chat_sessions %}
+                            {% for session in chat_sessions[:3] %}
+                                <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, session_id=session.id) }}" class="block p-3 rounded-xl bg-gray-50 hover:bg-[#333] border border-gray-200 text-sm text-gray-600 truncate">
+                                    💬 {{ session.title }}
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-sm text-gray-500 italic">No chats yet. Click "AI Tutor Explain" to ask questions.</p>
+                        {% endif %}
+                        <a href="{{ url_for('study.explain_topic_ai', topic_id=topic.id) }}" class="block w-full text-center mt-2 px-4 py-3 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition-all">
+                            Start AI Tutor
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<!-- MathJax for Rendering Formulas -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+  svg: { fontCache: 'global' }
+};
+</script>
+
+<!-- Scripts for Content Transformation & Interactivity -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Extract raw markdown and convert to HTML
+    const rawContainers = document.querySelectorAll('#raw-notes-container .markdown-body');
+    if (rawContainers.length === 0) return;
+
+    let fullMarkdown = '';
+    rawContainers.forEach(container => {
+        fullMarkdown += '\n\n' + container.textContent;
     });
 
-    // Shift+Enter to newline, Enter to submit
-    chatInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            chatForm.dispatchEvent(new Event('submit'));
+    const htmlContent = marked.parse(fullMarkdown);
+    
+    // 2. Parse HTML into Learning Cards
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    const container = document.getElementById('structured-content');
+    
+    let currentCard = null;
+    let cardContent = null;
+    let sectionCount = 0;
+
+    // Helper to create a card
+    function createCard(titleText, elementType) {
+        const typeMatch = titleText.toLowerCase();
+        let typeClass = 'type-concept';
+        let icon = '💡';
+
+        if (typeMatch.includes('definition') || typeMatch.includes('what is')) { typeClass = 'type-definition'; icon = '📖'; }
+        else if (typeMatch.includes('formula') || typeMatch.includes('equation')) { typeClass = 'type-formula'; icon = '∑'; }
+        else if (typeMatch.includes('example') || typeMatch.includes('application')) { typeClass = 'type-example'; icon = '🎯'; }
+        else if (typeMatch.includes('warning') || typeMatch.includes('mistake')) { typeClass = 'type-warning'; icon = '⚠️'; }
+        else if (typeMatch.includes('important') || typeMatch.includes('note')) { typeClass = 'type-important'; icon = '⭐'; }
+
+        const card = document.createElement('div');
+        card.className = `learning-card ${typeClass}`;
+        card.id = 'section-' + sectionCount;
+        
+        const header = document.createElement('div');
+        header.className = 'card-header';
+        header.innerHTML = `<span class="card-icon">${icon}</span><h3 class="card-title text-[#1d1d1f]">${titleText}</h3>`;
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'text-gray-600 leading-relaxed space-y-4 prose max-w-none';
+        
+        card.appendChild(header);
+        card.appendChild(contentDiv);
+        return { card, contentDiv, title: titleText, id: card.id };
+    }
+
+    const tocList = [];
+
+    Array.from(doc.body.children).forEach(node => {
+        if (node.tagName.match(/^H[1-4]$/)) {
+            sectionCount++;
+            const cardObj = createCard(node.textContent, node.tagName);
+            currentCard = cardObj.card;
+            cardContent = cardObj.contentDiv;
+            container.appendChild(currentCard);
+            
+            tocList.push({ title: cardObj.title, id: cardObj.id });
+            
+            // Randomly insert a mini-quiz after every 3 sections
+            if (sectionCount % 3 === 0) {
+                const quizId = 'quiz-' + sectionCount;
+                const quiz = document.createElement('div');
+                quiz.className = 'mini-quiz flex flex-col items-center text-center p-6 border border-gray-200 rounded-xl bg-white shadow-sm my-6';
+                quiz.id = quizId;
+                quiz.innerHTML = `
+                    <span class="text-3xl mb-3">🤔</span>
+                    <h4 class="text-[#1d1d1f] text-lg font-bold mb-2">Test Your Understanding</h4>
+                    <p class="text-sm text-gray-500 mb-4">Take a quick pause to reflect on what you just learned.</p>
+                    <button onclick="generateMiniQuiz('${quizId}')" class="px-5 py-2.5 rounded-full bg-[#0071e3] text-white font-bold hover:bg-[#0077ed] transition-all shadow-sm">Start Quick Check</button>
+                `;
+                container.appendChild(quiz);
+            }
+        } else if (cardContent) {
+            // Apply Tailwind prose classes to elements
+            if (node.tagName === 'P') node.classList.add('mb-4');
+            if (node.tagName === 'UL') node.classList.add('list-disc', 'list-inside', 'mb-4', 'space-y-1');
+            if (node.tagName === 'OL') node.classList.add('list-decimal', 'list-inside', 'mb-4', 'space-y-1');
+            if (node.tagName === 'PRE') node.classList.add('bg-gray-50', 'p-4', 'rounded-xl', 'overflow-x-auto', 'border', 'border-gray-200', 'my-4');
+            cardContent.appendChild(node.cloneNode(true));
+        } else {
+            // If text appears before any heading, wrap it in a generic card
+            if (node.textContent.trim()) {
+                sectionCount++;
+                const cardObj = createCard("Overview", "H2");
+                currentCard = cardObj.card;
+                cardContent = cardObj.contentDiv;
+                cardContent.appendChild(node.cloneNode(true));
+                container.appendChild(currentCard);
+                tocList.push({ title: cardObj.title, id: cardObj.id });
+            }
         }
     });
-    
-    if (chatForm) {
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const message = chatInput.value.trim();
-            if (!message) return;
-            
-            // Append user message
-            const userWrapper = document.createElement('div');
-            userWrapper.className = 'flex justify-end';
-            const userDiv = document.createElement('div');
-            userDiv.className = 'p-2.5 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm';
-            userDiv.innerText = message;
-            userWrapper.appendChild(userDiv);
-            chatBox.appendChild(userWrapper);
-            chatInput.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-            
-            // Append typing indicator
-            const typingWrapper = document.createElement('div');
-            typingWrapper.className = 'flex justify-start';
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'p-3 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm max-w-[85%] animate-pulse';
-            typingDiv.innerText = 'AI is typing...';
-            typingWrapper.appendChild(typingDiv);
-            chatBox.appendChild(typingWrapper);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            
-            // Send to server
-            try {
-                const sessionId = document.getElementById('chat-session-id').value;
-                const bodyParams = new URLSearchParams();
-                bodyParams.append('message', message);
-                if (sessionId) {
-                    bodyParams.append('session_id', sessionId);
-                }
-                
-                const response = await fetch('{{ url_for("study.chat_with_topic", topic_id=topic.id) }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: bodyParams.toString()
-                });
-                const data = await response.json();
-                
-                if (data.session_id && !document.getElementById('chat-session-id').value) {
-                    document.getElementById('chat-session-id').value = data.session_id;
-                }
-                
-                // Remove typing indicator with actual AI response
-                typingWrapper.remove();
-                
-                const aiWrapper = document.createElement('div');
-                aiWrapper.className = 'flex justify-start';
-                const aiDiv = document.createElement('div');
-                aiDiv.className = 'p-3 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto';
-                
-                if (data.response && typeof marked !== 'undefined') {
-                    aiDiv.innerHTML = parseMarkdownWithMath(data.response);
-                    // Apply highlighting if available
-                    if (typeof hljs !== 'undefined') {
-                        aiDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-                    }
-                    addCodeCopyButtons(aiDiv);
-                } else {
-                    aiDiv.innerText = data.response || data.error || 'No response received.';
-                }
-                
-                aiWrapper.appendChild(aiDiv);
-                chatBox.appendChild(aiWrapper);
-                chatBox.scrollTop = chatBox.scrollHeight;
-                
-                // Typeset new math equations
-                if (window.typesetMath) {
-                    window.typesetMath(aiDiv);
-                }
-            } catch (err) {
-                typingDiv.innerText = 'Failed to connect. Please try again.';
-                typingDiv.classList.remove('animate-pulse');
-                typingDiv.classList.add('text-red-500', 'bg-red-50', 'border-red-200');
-                console.error(err);
-            }
+
+    // 3. Build Table of Contents
+    const tocNav = document.getElementById('toc-nav');
+    if (tocList.length > 0) {
+        tocNav.innerHTML = '';
+        tocList.forEach((item, index) => {
+            const a = document.createElement('a');
+            a.href = '#' + item.id;
+            a.className = 'toc-link block px-3 py-2 rounded-lg text-gray-500 hover:bg-[#333] hover:text-[#1d1d1f] transition-all truncate';
+            a.textContent = item.title;
+            a.dataset.target = item.id;
+            tocNav.appendChild(a);
         });
     }
+
+    // 4. Scroll Tracking for TOC & Progress Bar
+    const scrollArea = document.getElementById('main-scroll-area');
+    const progressBar = document.getElementById('reading-progress');
+    const progressText = document.getElementById('reading-percentage');
+    const tocLinks = document.querySelectorAll('.toc-link');
+
+    scrollArea.addEventListener('scroll', () => {
+        // Progress Bar
+        const scrollTop = scrollArea.scrollTop;
+        const scrollHeight = scrollArea.scrollHeight - scrollArea.clientHeight;
+        const scrollPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        progressBar.style.width = scrollPercent + '%';
+        progressText.textContent = Math.round(scrollPercent) + '% Read';
+
+        // Highlight TOC
+        let currentActive = null;
+        const cards = document.querySelectorAll('.learning-card');
+        cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            // If card is near top of viewport
+            if (rect.top <= 200 && rect.bottom >= 100) {
+                currentActive = card.id;
+            }
+        });
+
+        if (currentActive) {
+            tocLinks.forEach(link => {
+                if (link.dataset.target === currentActive) {
+                    link.classList.add('bg-[#0071e3]/20', 'text-[#0071e3]', 'font-bold');
+                    link.classList.remove('text-gray-500', 'hover:bg-[#333]');
+                } else {
+                    link.classList.remove('bg-[#0071e3]/20', 'text-[#0071e3]', 'font-bold');
+                    link.classList.add('text-gray-500', 'hover:bg-[#333]');
+                }
+            });
+        }
+    });
 });
 </script>
 
 <script>
-// Bookmark Toggle
-async function toggleBookmark(topicId) {
-    const btn = document.getElementById('bookmark-btn');
-    const icon = document.getElementById('bookmark-icon');
-    const text = document.getElementById('bookmark-text');
+const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatBox = document.getElementById('chat-box');
 
-    try {
-        const response = await fetch(`/topic/${topicId}/bookmark`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
+        // Set Marked.js options
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({ breaks: true, gfm: true });
 
-        if (data.bookmarked) {
-            icon.textContent = '🔖';
-            text.textContent = 'Bookmarked';
-        } else {
-            icon.textContent = '📑';
-            text.textContent = 'Bookmark';
+            // Render all existing notes
+            document.querySelectorAll('.note-content').forEach(el => {
+                const md = el.getAttribute('data-markdown');
+                if (md) el.innerHTML = parseMarkdownWithMath(md);
+            });
+
+            // Render all existing chat messages
+            document.querySelectorAll('.ai-message').forEach(el => {
+                const md = el.getAttribute('data-markdown');
+                if (md) {
+                    el.innerHTML = parseMarkdownWithMath(md);
+                    if (typeof hljs !== 'undefined') {
+                        el.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                    }
+                    addCodeCopyButtons(el);
+                }
+            });
+
+            // Typeset math equations
+            if (window.typesetMath) {
+                window.typesetMath();
+            }
+
+            // Scroll to bottom on load
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
-    } catch (err) {
-        console.error('Bookmark toggle failed:', err);
-    }
-}
 
-async function toggleComplete(topicId) {
-    try {
-        const response = await fetch(`/topic/${topicId}/complete`, { method: 'POST' });
-        const data = await response.json();
-        if (data.success) {
+        // Auto-expand textarea
+        chatInput.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Shift+Enter to newline, Enter to submit
+        chatInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                chatForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        if (chatForm) {
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const message = chatInput.value.trim();
+                if (!message) return;
+
+                // Append user message
+                const userWrapper = document.createElement('div');
+                userWrapper.className = 'flex justify-end';
+                const userDiv = document.createElement('div');
+                userDiv.className = 'p-2.5 rounded-2xl rounded-br-sm bg-[#0071e3] text-[#1d1d1f] text-sm max-w-[85%] break-words shadow-sm';
+                userDiv.innerText = message;
+                userWrapper.appendChild(userDiv);
+                chatBox.appendChild(userWrapper);
+                chatInput.value = '';
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Append typing indicator
+                const typingWrapper = document.createElement('div');
+                typingWrapper.className = 'flex justify-start';
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'p-3 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm max-w-[85%] animate-pulse';
+                typingDiv.innerText = 'AI is typing...';
+                typingWrapper.appendChild(typingDiv);
+                chatBox.appendChild(typingWrapper);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Send to server
+                try {
+                    const sessionId = document.getElementById('chat-session-id').value;
+                    const bodyParams = new URLSearchParams();
+                    bodyParams.append('message', message);
+                    if (sessionId) {
+                        bodyParams.append('session_id', sessionId);
+                    }
+
+                    const response = await fetch('{{ url_for("study.chat_with_topic", topic_id=topic.id) }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: bodyParams.toString()
+                    });
+                    const data = await response.json();
+
+                    if (data.session_id && !document.getElementById('chat-session-id').value) {
+                        document.getElementById('chat-session-id').value = data.session_id;
+                    }
+
+                    // Remove typing indicator with actual AI response
+                    typingWrapper.remove();
+
+                    const aiWrapper = document.createElement('div');
+                    aiWrapper.className = 'flex justify-start';
+                    const aiDiv = document.createElement('div');
+                    aiDiv.className = 'p-3 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto';
+
+                    if (data.response && typeof marked !== 'undefined') {
+                        aiDiv.innerHTML = parseMarkdownWithMath(data.response);
+                        // Apply highlighting if available
+                        if (typeof hljs !== 'undefined') {
+                            aiDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                        }
+                        addCodeCopyButtons(aiDiv);
+                    } else {
+                        aiDiv.innerText = data.response || data.error || 'No response received.';
+                    }
+
+                    aiWrapper.appendChild(aiDiv);
+                    chatBox.appendChild(aiWrapper);
+                    chatBox.scrollTop = chatBox.scrollHeight;
+
+                    // Typeset new math equations
+                    if (window.typesetMath) {
+                        window.typesetMath(aiDiv);
+                    }
+                } catch (err) {
+                    typingDiv.innerText = 'Failed to connect. Please try again.';
+                    typingDiv.classList.remove('animate-pulse');
+                    typingDiv.classList.add('text-red-500', 'bg-red-50', 'border-red-200');
+                    console.error(err);
+                }
+            });
+        }
+
+    async function generateMiniQuiz(quizId) {
+        const quizContainer = document.getElementById(quizId);
+        if (!quizContainer) return;
+        
+        quizContainer.innerHTML = '<span class="text-2xl mb-2 animate-spin">⏳</span><h4 class="text-[#1d1d1f] font-bold">Generating question...</h4>';
+        
+        try {
+            const response = await fetch('/topic/{{ topic.id }}/mini-quiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            
+            if (data.error) {
+                quizContainer.innerHTML = '<span class="text-2xl mb-2">❌</span><h4 class="text-red-500 font-bold">Error</h4><p class="text-sm text-gray-500">' + data.error + '</p>';
+                return;
+            }
+            
+            let optionsHtml = '';
+            data.options.forEach((opt, idx) => {
+                optionsHtml += `<button onclick="checkAnswer(this, ${idx}, ${data.correct_index}, '${data.explanation.replace(/'/g, "\'")}')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all text-sm font-medium">${opt}</button>`;
+            });
+            
+            quizContainer.innerHTML = `
+                <div class="w-full text-left">
+                    <h4 class="text-[#1d1d1f] font-bold mb-4 text-lg">${data.question}</h4>
+                    <div class="space-y-2">${optionsHtml}</div>
+                    <div class="quiz-explanation hidden mt-4 p-4 rounded-lg bg-[#0071e3]/10 text-[#0071e3] text-sm"></div>
+                </div>
+            `;
+        } catch (e) {
+            quizContainer.innerHTML = '<span class="text-2xl mb-2">❌</span><h4 class="text-red-500 font-bold">Error</h4><p class="text-sm text-gray-500">Failed to load quiz.</p>';
+        }
+    }
+    
+    // Check answer function for quizzes
+    function checkAnswer(btn, selected, correct, explanation) {
+        const container = btn.parentElement.parentElement;
+        const buttons = container.querySelectorAll('button');
+        const expDiv = container.querySelector('.quiz-explanation');
+        
+        buttons.forEach((b, idx) => {
+            b.disabled = true;
+            if (idx === correct) {
+                b.className = "w-full text-left p-3 rounded-lg border border-green-500 bg-green-50 text-green-700 text-sm font-bold";
+            } else if (idx === selected && selected !== correct) {
+                b.className = "w-full text-left p-3 rounded-lg border border-red-500 bg-red-50 text-red-700 text-sm font-bold";
+            } else {
+                b.className = "w-full text-left p-3 rounded-lg border border-gray-200 opacity-50 text-sm font-medium";
+            }
+        });
+        
+        expDiv.innerHTML = '<strong>' + (selected === correct ? '✅ Correct!' : '❌ Incorrect.') + '</strong><br>' + explanation;
+        expDiv.classList.remove('hidden');
+    }
+
+    function printNotes() {
+        const rawContainers = document.querySelectorAll('#raw-notes-container .markdown-body');
+        let fullMarkdown = '';
+        rawContainers.forEach(container => {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = container.innerHTML;
+            fullMarkdown += txt.value + '\n\n';
+        });
+        
+        let htmlContent = '';
+        if (typeof marked !== 'undefined') {
+            htmlContent = marked.parse(fullMarkdown);
+        } else {
+            htmlContent = '<pre>' + fullMarkdown + '</pre>';
+        }
+        
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Print - {{ topic.name }}</title>
+                <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+                    h1, h2, h3 { color: #000; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 24px; }
+                    p { margin-bottom: 16px; }
+                    ul, ol { margin-bottom: 16px; padding-left: 20px; }
+                    pre { background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: monospace; }
+                    code { font-family: monospace; background: #f5f5f5; padding: 2px 4px; border-radius: 3px; }
+                    blockquote { border-left: 4px solid #ccc; margin: 0; padding-left: 16px; color: #666; }
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .header-info { text-align: center; margin-bottom: 30px; }
+                    .header-info h1 { border: none; margin-bottom: 5px; }
+                    .header-info p { color: #666; margin-top: 0; }
+                    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 8rem; color: rgba(0,0,0,0.05); z-index: -1; pointer-events: none; user-select: none; font-weight: bold; white-space: nowrap; }
+                </style>
+            </head>
+            <body>
+                <div class="watermark">KiraakStudy AI</div>
+                <div class="header-info">
+                    <h1>{{ topic.name }}</h1>
+                    <p>{{ topic.subject_name }} - {{ topic.unit_name }}</p>
+                </div>
+                ${htmlContent}
+                
+                <script>
+                    if (window.opener && window.opener.MathJax) {
+                        window.MathJax = window.opener.MathJax;
+                        const script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+                        script.onload = function() {
+                            MathJax.typesetPromise().then(() => {
+                                setTimeout(() => { window.print(); window.close(); }, 500);
+                            });
+                        };
+                        document.head.appendChild(script);
+                    } else {
+                        setTimeout(() => { window.print(); window.close(); }, 500);
+                    }
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+
+    
+    // Toggle Complete
+    async function toggleComplete(topicId) {
+        try {
+            const response = await fetch(`/topic/${topicId}/complete`, { method: 'POST' });
+            const data = await response.json();
             const btn = document.getElementById('complete-btn');
             const icon = document.getElementById('complete-icon');
             const text = document.getElementById('complete-text');
             
             if (data.is_completed) {
+                btn.className = 'px-4 py-2 rounded-xl text-sm font-bold transition-all border bg-emerald-500/20 text-emerald-400 border-emerald-500/50';
                 icon.innerText = '✅';
                 text.innerText = 'Completed';
-                btn.classList.remove('bg-white', 'text-[#1d1d1f]');
-                btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
             } else {
+                btn.className = 'px-4 py-2 rounded-xl text-sm font-bold transition-all border bg-gray-50 text-[#1d1d1f] border-gray-200 hover:border-gray-500';
                 icon.innerText = '⭕';
                 text.innerText = 'Mark Complete';
-                btn.classList.remove('bg-emerald-500', 'text-white', 'border-emerald-500');
-                btn.classList.add('bg-white', 'text-[#1d1d1f]');
             }
+        } catch (e) {
+            console.error(e);
+            alert('Failed to toggle completion status.');
         }
-    } catch (err) {
-        console.error('Complete toggle failed:', err);
     }
-}
 
-// Copy to clipboard function for total response
-function copyToClipboard(button) {
-    const content = button.getAttribute('data-content');
-    if (content) {
-        navigator.clipboard.writeText(content).then(() => {
-            const originalTitle = button.title;
-            button.title = 'Copied!';
-            button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-            setTimeout(() => {
-                button.title = originalTitle;
-                button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-            }, 2000);
-        });
-    }
-}
-
-function addCodeCopyButtons(container) {
-    container.querySelectorAll('pre').forEach(pre => {
-        if (pre.querySelector('.copy-code-btn')) return;
-        pre.style.position = 'relative';
-        const btn = document.createElement('button');
-        btn.className = 'copy-code-btn absolute top-2 right-2 bg-gray-700/50 hover:bg-gray-700 text-white p-1.5 rounded transition-colors shadow-sm';
-        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-        btn.onclick = () => {
-            const codeNode = pre.querySelector('code');
-            if(codeNode) {
-                navigator.clipboard.writeText(codeNode.innerText);
-                btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-400"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-                setTimeout(() => {
-                    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
-                }, 2000);
+    // Toggle Bookmark
+    async function toggleBookmark(topicId) {
+        try {
+            const response = await fetch(`/topic/${topicId}/bookmark`, { method: 'POST' });
+            const data = await response.json();
+            const btn = document.getElementById('bookmark-btn');
+            const icon = document.getElementById('bookmark-icon');
+            
+            if (data.status === 'added') {
+                btn.className = 'p-2.5 rounded-xl transition-all border bg-[#0071e3]/20 text-[#0071e3] border-[#0071e3]/50';
+                icon.innerText = '🔖';
+            } else {
+                btn.className = 'p-2.5 rounded-xl transition-all border bg-gray-50 text-[#1d1d1f] border-gray-200 hover:border-gray-500';
+                icon.innerText = '📑';
             }
-        };
-        pre.appendChild(btn);
-    });
-}
-
-// Print Notes as PDF
-function printNotes() {
-    window.print();
-}
-
-// Delete Archived Item
-async function deleteArchived(topicId, itemType, itemId) {
-    if (!confirm('Permanently delete this archived item?')) return;
-    try {
-        const response = await fetch(`/topic/${topicId}/archive/${itemType}/${itemId}/delete`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
-        if (data.success) {
-            const el = document.getElementById(`archive-${itemType}-${itemId}`);
-            if (el) {
-                el.style.transition = 'opacity 0.3s, transform 0.3s';
-                el.style.opacity = '0';
-                el.style.transform = 'translateX(20px)';
-                setTimeout(() => el.remove(), 300);
-            }
+        } catch (e) {
+            console.error(e);
+            alert('Failed to toggle bookmark.');
         }
-    } catch (err) {
-        console.error('Delete archived failed:', err);
     }
-}
+
 </script>
 
-<!-- Print Styles with Watermark -->
-<style>
-    @media print {
-        @page {
-            margin: 1cm; /* Adjust margins to hide browser default headers and footers, or use 0 and pad body */
-        }
+<!-- Floating Chat Widget -->
+<div id="floating-chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end no-print">
+    <!-- Chat Window -->
+    <div id="floating-chat-window" class="hidden bg-white/90 backdrop-blur-xl border border-gray-200 rounded-2xl shadow-2xl w-[380px] h-[550px] mb-4 flex flex-col overflow-hidden transition-all duration-300 transform scale-95 origin-bottom-right">
+        <!-- Header -->
+        <div id="floating-chat-header" class="p-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center cursor-move">
+            <h3 class="font-bold text-[#1d1d1f] flex items-center gap-2"><span>💬</span> Notes Chat</h3>
+            <div class="flex items-center gap-2">
+                <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}" class="text-xs text-[#0071e3] hover:underline font-semibold">New Chat</a>
+                <button onclick="toggleChatWindow()" class="text-gray-400 hover:text-gray-600">✖</button>
+            </div>
+        </div>
         
-        * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
+        <!-- Chat Body -->
+        <div id="chat-box" class="flex-1 p-4 overflow-y-auto custom-scroll space-y-4">
+            {% if chat_history %}
+            {% for msg in chat_history %}
+            {% if msg.role == 'user' %}
+            <div class="flex justify-end">
+                <div class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm">{{ msg.content }}</div>
+            </div>
+            {% else %}
+            <div class="flex justify-start relative group">
+                <div class="ai-message p-3 rounded-2xl rounded-bl-sm bg-gray-50 border border-gray-200 text-gray-800 text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto" data-markdown="{{ msg.content | escape }}"></div>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            <div class="flex justify-start">
+                <div class="p-3 rounded-2xl rounded-bl-sm bg-gray-50 border border-gray-200 text-gray-800 text-sm max-w-[85%] shadow-sm">
+                    Hello! Ask me anything about this topic or attached files.
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Chat Input -->
+        <form id="chat-form" class="p-3 bg-white border-t border-gray-200">
+            <input type="hidden" id="chat-session-id" name="session_id" value="{{ active_session_id or '' }}">
+            <div class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl p-1">
+                <textarea id="chat-input" rows="1" placeholder="Ask a question..." required class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none min-h-[36px] max-h-[100px]"></textarea>
+                <button type="submit" class="p-2 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] text-white transition-all shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Floating Button -->
+    <button onclick="toggleChatWindow()" id="floating-chat-btn" class="w-14 h-14 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-white shadow-lg shadow-[#0071e3]/30 flex items-center justify-center text-2xl transition-transform hover:scale-110 active:scale-95 border-2 border-white/20">
+        💬
+    </button>
+</div>
 
-        /* Hide everything except the printable notes */
-        body * { visibility: hidden; }
-        
-        #printable-notes, #printable-notes * { visibility: visible; }
-        
-        #printable-notes { 
-            position: absolute; 
-            left: 0; 
-            top: 0; 
-            width: 100%;
-            padding: 0;
-            margin: 0;
-            border: none !important;
-            box-shadow: none !important;
-        }
-        
-        /* Show print header */
-        .print-header { display: block !important; visibility: visible !important; }
-        
-        /* Hide non-print elements */
-        .no-print, .no-print * { display: none !important; visibility: hidden !important; }
-        
-        /* Watermark that repeats on every page */
-        body::before {
-            content: 'Helix';
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-35deg);
-            font-size: 80px;
-            font-weight: 900;
-            color: rgba(0, 113, 227, 0.08); /* slight blue tint */
-            z-index: 9999;
-            pointer-events: none;
-            letter-spacing: 8px;
-            white-space: nowrap;
-            visibility: visible;
-        }
-        
-        /* Clean prose styling for print */
-        .prose { font-size: 12pt; line-height: 1.6; color: #000; }
-        .prose h1 { font-size: 20pt; margin-top: 16pt; color: #0071e3 !important; }
-        .prose h2 { font-size: 16pt; margin-top: 14pt; color: #1d1d1f !important; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
-        .prose h3 { font-size: 14pt; margin-top: 12pt; }
-        .prose code { background: #f0f0f0 !important; padding: 2px 4px; border-radius: 3px; color: #d63384 !important; }
-        .prose pre { background: #f8f9fa !important; padding: 12px !important; border-radius: 6px; overflow: visible !important; white-space: pre-wrap !important; word-wrap: break-word !important; border: 1px solid #e9ecef !important; }
-        .prose pre code { background: transparent !important; color: #212529 !important; padding: 0 !important; }
-        .prose pre * { color: #212529 !important; } /* Force highlight.js spans to print darkly */
-        
-        /* Page break after each note section if needed */
-        .note-content { page-break-inside: auto; }
-        h1, h2, h3 { page-break-after: avoid; }
-    }
-
-    /* Screen Styles for AI Notes (Premium Markdown Rendering) */
-    @media screen {
-        .note-content h1 {
-            font-size: 1.75rem;
-            font-weight: 900;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #0071e3 0%, #4facfe 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            border-bottom: 2px solid #f0f4f8;
-            padding-bottom: 0.5rem;
-        }
-        .note-content h2 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            margin-top: 1.75rem;
-            margin-bottom: 0.75rem;
-            color: #1d1d1f;
-            display: flex;
-            align-items: center;
-        }
-        .note-content h2::before {
-            content: '';
-            display: inline-block;
-            width: 4px;
-            height: 1.2em;
-            background-color: #0071e3;
-            margin-right: 10px;
-            border-radius: 2px;
-        }
-        .note-content h3 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: #4b5563;
-        }
-        .note-content blockquote {
-            border-left: 4px solid #0071e3;
-            background: linear-gradient(to right, rgba(0, 113, 227, 0.05), transparent);
-            padding: 1rem 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 0 8px 8px 0;
-            font-style: italic;
-            color: #4b5563;
-        }
-        .note-content ul {
-            list-style-type: none;
-            padding-left: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .note-content ul li {
-            position: relative;
-            margin-bottom: 0.5rem;
-        }
-        .note-content ul li::before {
-            content: '•';
-            color: #0071e3;
-            font-weight: bold;
-            font-size: 1.5em;
-            position: absolute;
-            left: -1rem;
-            top: -0.2rem;
-        }
-        .note-content ol {
-            padding-left: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        .note-content ol li::marker {
-            color: #0071e3;
-            font-weight: 700;
-        }
-        .note-content code:not(pre code) {
-            background-color: rgba(0, 113, 227, 0.08);
-            color: #c2410c;
-            padding: 0.15rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.9em;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        }
-        .note-content pre {
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            padding: 1.25rem;
-            border-radius: 12px;
-            overflow-x: auto;
-            margin: 1.5rem 0;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-        }
-        .note-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-            font-size: 0.9em;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .note-content th {
-            background-color: #f8fafc;
-            color: #334155;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.75rem 1rem;
-            border-bottom: 2px solid #e2e8f0;
-            text-align: left;
-        }
-        .note-content td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .note-content tr:last-child td {
-            border-bottom: none;
-        }
-        .note-content tr:hover td {
-            background-color: #f8fafc;
+<script>
+    function toggleChatWindow() {
+        const win = document.getElementById('floating-chat-window');
+        if (win.classList.contains('hidden')) {
+            win.classList.remove('hidden');
+            setTimeout(() => {
+                win.classList.remove('scale-95', 'opacity-0');
+                win.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.getElementById('chat-input').focus();
+        } else {
+            win.classList.remove('scale-100', 'opacity-100');
+            win.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                win.classList.add('hidden');
+            }, 300);
         }
     }
+    
+    // Draggable Logic
+    const header = document.getElementById('floating-chat-header');
+    const widget = document.getElementById('floating-chat-widget');
+    let isDragging = false;
+    let offsetX, offsetY;
+    
+    header.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        const rect = widget.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        widget.style.bottom = 'auto';
+        widget.style.right = 'auto';
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        widget.style.left = (e.clientX - offsetX) + 'px';
+        widget.style.top = (e.clientY - offsetY) + 'px';
+    });
+    
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+</script>
 
-    /* Line clamp for archived items */
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-</style>
 {% endblock %}

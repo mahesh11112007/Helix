@@ -128,6 +128,38 @@ def api_explain_topic(topic_id):
     explanation = ai_service.explain_topic(topic["name"], level, language)
     return jsonify({"explanation": explanation})
 
+@study_bp.route("/topic/<topic_id>/math-level", methods=["GET", "POST"])
+def math_level_prompt(topic_id):
+    user_id = get_current_user_id()
+    if not user_id:
+        return redirect(url_for("auth.login"))
+        
+    topic = db_service.query("""
+        SELECT t.*, s.name as subject_name 
+        FROM topics t 
+        JOIN units u ON t.unit_id = u.id 
+        JOIN subjects s ON u.subject_id = s.id 
+        WHERE t.id = ?
+    """, (topic_id,), one=True)
+    if not topic:
+        flash("Topic not found", "error")
+        return redirect(url_for("dashboard.index"))
+        
+    if request.method == "POST":
+        level = request.form.get("math_level")
+        if level in ["beginner", "intermediate", "advanced"]:
+            db_service.execute("UPDATE profiles SET math_learning_level = ? WHERE id = ?", (level, user_id))
+            # Auto-trigger generation by posting back to the generate route
+            # Since we are returning a response, we can just redirect to a view that auto-submits, 
+            # or call the generate_resources logic directly. Let's redirect to a temporary auto-submit page, 
+            # or simply generate here to avoid complexity.
+            # Easiest way in Flask is a 307 redirect so the POST method is preserved!
+            return redirect(url_for("study.generate_resources", topic_id=topic_id), code=307)
+        else:
+            flash("Invalid learning level selected.", "error")
+            
+    return render_template("study/math_level.html", topic=topic)
+
 @study_bp.route("/topic/<topic_id>/generate-resources", methods=["POST"])
 def generate_resources(topic_id):
     user_id = get_current_user_id()
@@ -145,6 +177,11 @@ def generate_resources(topic_id):
         flash("Topic not found", "error")
         return redirect(url_for("dashboard.index"))
         
+    if topic["subject_name"] and "math" in topic["subject_name"].lower():
+        profile = db_service.query("SELECT math_learning_level FROM profiles WHERE id = ?", (user_id,), one=True)
+        if not profile or not profile.get("math_learning_level"):
+            return redirect(url_for("study.math_level_prompt", topic_id=topic_id))
+            
     if not usage_service.can_generate_deck(user_id):
         flash("You have reached your free AI Study Deck generation limit. Please upgrade to Premium to generate more!", "error")
         return redirect(url_for("dashboard.view_topic", topic_id=topic_id))
@@ -227,6 +264,72 @@ def increment_daily_streak(user_id):
             "UPDATE profiles SET study_streak = ?, last_active = ? WHERE id = ?",
             (current_streak, now_ist.isoformat(), user_id)
         )
+
+
+@study_bp.route("/topic/<topic_id>/mini-quiz", methods=["POST"])
+def mini_quiz(topic_id):
+    from services.db_service import db_service
+    from services.ai_service import ai_service
+    from flask import session, jsonify, request
+    
+    user = session.get("user")
+    if not user:
+        return jsonify({"error": "Not authenticated"}), 401
+        
+    topic = db_service.query("SELECT * FROM topics WHERE id = ?", (topic_id,), one=True)
+    if not topic:
+        return jsonify({"error": "Topic not found"}), 404
+        
+    try:
+        profile = db_service.query("SELECT api_keys, ai_platform, is_premium FROM profiles WHERE id = ?", (user["id"],), one=True)
+        key = profile["api_keys"] if profile else None
+        base_url = None
+        chat_model = None
+        
+        is_premium = bool(profile.get("is_premium")) if profile else False
+        if is_premium and not key:
+            key, base_url, chat_model, _ = ai_service._get_config()
+            
+        import json
+        prompt = f'''Generate exactly ONE multiple choice question based on the topic: {topic['name']}.
+Return ONLY valid JSON in this exact format, with no markdown code blocks or other text:
+{{
+  "question": "The question text here",
+  "options": ["Option A", "Option B", "Option C", "Option D"],
+  "correct_index": 0,
+  "explanation": "Why this is correct."
+}}
+'''
+        
+        if not base_url:
+            base_url = "https://integrate.api.nvidia.com/v1"
+            chat_model = "meta/llama-3.1-8b-instruct"
+            
+        if not key:
+            key, base_url, chat_model, _ = ai_service._get_config()
+            
+        headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+            
+        payload = {
+            "model": chat_model,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.3,
+            "max_tokens": 500
+        }
+        
+        import requests
+        resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=15)
+        resp.raise_for_status()
+        
+        content = resp.json()["choices"][0]["message"]["content"].strip()
+        if content.startswith("```json"):
+            content = content[7:-3].strip()
+        elif content.startswith("```"):
+            content = content[3:-3].strip()
+            
+        return jsonify(json.loads(content))
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # ── Helper to Get Current User ID ───────────────────────────────────────────────
 @study_bp.route("/topic/<topic_id>/archive/<item_type>/<item_id>/delete", methods=["POST"])

@@ -6,14 +6,24 @@
     <h2 class="text-3xl font-semibold mb-2 text-white">Let's set up your syllabus</h2>
     <p class="text-gray-400 mb-8">Select your course details to automatically load your entire syllabus, subjects, and topics.</p>
 
-    <form method="POST" action="{{ url_for('dashboard.setup') }}" class="space-y-6">
+    <form method="POST" action="{{ url_for('dashboard.setup') }}" class="space-y-6" onsubmit="
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-wait');
+        btn.innerHTML = '⚙️ Importing Syllabus... ~5s';
+        
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white px-6 py-4 rounded-xl shadow-lg flex flex-col gap-1 z-50 animate-bounce';
+        toast.innerHTML = '<div class=\\'font-bold text-sm flex items-center gap-2\\'><svg class=\\'animate-spin h-4 w-4\\' viewBox=\\'0 0 24 24\\'><circle class=\\'opacity-25\\' cx=\\'12\\' cy=\\'12\\' r=\\'10\\' stroke=\\'currentColor\\' stroke-width=\\'4\\' fill=\\'none\\'></circle><path class=\\'opacity-75\\' fill=\\'currentColor\\' d=\\'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z\\'></path></svg> Importing Syllabus...</div><div class=\\'text-xs opacity-80\\'>Estimated time: ~5s</div>';
+        document.body.appendChild(toast);
+    ">
         
         <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">Education Level</label>
             <select id="education" name="education" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors appearance-none">
                 <option value="">Select Education</option>
                 {% for edu in educations %}
-                <option value="{{ edu }}">{{ edu | title }}</option>
+                <option value="{{ edu.id }}">{{ edu.name }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -70,8 +80,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const boards = await res.json();
             boards.forEach(b => {
                 const opt = document.createElement('option');
-                opt.value = b;
-                opt.textContent = b.toUpperCase();
+                opt.value = b.id;
+                opt.textContent = b.name;
                 boardSelect.appendChild(opt);
             });
             boardSelect.disabled = false;
@@ -90,9 +100,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const years = await res.json();
             years.forEach(y => {
                 const opt = document.createElement('option');
-                opt.value = y;
-                // format like "first_year" -> "First Year"
-                opt.textContent = y.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                opt.value = y.id;
+                opt.textContent = y.name;
                 yearSelect.appendChild(opt);
             });
             yearSelect.disabled = false;

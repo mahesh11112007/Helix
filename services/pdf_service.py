@@ -1,5 +1,6 @@
 import io
-import fitz # PyMuPDF
+# pyrefly: ignore [missing-import]
+import fitz
 
 class PDFService:
     @staticmethod

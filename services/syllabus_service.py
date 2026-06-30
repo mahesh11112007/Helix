@@ -6,18 +6,38 @@ class SyllabusService:
     def __init__(self, data_dir="data/syllabus"):
         self.data_dir = data_dir
 
+    PRETTY_NAMES = {
+        "intermediate": "Intermediate",
+        "diploma": "Diploma",
+        "tg": "TG Intermediate Board",
+        "ap": "AP Intermediate Board",
+        "sbtet_tg": "TG SBTET Board",
+        "c24_1st_sem": "C24 Curriculum - I Semester",
+        "c24_2nd_sem": "C24 Curriculum - II Semester",
+        "c24_3rd_sem": "C24 Curriculum - III Semester",
+        "c24_4th_sem": "C24 Curriculum - IV Semester",
+        "c24_5th_sem": "C24 Curriculum - V Semester",
+        "first_year": "First Year",
+        "second_year": "Second Year"
+    }
+
+    def _format(self, items):
+        return [{"id": item, "name": self.PRETTY_NAMES.get(item, item.replace('_', ' ').title())} for item in items]
+
     def get_available_education_levels(self):
         """Returns list of education levels (e.g. ['intermediate', 'btech'])"""
         if not os.path.exists(self.data_dir):
             return []
-        return [d for d in os.listdir(self.data_dir) if os.path.isdir(os.path.join(self.data_dir, d))]
+        items = [d for d in os.listdir(self.data_dir) if os.path.isdir(os.path.join(self.data_dir, d))]
+        return self._format(items)
 
     def get_available_boards(self, education_level):
         """Returns list of boards (e.g. ['tg', 'ap']) for an education level"""
         path = os.path.join(self.data_dir, education_level)
         if not os.path.exists(path):
             return []
-        return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
+        items = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
+        return self._format(items)
 
     def get_available_years(self, education_level, board):
         """Returns list of JSON files (e.g. ['first_year', 'second_year'])"""
@@ -25,7 +45,8 @@ class SyllabusService:
         if not os.path.exists(path):
             return []
         files = [f for f in os.listdir(path) if f.endswith(".json")]
-        return [f.replace(".json", "") for f in files]
+        items = [f.replace(".json", "") for f in files]
+        return self._format(items)
 
     def get_syllabus_data(self, education_level, board, year):
         """Loads and returns the JSON syllabus data"""

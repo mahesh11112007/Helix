@@ -2,6 +2,7 @@ import os
 import sqlite3
 import psycopg2
 import psycopg2.extras
+# pyrefly: ignore [missing-import]
 from supabase import create_client, Client
 
 class DBService:
@@ -67,6 +68,8 @@ class DBService:
                 password_hash TEXT,
                 google_id TEXT UNIQUE,
                 last_active TEXT,
+                math_learning_level TEXT,
+                is_premium BOOLEAN DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"""))
             
@@ -318,6 +321,12 @@ class DBService:
             # Clear stale completed/failed tasks on startup to prevent timezone layout loops
             try:
                 cursor.execute("DELETE FROM background_tasks WHERE status IN ('completed', 'failed')")
+            except Exception:
+                pass
+                
+            # Migration: add math_learning_level to profiles if it doesn't exist
+            try:
+                cursor.execute("ALTER TABLE profiles ADD COLUMN math_learning_level TEXT")
             except Exception:
                 pass
                 

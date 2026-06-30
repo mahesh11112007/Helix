@@ -1,0 +1,1125 @@
+{
+  "year": "I Semester",
+  "groups": {
+    "AI & ML": [
+      {
+        "subject": "Basic English",
+        "code": "HU-101",
+        "chapters": [
+          {
+            "name": "Vocabulary Through Reading - I",
+            "topics": [
+              "How to Learn a New Word",
+              "Synonyms, Antonyms and One-Word Substitutes",
+              "Purpose of Reading",
+              "Types of Reading",
+              "Types of Paragraphs and Questions"
+            ]
+          },
+          {
+            "name": "Speaking - I",
+            "topics": [
+              "Need for English",
+              "Classroom English",
+              "Expressing Likes and Dislikes",
+              "Expressing Feelings"
+            ]
+          },
+          {
+            "name": "Grammar - I",
+            "topics": [
+              "Basic Sentence Structures",
+              "Tenses-I",
+              "Tenses-II",
+              "Voice"
+            ]
+          },
+          {
+            "name": "Speaking - II",
+            "topics": [
+              "Introducing Oneself",
+              "Talking about daily routine",
+              "Fixing, Cancelling and Rescheduling Appointments",
+              "Extending, Accepting and Declining Invitations"
+            ]
+          },
+          {
+            "name": "Grammar - II",
+            "topics": [
+              "Adjectives",
+              "Prepositions",
+              "Asking Questions -I",
+              "Asking Questions - II"
+            ]
+          },
+          {
+            "name": "Writing-I",
+            "topics": [
+              "Paragraph Writing - I",
+              "Paragraph Writing - II",
+              "Letter Writing - I",
+              "Letter Writing - II"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Basic Engineering Mathematics",
+        "code": "SC-102",
+        "chapters": [
+          {
+            "name": "Algebra",
+            "topics": [
+              "Logarithms",
+              "Partial Fractions"
+            ]
+          },
+          {
+            "name": "Matrices and Determinants",
+            "topics": [
+              "Matrices",
+              "Determinants"
+            ]
+          },
+          {
+            "name": "Trigonometry - I",
+            "topics": [
+              "Trigonometric Ratios of Allied Angles",
+              "Compound Angles"
+            ]
+          },
+          {
+            "name": "Trigonometry - II",
+            "topics": [
+              "Multiple and sub-multiple angles",
+              "Transformations"
+            ]
+          },
+          {
+            "name": "Trigonometry - III",
+            "topics": [
+              "Inverse Trigonometric Functions",
+              "Properties of Triangles"
+            ]
+          },
+          {
+            "name": "Applications of Trigonometry and Matrices",
+            "topics": [
+              "Solutions of Triangles",
+              "Solutions of system of Simultaneous Linear Equations"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Basic Physics",
+        "code": "SC-103",
+        "chapters": [
+          {
+            "name": "Units, Dimensions and Measurements",
+            "topics": [
+              "Physical quantity",
+              "Fundamental and derived quantities",
+              "Dimensions and dimensional formula",
+              "Principle of homogeneity",
+              "Applications and limitations of dimensional analysis",
+              "Errors in measurement"
+            ]
+          },
+          {
+            "name": "Vectors",
+            "topics": [
+              "Scalar and Vector quantities",
+              "Triangle and Parallelogram law of vectors",
+              "Scalar product of vectors",
+              "Vector product of vectors"
+            ]
+          },
+          {
+            "name": "Mechanics",
+            "topics": [
+              "Equations of motion",
+              "Projectile motion",
+              "Friction (types, laws, advantages and disadvantages)"
+            ]
+          },
+          {
+            "name": "Properties of Matter",
+            "topics": [
+              "Elasticity (Stress, Strain, Hooke's Law)",
+              "Surface tension",
+              "Viscosity"
+            ]
+          },
+          {
+            "name": "Work and Energy",
+            "topics": [
+              "Work, Power and Energy",
+              "Work-Energy theorem",
+              "Law of conservation of energy",
+              "Renewable and Non-renewable energy sources"
+            ]
+          },
+          {
+            "name": "Thermal Physics",
+            "topics": [
+              "Thermal expansion",
+              "Thermal conductivity",
+              "Boyle's law and Charles' laws",
+              "Ideal gas equation",
+              "Laws of thermodynamics"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "General Engineering Chemistry",
+        "code": "SC-104",
+        "chapters": [
+          {
+            "name": "Fundamentals of Chemistry",
+            "topics": [
+              "Atomic Structure",
+              "Chemical Bonding",
+              "Oxidation-Reduction"
+            ]
+          },
+          {
+            "name": "Solutions and Colloids",
+            "topics": [
+              "Mole concept",
+              "Molarity and Normality",
+              "Colloids and industrial applications"
+            ]
+          },
+          {
+            "name": "Acids and Bases",
+            "topics": [
+              "Theories of acids and bases",
+              "Ionic product of water",
+              "pH",
+              "Buffer solutions",
+              "Indicators"
+            ]
+          },
+          {
+            "name": "Environmental Science",
+            "topics": [
+              "Ecosystem",
+              "Biodiversity",
+              "Green Chemistry",
+              "e-waste Management"
+            ]
+          },
+          {
+            "name": "Water Technology",
+            "topics": [
+              "Hardness of water",
+              "Softening methods",
+              "Municipal treatment",
+              "Reverse Osmosis",
+              "Desalination"
+            ]
+          },
+          {
+            "name": "Electrochemistry",
+            "topics": [
+              "Conductors and electrolytes",
+              "Electrolysis",
+              "Faraday's laws",
+              "Electrolytic refining"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Computer Fundamentals & Hardware",
+        "code": "CS-105",
+        "chapters": [
+          {
+            "name": "Fundamentals of Digital Computer",
+            "topics": [
+              "Generations of Computers",
+              "Block diagram",
+              "CPU functional parameters",
+              "Memory types"
+            ]
+          },
+          {
+            "name": "DOS Operating Systems",
+            "topics": [
+              "Need for OS",
+              "DOS Commands",
+              "Directories and files"
+            ]
+          },
+          {
+            "name": "Windows Operating Systems",
+            "topics": [
+              "Features of Windows",
+              "File and folder management",
+              "Control panel utilities"
+            ]
+          },
+          {
+            "name": "PC hardware and its Components",
+            "topics": [
+              "BIOS",
+              "Motherboard components",
+              "I/O ports",
+              "SMPS"
+            ]
+          },
+          {
+            "name": "Processors, Memories",
+            "topics": [
+              "Processors (INTEL/AMD)",
+              "Chipsets",
+              "RAM types and upgradation"
+            ]
+          },
+          {
+            "name": "Mass storage devices & I/O Devices",
+            "topics": [
+              "Hard Disk drive",
+              "Optical disk drives",
+              "SSD",
+              "Input/Output devices"
+            ]
+          }
+        ]
+      }
+    ],
+    "CSE": [
+      {
+        "subject": "Basic English",
+        "code": "HU-101",
+        "chapters": [
+          {
+            "name": "MODULE 1: VOCABULARY THROUGH READING - I",
+            "topics": [
+              "How to Learn a New Word",
+              "Synonyms, Antonyms and One-Word Substitutes",
+              "Reading - I",
+              "Reading - II"
+            ]
+          },
+          {
+            "name": "MODULE 2: SPEAKING - 1",
+            "topics": [
+              "Need for English",
+              "Classroom English",
+              "Expressing Likes and Dislikes",
+              "Expressing Feelings"
+            ]
+          },
+          {
+            "name": "MODULE 3: GRAMMAR - I",
+            "topics": [
+              "Basic Sentence Structures",
+              "Tenses-I",
+              "Tenses-II",
+              "Voice"
+            ]
+          },
+          {
+            "name": "MODULE 4: SPEAKING - II",
+            "topics": [
+              "Introducing Oneself",
+              "Talking about daily routine",
+              "Fixing, Cancelling and Rescheduling Appointments",
+              "Extending, Accepting and Declining Invitations"
+            ]
+          },
+          {
+            "name": "MODULE 5: GRAMMAR - II",
+            "topics": [
+              "Adjectives",
+              "Prepositions",
+              "Asking Questions -I",
+              "Asking Questions - II"
+            ]
+          },
+          {
+            "name": "MODULE 6: WRITING - I",
+            "topics": [
+              "Paragraph Writing - I",
+              "Paragraph Writing - II",
+              "Letter Writing - I",
+              "Letter Writing - II"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Basic Engineering Mathematics",
+        "code": "SC-102",
+        "chapters": [
+          {
+            "name": "Unit - I Algebra",
+            "topics": [
+              "Logarithms",
+              "Partial Fractions"
+            ]
+          },
+          {
+            "name": "Unit - II Matrices and Determinants",
+            "topics": [
+              "Matrices",
+              "Determinants"
+            ]
+          },
+          {
+            "name": "Unit - III Trigonometry - I",
+            "topics": [
+              "Trigonometric Ratios of Allied Angles",
+              "Compound Angles"
+            ]
+          },
+          {
+            "name": "Unit - IV Trigonometry - II",
+            "topics": [
+              "Multiple and sub-multiple angles",
+              "Transformations"
+            ]
+          },
+          {
+            "name": "Unit - V Trigonometry - III",
+            "topics": [
+              "Inverse Trigonometric Functions",
+              "Properties of Triangles"
+            ]
+          },
+          {
+            "name": "Unit - VI Applications of Trigonometry and Matrices",
+            "topics": [
+              "Solutions of Triangles",
+              "Solutions of system of Simultaneous Linear Equations"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Basic Physics",
+        "code": "SC-103",
+        "chapters": [
+          {
+            "name": "Unit 1 Units, Dimensions and Measurements",
+            "topics": [
+              "Physical quantity",
+              "Fundamental and derived quantities",
+              "SI units",
+              "Dimensions and dimensional formula",
+              "Errors in measurement"
+            ]
+          },
+          {
+            "name": "Unit 2 Vectors",
+            "topics": [
+              "Scalar and Vector quantities",
+              "Graphical representation of a vector",
+              "Classification of vectors",
+              "Triangle law of vectors",
+              "Parallelogram law of vectors",
+              "Scalar and Vector product of vectors"
+            ]
+          },
+          {
+            "name": "Unit 3 Mechanics",
+            "topics": [
+              "Equations of motion in a straight line",
+              "Projectile motion",
+              "Friction"
+            ]
+          },
+          {
+            "name": "Unit 4 Properties of Matter",
+            "topics": [
+              "Elasticity and elastic bodies",
+              "Stress and Strain",
+              "Young's modulus",
+              "Cohesive and Adhesive forces",
+              "Surface tension",
+              "Viscosity"
+            ]
+          },
+          {
+            "name": "Unit 5 Work and Energy",
+            "topics": [
+              "Work, Power and Energy",
+              "Potential energy and Kinetic energy",
+              "Work-Energy theorem",
+              "Law of conservation of energy",
+              "Non-renewable and Renewable energy sources"
+            ]
+          },
+          {
+            "name": "Unit 6 Thermal Physics",
+            "topics": [
+              "Transmission of heat",
+              "Thermal expansion of solids",
+              "Boyle's law in gases",
+              "Charles' laws in gases",
+              "Ideal gas equation",
+              "Laws of thermodynamics"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "General Engineering Chemistry",
+        "code": "SC-104",
+        "chapters": [
+          {
+            "name": "UNIT-I: Fundamentals of Chemistry",
+            "topics": [
+              "Atomic Structure",
+              "Chemical Bonding",
+              "Oxidation - Reduction"
+            ]
+          },
+          {
+            "name": "UNIT-II: Solutions and Colloids",
+            "topics": [
+              "Solution",
+              "Mole concept",
+              "Molarity-Normality",
+              "Colloids"
+            ]
+          },
+          {
+            "name": "UNIT-III: Acids and Bases",
+            "topics": [
+              "Theories of acids and bases",
+              "Ionic product of water",
+              "pH",
+              "Buffer solutions"
+            ]
+          },
+          {
+            "name": "UNIT-IV: Environmental Science",
+            "topics": [
+              "Segments of environment",
+              "Ecosystem",
+              "Biodiversity",
+              "Green Chemistry",
+              "e-waste management"
+            ]
+          },
+          {
+            "name": "UNIT-V: Water Technology",
+            "topics": [
+              "Soft and hard water",
+              "Hardness of water",
+              "Softening methods",
+              "Desalination",
+              "Municipal treatment of water"
+            ]
+          },
+          {
+            "name": "UNIT-VI: Electrochemistry",
+            "topics": [
+              "Conductors, insulators, electrolytes",
+              "Electrolysis",
+              "Faraday's laws of electrolysis"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Computer Fundamentals & Hardware",
+        "code": "CS-105",
+        "chapters": [
+          {
+            "name": "UNIT - 1: Fundamentals of Digital Computer",
+            "topics": [
+              "Generations of Computers",
+              "Block diagram of a Digital Computer",
+              "Functional blocks of a CPU",
+              "Types of memory"
+            ]
+          },
+          {
+            "name": "UNIT - 2: DOS Operating Systems",
+            "topics": [
+              "Operating System need",
+              "DOS Prompt",
+              "DOS commands",
+              "Directories and files"
+            ]
+          },
+          {
+            "name": "UNIT - 3: Windows Operating Systems",
+            "topics": [
+              "Windows desktop",
+              "Components of a Window",
+              "File and folder management",
+              "Control panel settings"
+            ]
+          },
+          {
+            "name": "UNIT -4: PC hardware and its Components",
+            "topics": [
+              "BIOS functions",
+              "Motherboard components",
+              "SMPS",
+              "Processors"
+            ]
+          },
+          {
+            "name": "UNIT-5: Processors, Memories",
+            "topics": [
+              "Processor types",
+              "Chipsets",
+              "RAM types",
+              "RAM upgradation"
+            ]
+          },
+          {
+            "name": "UNIT-6: Mass storage devices & I/O Devices",
+            "topics": [
+              "Hard Disk drive",
+              "Optical disk drives",
+              "Input devices",
+              "Output Devices"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Basic Electrical & Electronics Engineering",
+        "code": "CS-106",
+        "chapters": [
+          {
+            "name": "UNIT 1: Electric Current - Ohm's Law-Resistance",
+            "topics": [
+              "Conductor, Insulator and semi-Conductor",
+              "Electric Potential",
+              "Ohm's Law",
+              "Resistance",
+              "Temperature co-efficient of resistance"
+            ]
+          },
+          {
+            "name": "UNIT-2: Kirchoff's Laws - Star - Delta Transformation",
+            "topics": [
+              "Active and passive circuits",
+              "Kirchoff's laws",
+              "Star - Delta Transformation"
+            ]
+          },
+          {
+            "name": "UNIT - 3: Electro Magnetic Induction & AC Fundamentals",
+            "topics": [
+              "Faraday's laws of electromagnetic induction",
+              "Self and mutual inductance",
+              "A.C. fundamentals",
+              "Series and Parallel AC Circuits"
+            ]
+          },
+          {
+            "name": "UNIT - 4: Electronic passive components",
+            "topics": [
+              "Resistors",
+              "Potentiometers",
+              "Capacitors",
+              "Chokes and Transformers"
+            ]
+          },
+          {
+            "name": "UNIT-5: Semiconductor materials, Junction diode & transistors",
+            "topics": [
+              "Semiconductor physics",
+              "P-N junction",
+              "Transistors"
+            ]
+          },
+          {
+            "name": "UNIT 6: Stabilizers and UPS",
+            "topics": [
+              "Stabilizers",
+              "UPS"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Engineering Drawing-I",
+        "code": "ME-107",
+        "chapters": [
+          {
+            "name": "Engineering Drawing Basics",
+            "topics": [
+              "Importance of Engineering Drawing",
+              "Drawing Instruments",
+              "Free hand lettering & numbering",
+              "Dimensioning practice"
+            ]
+          },
+          {
+            "name": "Geometric Construction",
+            "topics": [
+              "Division of a line",
+              "Construction of tangent lines",
+              "Construction of polygons",
+              "Conical Curves",
+              "Special Curves"
+            ]
+          },
+          {
+            "name": "Projections",
+            "topics": [
+              "Projection of points, lines and planes",
+              "Orthographic Projections"
+            ]
+          }
+        ]
+      }
+    ],
+    "ECE": [
+      {
+        "subject": "Basic English",
+        "code": "HU-101",
+        "chapters": [
+          {
+            "name": "Module 1: Vocabulary Through Reading - I",
+            "topics": [
+              "How to Learn a New Word",
+              "Synonyms, Antonyms, One-Word Substitutes",
+              "Reading - I",
+              "Reading - II"
+            ]
+          },
+          {
+            "name": "Module 2: Speaking - I",
+            "topics": [
+              "Need for English",
+              "Classroom English",
+              "Expressing Likes and Dislikes",
+              "Expressing Feelings"
+            ]
+          },
+          {
+            "name": "Module 3: Grammar - I",
+            "topics": [
+              "Basic Sentence Structures",
+              "Tenses-I",
+              "Tenses-II",
+              "Voice"
+            ]
+          },
+          {
+            "name": "Module 4: Speaking - II",
+            "topics": [
+              "Introducing Oneself",
+              "Talking about daily routine",
+              "Fixing, Cancelling and Rescheduling Appointments",
+              "Extending, Accepting and Declining Invitations"
+            ]
+          },
+          {
+            "name": "Module 5: Grammar - II",
+            "topics": [
+              "Adjectives",
+              "Prepositions",
+              "Asking Questions - I",
+              "Asking Questions - II"
+            ]
+          },
+          {
+            "name": "Module 6: Writing - I",
+            "topics": [
+              "Paragraph Writing - I",
+              "Paragraph Writing - II",
+              "Letter Writing - I",
+              "Letter Writing - II"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Basic Engineering Mathematics",
+        "code": "SC-102",
+        "chapters": [
+          {
+            "name": "Unit I: Algebra",
+            "topics": [
+              "Logarithms",
+              "Partial Fractions"
+            ]
+          },
+          {
+            "name": "Unit II: Matrices and Determinants",
+            "topics": [
+              "Algebra of matrices",
+              "Determinants",
+              "Adjoint and Inverse of a square matrix"
+            ]
+          },
+          {
+            "name": "Unit III: Trigonometry - I",
+            "topics": [
+              "Trigonometric Ratios of Allied Angles",
+              "Compound Angles"
+            ]
+          },
+          {
+            "name": "Unit IV: Trigonometry - II",
+            "topics": [
+              "Multiple and sub-multiple angles",
+              "Transformations"
+            ]
+          },
+          {
+            "name": "Unit V: Trigonometry - III",
+            "topics": [
+              "Inverse Trigonometric Functions",
+              "Properties of Triangles"
+            ]
+          },
+          {
+            "name": "Unit VI: Applications of Trigonometry and Matrices",
+            "topics": [
+              "Solutions of Triangles",
+              "Solutions of system of Simultaneous Linear Equations"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Basic Physics",
+        "code": "SC-103",
+        "chapters": [
+          {
+            "name": "Unit 1: Units, Dimensions and Measurements",
+            "topics": [
+              "Physical quantity",
+              "Fundamental and derived quantities",
+              "Dimensional analysis",
+              "Errors in measurement"
+            ]
+          },
+          {
+            "name": "Unit 2: Vectors",
+            "topics": [
+              "Scalar and Vector quantities",
+              "Triangle law of vectors",
+              "Parallelogram law of vectors",
+              "Scalar product",
+              "Vector product"
+            ]
+          },
+          {
+            "name": "Unit 3: Mechanics",
+            "topics": [
+              "Equations of motion",
+              "Projectile motion",
+              "Friction"
+            ]
+          },
+          {
+            "name": "Unit 4: Properties of Matter",
+            "topics": [
+              "Elasticity",
+              "Stress and Strain",
+              "Surface tension",
+              "Viscosity"
+            ]
+          },
+          {
+            "name": "Unit 5: Work and Energy",
+            "topics": [
+              "Work, Power and Energy",
+              "Law of conservation of energy",
+              "Non-renewable and Renewable energy sources"
+            ]
+          },
+          {
+            "name": "Unit 6: Thermal Physics",
+            "topics": [
+              "Transmission of heat",
+              "Boyle's law",
+              "Charles' laws",
+              "Ideal gas equation",
+              "Laws of thermodynamics"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "General Engineering Chemistry",
+        "code": "SC-104",
+        "chapters": [
+          {
+            "name": "Unit I: Fundamentals of Chemistry",
+            "topics": [
+              "Atomic Structure",
+              "Chemical Bonding",
+              "Oxidation-Reduction"
+            ]
+          },
+          {
+            "name": "Unit II: Solutions and Colloids",
+            "topics": [
+              "Mole concept",
+              "Molarity",
+              "Normality",
+              "Colloids"
+            ]
+          },
+          {
+            "name": "Unit III: Acids and Bases",
+            "topics": [
+              "Theories of acids and bases",
+              "Ionic product of water",
+              "pH",
+              "Buffer solutions"
+            ]
+          },
+          {
+            "name": "Unit IV: Environmental Science",
+            "topics": [
+              "Ecosystem",
+              "Biodiversity",
+              "Green Chemistry",
+              "e-waste management"
+            ]
+          },
+          {
+            "name": "Unit V: Water Technology",
+            "topics": [
+              "Hardness of water",
+              "Softening methods",
+              "Osmosis and Reverse Osmosis"
+            ]
+          },
+          {
+            "name": "Unit VI: Electrochemistry",
+            "topics": [
+              "Electrolysis",
+              "Faraday's laws of electrolysis",
+              "Electrolytic refining"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Basic Electronics",
+        "code": "EC-105",
+        "chapters": [
+          {
+            "name": "Unit 1: Resistors",
+            "topics": [
+              "Types of resistors",
+              "Colour coding",
+              "Potentiometers",
+              "Series and parallel connections"
+            ]
+          },
+          {
+            "name": "Unit 2: Capacitors",
+            "topics": [
+              "Types of capacitors",
+              "Factors affecting capacitance",
+              "Applications of capacitors"
+            ]
+          },
+          {
+            "name": "Unit 3: Inductors and Transformers",
+            "topics": [
+              "Properties of inductors",
+              "Self-inductance and mutual inductance",
+              "Working principle of transformer"
+            ]
+          },
+          {
+            "name": "Unit 4: Switches, Fuses and Relays",
+            "topics": [
+              "Switches classifications",
+              "Fuse types",
+              "Electromagnetic relay working"
+            ]
+          },
+          {
+            "name": "Unit 5: KVL, KCL, Star Delta Transformation",
+            "topics": [
+              "KVL and KCL",
+              "Source transformation",
+              "Star and delta networks"
+            ]
+          },
+          {
+            "name": "Unit 6: AC Fundamentals",
+            "topics": [
+              "Sine wave concepts",
+              "RMS value",
+              "Phase and phase difference",
+              "Phasor diagrams"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Semiconductor Devices",
+        "code": "EC-106",
+        "chapters": [
+          {
+            "name": "Unit 1: Semiconductor Theory",
+            "topics": [
+              "Electrical properties of semiconductors",
+              "Doping",
+              "N-type and P-type semiconductors",
+              "Intrinsic and extrinsic semiconductors"
+            ]
+          },
+          {
+            "name": "Unit 2: Semiconductor Diode and Zener Diode",
+            "topics": [
+              "PN diode working",
+              "Characteristics",
+              "Zener diode working",
+              "Breakdown mechanisms"
+            ]
+          },
+          {
+            "name": "Unit 3: Bipolar Junction Transistor",
+            "topics": [
+              "Working of NPN/PNP transistors",
+              "Configurations (CB, CE, CC)",
+              "Transistor characteristics"
+            ]
+          },
+          {
+            "name": "Unit 4: DC Power Supply and Components",
+            "topics": [
+              "Regulated power supply block diagram",
+              "Rectifiers (HW, FW, Bridge)",
+              "Filters",
+              "UPS and SMPS"
+            ]
+          },
+          {
+            "name": "Unit 5: Field Effect Transistor",
+            "topics": [
+              "JFET construction and working",
+              "Drain and mutual characteristics",
+              "BJT vs FET comparison"
+            ]
+          },
+          {
+            "name": "Unit 6: Metal Oxide Semiconductor FET",
+            "topics": [
+              "MOSFET types",
+              "Working principle",
+              "Enhancement and Depletion MOSFETs"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Engineering Drawing-I",
+        "code": "ME-107",
+        "chapters": [
+          {
+            "name": "General",
+            "topics": [
+              "Drawing instruments",
+              "Free hand lettering & numbering",
+              "Dimensioning practice",
+              "Geometric Construction",
+              "Projection of points, lines and planes",
+              "Orthographic Projections"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Basic Electronics Lab",
+        "code": "EC-108",
+        "chapters": [
+          {
+            "name": "Practical Experiments",
+            "topics": [
+              "Identify and test electronic components",
+              "CRO controls",
+              "Transformer turns ratio",
+              "Resistor measurements",
+              "PN/Zener diode and BJT identification/testing",
+              "Characteristics of Diode/Zener/BJT",
+              "HWR/FWR waveforms"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Basic Science Lab",
+        "code": "SC-109",
+        "chapters": [
+          {
+            "name": "Physics Lab",
+            "topics": [
+              "Screw Gauge measurements",
+              "Vector addition laws",
+              "Coefficient of friction",
+              "Coefficient of viscosity",
+              "Boyle's law",
+              "Surface tension (Demonstration)"
+            ]
+          },
+          {
+            "name": "Chemistry Lab",
+            "topics": [
+              "Standard solution preparation",
+              "HCl/NaOH estimation",
+              "EDTA standardisation",
+              "Water hardness determination"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Computer Fundamentals Lab",
+        "code": "CS-110",
+        "chapters": [
+          {
+            "name": "MS-WORD",
+            "topics": [
+              "Document creation/formatting",
+              "Spell checking",
+              "Mail merging",
+              "Tables"
+            ]
+          },
+          {
+            "name": "MS-POWER POINT",
+            "topics": [
+              "Presentation creation",
+              "Text/Picture insertion",
+              "Slide transition",
+              "Animation effects"
+            ]
+          },
+          {
+            "name": "MS-EXCEL",
+            "topics": [
+              "Worksheet building",
+              "Formatting",
+              "Formulas/Functions",
+              "Charts"
+            ]
+          },
+          {
+            "name": "MS-ACCESS",
+            "topics": [
+              "Database creation",
+              "Tables",
+              "Queries",
+              "Forms",
+              "Reports"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

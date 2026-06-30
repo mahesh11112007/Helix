@@ -1,0 +1,1101 @@
+{
+  "year": "II Semester",
+  "groups": {
+    "AI & ML": [
+      {
+        "subject": "Advanced English",
+        "code": "HU-201",
+        "chapters": [
+          {
+            "name": "Vocabulary Through Reading - II",
+            "topics": [
+              "Homonyms, Homophones and Homographs",
+              "Root-words and Affixes",
+              "Reading - III (Passages on Innovation, Science, History, etc.)",
+              "Reading - IV"
+            ]
+          },
+          {
+            "name": "Speaking-III",
+            "topics": [
+              "Making Requests",
+              "Offering Help and Suggestions",
+              "Expressing Obligations",
+              "Seeking and Giving Permissions"
+            ]
+          },
+          {
+            "name": "Grammar-III",
+            "topics": [
+              "Reported Speech",
+              "Error Analysis - I (Nouns, articles, pronouns, verbs)",
+              "Error Analysis - II (Adjectives, adverbs, prepositions)",
+              "Error Analysis - III (Questions, concord, redundancy)"
+            ]
+          },
+          {
+            "name": "Speaking - IV",
+            "topics": [
+              "Giving Directions",
+              "Giving Instructions",
+              "Talking about the Past",
+              "Describing Objects"
+            ]
+          },
+          {
+            "name": "Writing - II",
+            "topics": [
+              "Mechanics of Writing (Spelling, punctuation, fonts, etc.)",
+              "Data Interpretation - I (Flow charts)",
+              "Data Interpretation - II (Tree diagrams)",
+              "Data Interpretation - III (Tables and pie charts)"
+            ]
+          },
+          {
+            "name": "Writing-III",
+            "topics": [
+              "Writing a Resume",
+              "Writing a Cover Letter",
+              "Note Making (Cue Method, Mind Mapping)",
+              "Writing a Report"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Engineering Mathematics",
+        "code": "SC-202",
+        "chapters": [
+          {
+            "name": "Straight lines and Circles",
+            "topics": [
+              "Slope of straight line",
+              "Various forms of straight line",
+              "Angle between two straight lines",
+              "Equations of parallel and perpendicular lines",
+              "Circle equation from center/radius/diameter/points"
+            ]
+          },
+          {
+            "name": "Conic Sections",
+            "topics": [
+              "Parabola standard equations",
+              "Ellipse standard equations",
+              "Hyperbola standard equations"
+            ]
+          },
+          {
+            "name": "Functions & Limits",
+            "topics": [
+              "Types of functions",
+              "Limit of a function",
+              "Standard limits and Indeterminate forms",
+              "Evaluation of limits"
+            ]
+          },
+          {
+            "name": "Differential Calculus - I",
+            "topics": [
+              "First Principle of Derivatives",
+              "Algebra of derivatives",
+              "Chain rule"
+            ]
+          },
+          {
+            "name": "Differential Calculus - II",
+            "topics": [
+              "Logarithmic Differentiation",
+              "Implicit functions",
+              "Parametric functions",
+              "Successive differentiation",
+              "Partial Differentiation & Euler's theorem"
+            ]
+          },
+          {
+            "name": "Applications of Derivatives",
+            "topics": [
+              "Tangent and Normal equations",
+              "Angle between intersecting curves",
+              "Maxima & Minima"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Applied Physics",
+        "code": "SC-203",
+        "chapters": [
+          {
+            "name": "Simple Harmonic Motion",
+            "topics": [
+              "SHM conditions and characteristics",
+              "Expressions for Displacement, Velocity, Acceleration",
+              "Simple Pendulum, Second's Pendulum"
+            ]
+          },
+          {
+            "name": "Waves and Acoustics",
+            "topics": [
+              "Longitudinal and transverse waves",
+              "Beats, Echo, Doppler Effect",
+              "SONAR, Reverberation, Noise pollution"
+            ]
+          },
+          {
+            "name": "Electricity",
+            "topics": [
+              "Ohm's law, Specific resistance",
+              "Kirchhoff's laws",
+              "Wheatstone's bridge, Meter bridge"
+            ]
+          },
+          {
+            "name": "Electromagnetism",
+            "topics": [
+              "Magnetic materials, Faraday's laws",
+              "Self and Mutual induction",
+              "Transformers"
+            ]
+          },
+          {
+            "name": "Modern Physics",
+            "topics": [
+              "Photoelectric effect",
+              "LASER",
+              "Optical fibers",
+              "Nanoscale materials"
+            ]
+          },
+          {
+            "name": "Semiconductor Physics",
+            "topics": [
+              "Energy bands, Intrinsic/Extrinsic semiconductors",
+              "PN Junction Diode",
+              "Rectifiers, LED"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Engineering Chemistry",
+        "code": "SC-204",
+        "chapters": [
+          {
+            "name": "Electrochemical Cell-Batteries",
+            "topics": [
+              "Galvanic cell, Standard electrode potential",
+              "Batteries (Leclanche, Lead storage, Fuel cells)"
+            ]
+          },
+          {
+            "name": "Metallurgy",
+            "topics": [
+              "Ores, Concentration methods",
+              "Extraction processes (Roasting, Calcination, Smelting)",
+              "Alloys (Brass, Nichrome, Duralumin)"
+            ]
+          },
+          {
+            "name": "Corrosion",
+            "topics": [
+              "Theories of corrosion",
+              "Rusting of iron mechanism",
+              "Prevention methods (Coating, Cathodic protection, Paints)"
+            ]
+          },
+          {
+            "name": "Polymers",
+            "topics": [
+              "Polymerization types",
+              "Plastics (Polythene, PVC, Bakelite)",
+              "Natural and Synthetic rubber (Vulcanization, Buna-S, Neoprene)",
+              "Biodegradable polymers"
+            ]
+          },
+          {
+            "name": "Industrial Fuels and Materials",
+            "topics": [
+              "Fuel classification (CNG, LPG, Biogas)",
+              "Lubricants",
+              "Glass properties and types"
+            ]
+          },
+          {
+            "name": "Environmental Pollution and Control",
+            "topics": [
+              "Air, Water, Soil pollution",
+              "Carbon credit and carbon trading"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Programming In C",
+        "code": "CS-205",
+        "chapters": [
+          {
+            "name": "Programming Methodology and Introduction to C",
+            "topics": [
+              "Algorithm and Flowchart",
+              "Structure of C program",
+              "Stages of compilation"
+            ]
+          },
+          {
+            "name": "Constants, Variables, Data Types, and Operators",
+            "topics": [
+              "Tokens, Keywords, Identifiers",
+              "Operators and Expressions",
+              "Input/Output functions"
+            ]
+          },
+          {
+            "name": "Decision making and Looping",
+            "topics": [
+              "if, if-else, nested if, else-if ladder",
+              "Switch statement",
+              "while, do-while, for loops",
+              "break and continue"
+            ]
+          },
+          {
+            "name": "Arrays and Strings",
+            "topics": [
+              "1D and 2D Arrays",
+              "String handling functions"
+            ]
+          },
+          {
+            "name": "User defined functions",
+            "topics": [
+              "Function definition and prototype",
+              "Storage classes",
+              "Recursion"
+            ]
+          },
+          {
+            "name": "Structures and Unions",
+            "topics": [
+              "Structure definition and members",
+              "Nested structures",
+              "Unions"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Web Technologies",
+        "code": "CS-206",
+        "chapters": [
+          {
+            "name": "Principles of Web Design and Introduction to HTML",
+            "topics": [
+              "Internet, Webpage, Website, URL",
+              "HTML basics and tags"
+            ]
+          },
+          {
+            "name": "HTML Elements",
+            "topics": [
+              "Images, Lists, Tables, Forms, Frames"
+            ]
+          },
+          {
+            "name": "CSS",
+            "topics": [
+              "Inline, Embedded, External Style Sheets",
+              "Backgrounds, Borders, Colors, Padding, Margins"
+            ]
+          },
+          {
+            "name": "JavaScript Basics",
+            "topics": [
+              "Variables, Operators, Conditional Statements, Iterative Statements"
+            ]
+          },
+          {
+            "name": "JavaScript Functions and Arrays",
+            "topics": [
+              "Function definitions, Recursion, Types of Arrays"
+            ]
+          },
+          {
+            "name": "Introduction to PHP",
+            "topics": [
+              "Fundamentals of PHP, Operators, Loops, Arrays, Functions"
+            ]
+          }
+        ]
+      }
+    ],
+    "CSE": [
+      {
+        "subject": "Advanced English",
+        "code": "HU-201",
+        "chapters": [
+          {
+            "name": "Vocabulary Through Reading - II",
+            "topics": [
+              "Homonyms, Homophones and Homographs",
+              "Root-words and Affixes",
+              "Reading - III",
+              "Reading IV"
+            ]
+          },
+          {
+            "name": "Speaking-III",
+            "topics": [
+              "Making Requests",
+              "Offering Help and Suggestions",
+              "Expressing Obligations",
+              "Seeking and Giving Permissions"
+            ]
+          },
+          {
+            "name": "Grammar-III",
+            "topics": [
+              "Reported Speech",
+              "Error Analysis - I",
+              "Error Analysis - II",
+              "Error Analysis - III"
+            ]
+          },
+          {
+            "name": "Speaking - IV",
+            "topics": [
+              "Giving Directions",
+              "Giving Instructions",
+              "Talking about the Past",
+              "Describing Objects"
+            ]
+          },
+          {
+            "name": "Writing - II",
+            "topics": [
+              "Mechanics of Writing",
+              "Data Interpretation -I",
+              "Data Interpretation -II",
+              "Data Interpretation -III"
+            ]
+          },
+          {
+            "name": "Writing-III",
+            "topics": [
+              "Writing a Resume",
+              "Writing a Cover Letter",
+              "Note Making",
+              "Writing a Report"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Engineering Mathematics",
+        "code": "SC-202",
+        "chapters": [
+          {
+            "name": "Straight lines and Circles",
+            "topics": [
+              "Straight lines",
+              "Circles"
+            ]
+          },
+          {
+            "name": "Conic Sections",
+            "topics": [
+              "Parabola",
+              "Ellipse",
+              "Hyperbola"
+            ]
+          },
+          {
+            "name": "Functions & Limits",
+            "topics": [
+              "Definition of a function",
+              "Intervals and Neighbourhoods",
+              "Limits"
+            ]
+          },
+          {
+            "name": "Differential Calculus - I",
+            "topics": [
+              "Definition of Derivative",
+              "Algebra of derivative of functions",
+              "Chain rule"
+            ]
+          },
+          {
+            "name": "Differential Calculus - II",
+            "topics": [
+              "Logarithmic Differentiation",
+              "Parametric functions",
+              "Partial Differentiation",
+              "Euler's theorem"
+            ]
+          },
+          {
+            "name": "Applications of Derivatives",
+            "topics": [
+              "Geometrical Applications",
+              "Maxima & Minima"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Applied Physics",
+        "code": "SC-203",
+        "chapters": [
+          {
+            "name": "Simple Harmonic Motion",
+            "topics": [
+              "Periodic motion",
+              "SHM",
+              "Ideal simple pendulum",
+              "Second's pendulum"
+            ]
+          },
+          {
+            "name": "Waves and Acoustics",
+            "topics": [
+              "Wave characteristics",
+              "Echo",
+              "Doppler Effect",
+              "SONAR",
+              "Reverberation",
+              "Noise pollution"
+            ]
+          },
+          {
+            "name": "Electricity",
+            "topics": [
+              "Ohm's law",
+              "Combination of resistors",
+              "Heating effect of electric current",
+              "Kirchhoff's laws",
+              "Wheatstone's bridge",
+              "Meter Bridge"
+            ]
+          },
+          {
+            "name": "Electromagnetism",
+            "topics": [
+              "Magnetic field",
+              "Magnetic materials",
+              "Faraday's laws",
+              "Transformer"
+            ]
+          },
+          {
+            "name": "Modern Physics",
+            "topics": [
+              "Electromagnetic spectrum",
+              "Photoelectric effect",
+              "LASER",
+              "Optical fiber",
+              "Nanoscale materials"
+            ]
+          },
+          {
+            "name": "Semiconductor Physics",
+            "topics": [
+              "Energy band diagrams",
+              "Intrinsic/Extrinsic semiconductors",
+              "PN Junction Diode",
+              "Rectifiers",
+              "LED"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Engineering Chemistry",
+        "code": "SC-204",
+        "chapters": [
+          {
+            "name": "Electrochemical Cell-Batteries",
+            "topics": [
+              "Galvanic cell",
+              "Standard electrode potential",
+              "Reference electrodes",
+              "Batteries",
+              "Fuel cells"
+            ]
+          },
+          {
+            "name": "Metallurgy",
+            "topics": [
+              "Characteristics of metals",
+              "Extraction of Al and Fe",
+              "Alloys"
+            ]
+          },
+          {
+            "name": "Corrosion",
+            "topics": [
+              "Factors influencing corrosion",
+              "Theories of corrosion",
+              "Prevention of corrosion",
+              "Paints"
+            ]
+          },
+          {
+            "name": "Polymers",
+            "topics": [
+              "Polymerization",
+              "Plastics",
+              "Natural rubber",
+              "Vulcanization",
+              "Elastomers",
+              "Biodegradable polymers"
+            ]
+          },
+          {
+            "name": "Industrial Fuels and Materials",
+            "topics": [
+              "Fuels classification",
+              "CNG, LPG, Bio gas",
+              "Lubricants",
+              "Glass"
+            ]
+          },
+          {
+            "name": "Environmental Pollution and Control",
+            "topics": [
+              "Air pollution",
+              "Water pollution",
+              "Soil pollution",
+              "Carbon credit/trading"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Programming In C",
+        "code": "CS-205",
+        "chapters": [
+          {
+            "name": "Programming Methodology and Introduction to C",
+            "topics": [
+              "Algorithm",
+              "Flowchart",
+              "Program structure",
+              "C program execution"
+            ]
+          },
+          {
+            "name": "Constants, Variables, Data types, Operators and Expressions",
+            "topics": [
+              "C Tokens",
+              "Data types",
+              "Operators",
+              "Type conversion",
+              "Preprocessor directives"
+            ]
+          },
+          {
+            "name": "Decision making and Looping statements",
+            "topics": [
+              "if-else",
+              "Switch",
+              "while",
+              "do-while",
+              "for",
+              "break and continue"
+            ]
+          },
+          {
+            "name": "Arrays and Strings",
+            "topics": [
+              "1D and 2D Arrays",
+              "Matrix operations",
+              "String handling functions"
+            ]
+          },
+          {
+            "name": "User defined functions",
+            "topics": [
+              "Function elements",
+              "Scope and visibility",
+              "Storage classes",
+              "Recursion"
+            ]
+          },
+          {
+            "name": "Structures and Unions",
+            "topics": [
+              "Structure definition",
+              "Nested structure",
+              "Array of structures",
+              "Union"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Web Technologies",
+        "code": "CS-206",
+        "chapters": [
+          {
+            "name": "Principles of Web Design and Introduction to HTML",
+            "topics": [
+              "Internet",
+              "Webpage/Website/URL",
+              "HTML Tags"
+            ]
+          },
+          {
+            "name": "HTML Elements",
+            "topics": [
+              "Images",
+              "Lists",
+              "Tables",
+              "Forms",
+              "Frames"
+            ]
+          },
+          {
+            "name": "CSS",
+            "topics": [
+              "Inline/Embedded/External style sheets",
+              "Backgrounds",
+              "Borders",
+              "Dimensions"
+            ]
+          },
+          {
+            "name": "Java Script Basics",
+            "topics": [
+              "Variables",
+              "Operators",
+              "Conditional statements",
+              "Iterative statements"
+            ]
+          },
+          {
+            "name": "Java Script Functions and Arrays",
+            "topics": [
+              "Function definitions",
+              "Recursion",
+              "Arrays"
+            ]
+          },
+          {
+            "name": "Introduction to PHP",
+            "topics": [
+              "Fundamentals of PHP",
+              "Operators",
+              "Control structures",
+              "Arrays",
+              "Functions"
+            ]
+          }
+        ]
+      }
+    ],
+    "ECE": [
+      {
+        "subject": "Advanced English",
+        "code": "HU-201",
+        "chapters": [
+          {
+            "name": "Vocabulary Through Reading - II",
+            "topics": [
+              "Homonyms, Homophones and Homographs",
+              "Root-words and Affixes",
+              "Reading - III",
+              "Reading - IV"
+            ]
+          },
+          {
+            "name": "Speaking-III",
+            "topics": [
+              "Making Requests",
+              "Offering Help and Suggestions",
+              "Expressing Obligations",
+              "Seeking and Giving Permissions"
+            ]
+          },
+          {
+            "name": "Grammar-III",
+            "topics": [
+              "Reported Speech",
+              "Error Analysis - I",
+              "Error Analysis - II",
+              "Error Analysis - III"
+            ]
+          },
+          {
+            "name": "Speaking - IV",
+            "topics": [
+              "Giving Directions",
+              "Giving Instructions",
+              "Talking about the Past",
+              "Describing Objects"
+            ]
+          },
+          {
+            "name": "Writing - II",
+            "topics": [
+              "Mechanics of Writing",
+              "Data Interpretation - I",
+              "Data Interpretation - II",
+              "Data Interpretation - III"
+            ]
+          },
+          {
+            "name": "Writing - III",
+            "topics": [
+              "Writing a Resume",
+              "Writing a Cover Letter",
+              "Note Making",
+              "Writing a Report"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Engineering Mathematics",
+        "code": "SC-202",
+        "chapters": [
+          {
+            "name": "Straight lines and Circles",
+            "topics": [
+              "Slope of straight line",
+              "Various forms of straight lines",
+              "Equations of parallel and perpendicular lines",
+              "Definition of Locus and Circle"
+            ]
+          },
+          {
+            "name": "Conic Sections",
+            "topics": [
+              "Parabola",
+              "Ellipse",
+              "Hyperbola"
+            ]
+          },
+          {
+            "name": "Functions & Limits",
+            "topics": [
+              "Types of functions",
+              "Intervals and Neighbourhoods",
+              "Limits of a function",
+              "Evaluation of Limits"
+            ]
+          },
+          {
+            "name": "Differential Calculus - I",
+            "topics": [
+              "Definition of Derivative",
+              "Derivatives of Standard functions",
+              "Algebra of derivatives",
+              "Chain rule"
+            ]
+          },
+          {
+            "name": "Differential Calculus - II",
+            "topics": [
+              "Logarithmic Differentiation",
+              "Implicit functions",
+              "Parametric functions",
+              "Partial Differentiation",
+              "Euler's theorem"
+            ]
+          },
+          {
+            "name": "Applications of Derivatives",
+            "topics": [
+              "Slope of Tangent and Normal",
+              "Angle between two curves",
+              "Maxima & Minima"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Applied Physics",
+        "code": "SC-203",
+        "chapters": [
+          {
+            "name": "Simple Harmonic Motion",
+            "topics": [
+              "Conditions of SHM",
+              "Expressions for Displacement, Velocity, Acceleration",
+              "Simple pendulum",
+              "Second's pendulum"
+            ]
+          },
+          {
+            "name": "Waves and Acoustics",
+            "topics": [
+              "Longitudinal and Transverse waves",
+              "Beats",
+              "Echo",
+              "Doppler Effect",
+              "SONAR",
+              "Noise pollution"
+            ]
+          },
+          {
+            "name": "Electricity",
+            "topics": [
+              "Ohm's law",
+              "Kirchhoff's laws",
+              "Wheatstone's bridge",
+              "Meter Bridge"
+            ]
+          },
+          {
+            "name": "Electromagnetism",
+            "topics": [
+              "Coulomb's inverse square law",
+              "Faraday's laws",
+              "Lenz's law",
+              "Transformer construction"
+            ]
+          },
+          {
+            "name": "Modern Physics",
+            "topics": [
+              "Photo electric effect",
+              "LASER",
+              "Optical fiber",
+              "Nanoscale properties"
+            ]
+          },
+          {
+            "name": "Semiconductor Physics",
+            "topics": [
+              "Valence and Conduction bands",
+              "Intrinsic/Extrinsic semiconductors",
+              "PN Junction Diode",
+              "Half/Full wave rectifiers",
+              "LED"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Applied Engineering Chemistry",
+        "code": "SC-204",
+        "chapters": [
+          {
+            "name": "Electrochemical Cell-Batteries",
+            "topics": [
+              "Galvanic cell",
+              "Electrochemical series",
+              "Primary and Secondary batteries",
+              "Fuel cells"
+            ]
+          },
+          {
+            "name": "Metallurgy",
+            "topics": [
+              "Concentration of ore",
+              "Roasting, Calcination, Smelting",
+              "Extraction of Al and Fe",
+              "Alloys"
+            ]
+          },
+          {
+            "name": "Corrosion",
+            "topics": [
+              "Electrochemical theory of corrosion",
+              "Rusting mechanism",
+              "Prevention methods",
+              "Paints"
+            ]
+          },
+          {
+            "name": "Polymers",
+            "topics": [
+              "Addition and Condensation polymerization",
+              "Plastics",
+              "Natural and Synthetic rubber",
+              "Biodegradable polymers"
+            ]
+          },
+          {
+            "name": "Industrial Fuels and Materials",
+            "topics": [
+              "Fuels classification",
+              "CNG, LPG, Bio gas",
+              "Lubricants",
+              "Glass properties and manufacture"
+            ]
+          },
+          {
+            "name": "Environmental Pollution and Control",
+            "topics": [
+              "Air, Water, and Soil pollution causes/effects",
+              "Control methods",
+              "Carbon credit/trading"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Programming In C",
+        "code": "CS-205",
+        "chapters": [
+          {
+            "name": "Programming Methodology and Introduction to C Language",
+            "topics": [
+              "Algorithm development",
+              "Flowchart",
+              "Structure of C program"
+            ]
+          },
+          {
+            "name": "Constants, Variables, Data types, and Operators",
+            "topics": [
+              "Data types",
+              "Operator types",
+              "Precedence and associativity",
+              "Formatted input and output"
+            ]
+          },
+          {
+            "name": "Decision making and Looping statements",
+            "topics": [
+              "if-else",
+              "Switch statement",
+              "while, do-while, for loops",
+              "Break and Continue"
+            ]
+          },
+          {
+            "name": "Arrays and Strings",
+            "topics": [
+              "One and Two Dimensional Arrays",
+              "Matrix operations",
+              "String handling functions"
+            ]
+          },
+          {
+            "name": "User defined functions",
+            "topics": [
+              "Function definition",
+              "Storage classes",
+              "Recursion",
+              "Passing arrays to functions"
+            ]
+          },
+          {
+            "name": "Structures and Unions",
+            "topics": [
+              "Structure definition and access",
+              "Nested structures",
+              "Array of structures",
+              "Union usage"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Electronic Devices & Circuits",
+        "code": "EC-206",
+        "chapters": [
+          {
+            "name": "Transistor Biasing",
+            "topics": [
+              "Thermal runaway",
+              "Stability factors",
+              "Fixed bias",
+              "Collector to base bias",
+              "Self bias"
+            ]
+          },
+          {
+            "name": "Small Signal and Multi stage Amplifiers",
+            "topics": [
+              "h-parameter model",
+              "RC coupled amplifier",
+              "Transformer coupled amplifier",
+              "Direct coupled amplifier"
+            ]
+          },
+          {
+            "name": "Feedback amplifiers",
+            "topics": [
+              "Negative feedback types",
+              "Effect on gain/bandwidth/impedance"
+            ]
+          },
+          {
+            "name": "Power amplifiers",
+            "topics": [
+              "Class A amplifier",
+              "Class B Push-pull",
+              "Complementary symmetry"
+            ]
+          },
+          {
+            "name": "Oscillators",
+            "topics": [
+              "Barkhausen criteria",
+              "RC Phase shift",
+              "Hartley/Colpitts",
+              "Crystal Oscillator"
+            ]
+          },
+          {
+            "name": "Special semiconductor devices",
+            "topics": [
+              "LED",
+              "LDR",
+              "UJT",
+              "Photo Diode",
+              "Photo transistor"
+            ]
+          }
+        ]
+      },
+      {
+        "subject": "Engineering Drawing - II",
+        "code": "ME-207",
+        "chapters": [
+          {
+            "name": "Projection of solids",
+            "topics": [
+              "Regular solids projections",
+              "Inclination of axis"
+            ]
+          },
+          {
+            "name": "Sectional views",
+            "topics": [
+              "Cutting planes",
+              "Hatching",
+              "True shape of section"
+            ]
+          },
+          {
+            "name": "Auxiliary views",
+            "topics": [
+              "Reference planes",
+              "Partial auxiliary view"
+            ]
+          },
+          {
+            "name": "Pictorial Drawings",
+            "topics": [
+              "Isometric view",
+              "Isometric scale",
+              "Oblique and perspective drawing"
+            ]
+          },
+          {
+            "name": "Development of Surfaces",
+            "topics": [
+              "Parallel line method",
+              "Radial line method",
+              "Sheet metal work components"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
