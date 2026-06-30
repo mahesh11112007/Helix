@@ -1,4 +1,4 @@
-const CACHE_NAME = 'helix-ai-cache-v1';
+const CACHE_NAME = 'helix-ai-cache-v2';
 const urlsToCache = [
   '/',
   '/static/css/style.css',
@@ -16,14 +16,28 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Use Network First strategy for HTML (navigation) requests
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          return caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, response.clone());
+            return response;
+          });
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // Use Cache First for everything else (CSS, images, etc.)
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
+        return response || fetch(event.request);
       })
   );
 });
