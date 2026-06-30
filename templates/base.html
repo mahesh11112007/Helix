@@ -169,11 +169,11 @@
 
         <div class="flex items-center space-x-2 md:space-x-3 shrink-0">
             {% if current_user %}
-                <a href="{{ url_for('study.paste_syllabus') }}" class="hidden md:inline-flex px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition items-center">
-                    Import
+                <a href="{{ url_for('study.paste_syllabus') }}" class="inline-flex p-2 md:px-4 md:py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition items-center justify-center" aria-label="Import">
+                    <i data-lucide="download" class="w-4 h-4 md:mr-1.5"></i> <span class="hidden md:inline">Import</span>
                 </a>
-                <a href="{{ url_for('planner.view_planner') }}" class="hidden md:inline-flex px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition items-center">
-                    Planner
+                <a href="{{ url_for('planner.view_planner') }}" class="inline-flex p-2 md:px-4 md:py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition items-center justify-center" aria-label="Planner">
+                    <i data-lucide="calendar" class="w-4 h-4 md:mr-1.5"></i> <span class="hidden md:inline">Planner</span>
                 </a>
                 {% if current_user.subscription_tier != 'premium' %}
                 <a href="{{ url_for('billing.upgrade_page') }}" class="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-xs md:text-sm font-semibold hover:opacity-90 transition inline-flex items-center shadow-md shadow-violet-500/20 whitespace-nowrap">
