@@ -319,6 +319,20 @@ class DBService:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"""))
             
+            # Weekly Tests Table
+            cursor.execute(self._translate_schema("""
+            CREATE TABLE IF NOT EXISTS weekly_tests (
+                id TEXT PRIMARY KEY,
+                user_id TEXT,
+                subject_id TEXT,
+                title TEXT,
+                test_data TEXT,
+                status TEXT,
+                score INTEGER,
+                total_questions INTEGER,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )"""))
+
             # Clear stale completed/failed tasks on startup to prevent timezone layout loops
             try:
                 cursor.execute("DELETE FROM background_tasks WHERE status IN ('completed', 'failed')")
