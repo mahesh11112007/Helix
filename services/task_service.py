@@ -113,9 +113,15 @@ class TaskService:
                 # Dynamic Key Rotation for Premium Users using Admin Pool
                 if is_premium and (not profile or not profile.get("api_keys")):
                     key, base_url, chat_model, _ = ai_service._get_config()
-                tid = topic_data["id"]
-                tname = topic_data["name"]
-                sname = topic_data["subject_name"] if "subject_name" in topic_data.keys() else ""
+                if isinstance(topic_data, (tuple, list)):
+                    tid = topic_data[0]
+                    tname = topic_data[1]
+                    sname = topic_data[2] if len(topic_data) > 2 else ""
+                else:
+                    topic_dict = dict(topic_data) if not isinstance(topic_data, dict) else topic_data
+                    tid = topic_dict.get("id")
+                    tname = topic_dict.get("name")
+                    sname = topic_dict.get("subject_name", "")
                 
                 # Check if task was cancelled by user
                 task_status = db_service.query("SELECT status FROM background_tasks WHERE id = ?", (task_id,), one=True)
