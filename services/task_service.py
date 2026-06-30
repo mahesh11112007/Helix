@@ -57,6 +57,8 @@ class TaskService:
             
             if user_id:
                 profile = db_service.query("SELECT api_keys, ai_platform, custom_instructions, math_learning_level, is_premium FROM profiles WHERE id = ?", (user_id,), one=True)
+                if profile:
+                    profile = dict(profile)
                 if profile and profile["api_keys"]:
                     key = profile["api_keys"]
                     platform = profile["ai_platform"] or "custom"

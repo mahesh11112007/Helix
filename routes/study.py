@@ -282,6 +282,8 @@ def mini_quiz(topic_id):
         
     try:
         profile = db_service.query("SELECT api_keys, ai_platform, is_premium FROM profiles WHERE id = ?", (user["id"],), one=True)
+        if profile:
+            profile = dict(profile)
         key = profile["api_keys"] if profile else None
         base_url = None
         chat_model = None
