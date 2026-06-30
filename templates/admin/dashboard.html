@@ -53,7 +53,7 @@
                     <tbody class="divide-y divide-gray-100">
                         {% for proof in proofs %}
                         <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="py-4 px-6 text-sm text-gray-500 whitespace-nowrap">{{ proof.created_at[:16] }}</td>
+                            <td class="py-4 px-6 text-sm text-gray-500 whitespace-nowrap">{{ (proof.created_at|string)[:16] }}</td>
                             <td class="py-4 px-6">
                                 <div class="font-medium text-[#1d1d1f]">{{ proof.full_name or 'No Name' }}</div>
                                 <div class="text-xs text-gray-500">{{ proof.email }}</div>
@@ -123,7 +123,7 @@
                             </div>
                             <div>
                                 <h3 class="font-bold text-[#1d1d1f] text-sm">{{ req.full_name or 'Unknown User' }}</h3>
-                                <p class="text-xs text-gray-500">{{ req.email }} â€¢ {{ req.created_at[:16] }}</p>
+                                <p class="text-xs text-gray-500">{{ req.email }} â€¢ {{ (req.created_at|string)[:16] }}</p>
                             </div>
                         </div>
                         {% if req.status == 'open' %}
@@ -205,7 +205,7 @@
                                     {{ user.subscription_tier }}
                                 </span>
                             </td>
-                            <td class="py-4 px-6 text-sm text-gray-500">{{ user.created_at[:10] }}</td>
+                            <td class="py-4 px-6 text-sm text-gray-500">{{ (user.created_at|string)[:10] }}</td>
                             <td class="py-4 px-6 text-right">
                                 <form action="{{ url_for('admin.reset_password', user_id=user.id) }}" method="POST" onsubmit="return confirm('Send a password reset email to {{ user.email }}?');">
                                     <button class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-[#1d1d1f] rounded-lg text-sm font-semibold transition-colors">
