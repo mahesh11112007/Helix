@@ -390,13 +390,14 @@ def reset_account():
 def support():
     user = get_current_user()
     if not user:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"error": "Unauthorized"}), 401
         return redirect(url_for("auth.login"))
         
     if request.method == "POST":
         message = request.form.get("message")
         if not message:
-            flash("Message cannot be empty.", "error")
-            return redirect(url_for("dashboard.support"))
+            return jsonify({"error": "Message cannot be empty."}), 400
             
         # Call AI Triage
         triage_result = ai_service.triage_support_request(message)
@@ -412,9 +413,14 @@ def support():
             (req_id, user["id"], message, ai_response, 1 if is_genuine else 0)
         )
         
-        if is_genuine:
-            flash("Your request has been forwarded to the Admin team. You will be contacted soon.", "success")
+        return jsonify({
+            "response": ai_response,
+            "is_genuine": is_genuine
+        })
         
-        return render_template("dashboard/support.html", ai_response=ai_response, user_message=message)
-        
-    return render_template("dashboard/support.html")
+    # GET request - fetch history
+    history = db_service.query(
+        "SELECT * FROM support_requests WHERE user_id = ? ORDER BY created_at ASC",
+        (user["id"],)
+    )
+    return render_template("dashboard/support.html", history=history)

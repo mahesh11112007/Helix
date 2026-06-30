@@ -1,44 +1,207 @@
 {% extends "base.html" %}
 
-{% block title %}Contact Support - Helix AI{% endblock %}
+{% block title %}Support Chat - Helix AI{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto space-y-8 animate-fade-in py-8">
-    <div>
-        <h1 class="text-3xl font-extrabold mb-2 font-outfit text-[#1d1d1f]">Contact Support</h1>
-        <p class="text-gray-500 text-sm">Need help with your account, billing, or technical issues? Ask our Support AI.</p>
+<div class="max-w-4xl mx-auto h-[calc(100vh-100px)] flex flex-col py-4">
+    <!-- Header -->
+    <div class="glass-card flex items-center justify-between p-4 rounded-t-3xl border-b border-gray-100 shrink-0 shadow-sm z-10">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-violet-100 to-fuchsia-100 flex items-center justify-center text-violet-600 shadow-sm shrink-0">
+                <i data-lucide="bot" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold font-outfit text-[#1d1d1f]">Support AI</h1>
+                <p class="text-xs text-gray-500 font-medium flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online and ready to help
+                </p>
+            </div>
+        </div>
     </div>
 
-    {% if ai_response %}
-    <div class="glass-card bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-blue-100">
-        <h2 class="text-lg font-bold font-outfit text-blue-600 mb-2 flex items-center gap-2">
-            <i data-lucide="bot" class="w-5 h-5"></i> Support AI Response
-        </h2>
-        <div class="mb-4 text-gray-700 bg-gray-50 p-4 rounded-xl text-sm italic">
-            "{{ user_message }}"
-        </div>
-        <div class="prose prose-sm max-w-none text-[#1d1d1f]">
-            {{ ai_response }}
-        </div>
-        <div class="mt-6">
-            <a href="{{ url_for('dashboard.support') }}" class="px-5 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold transition-all">
-                Ask Another Question
-            </a>
-        </div>
-    </div>
-    {% else %}
-    <div class="glass-card bg-white p-6 rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100">
-        <form action="{{ url_for('dashboard.support') }}" method="POST" class="space-y-4">
-            <div>
-                <label for="message" class="block text-sm font-semibold text-gray-700 mb-1">How can we help?</label>
-                <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all text-[#1d1d1f] resize-y" placeholder="Describe your issue with billing, account access, or bugs here..." required></textarea>
-                <p class="text-xs text-gray-500 mt-2">Note: Please do not ask study or subject-related questions here. This is for account and platform support only.</p>
+    <!-- Chat History -->
+    <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/50 flex flex-col custom-scrollbar">
+        <!-- Initial Greeting -->
+        <div class="flex justify-start">
+            <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 mr-3 shrink-0 shadow-sm mt-1">
+                <i data-lucide="bot" class="w-4 h-4"></i>
             </div>
-            <button type="submit" class="px-6 py-3 rounded-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold transition-all shadow-md shadow-violet-500/25 flex items-center gap-2">
-                <i data-lucide="send" class="w-4 h-4"></i> Send Request
-            </button>
+            <div class="p-4 rounded-2xl rounded-tl-sm bg-white border border-gray-100 text-[#1d1d1f] text-sm max-w-[85%] shadow-sm">
+                Hi {{ current_user.full_name }}! 👋 I'm the Helix Support AI. How can I help you today with your account, billing, or technical issues?
+            </div>
+        </div>
+
+        <!-- Render History -->
+        {% if history %}
+            {% for req in history %}
+                <!-- User Message -->
+                <div class="flex justify-end">
+                    <div class="p-4 rounded-2xl rounded-tr-sm bg-[#0071e3] text-white text-sm max-w-[85%] shadow-sm whitespace-pre-wrap">
+                        {{ req.message }}
+                    </div>
+                </div>
+
+                <!-- AI Response -->
+                {% if req.ai_response %}
+                <div class="flex justify-start">
+                    <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 mr-3 shrink-0 shadow-sm mt-1">
+                        <i data-lucide="bot" class="w-4 h-4"></i>
+                    </div>
+                    <div class="p-4 rounded-2xl rounded-tl-sm bg-white border border-gray-100 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm">
+                        {{ req.ai_response | safe }}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Input Area -->
+    <div class="glass-card p-4 rounded-b-3xl border-t border-gray-100 shrink-0">
+        <form id="supportForm" class="flex items-end gap-3 max-w-4xl mx-auto relative" onsubmit="event.preventDefault(); sendSupportMessage();">
+            <div class="flex-1 bg-white rounded-2xl border border-gray-200 shadow-inner overflow-hidden focus-within:border-violet-500 focus-within:ring-2 focus-within:ring-violet-500/20 transition-all flex items-center p-2">
+                <textarea id="messageInput" rows="1" class="w-full px-4 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none max-h-32 custom-scrollbar" placeholder="Describe your issue here..." required></textarea>
+                <button type="submit" id="sendBtn" class="w-10 h-10 rounded-xl bg-violet-600 hover:bg-violet-700 text-white flex items-center justify-center shrink-0 transition-colors shadow-md shadow-violet-500/25 ml-2 disabled:opacity-50">
+                    <i data-lucide="send" class="w-4 h-4 ml-0.5"></i>
+                </button>
+            </div>
         </form>
     </div>
-    {% endif %}
 </div>
+
+<script>
+    const chatBox = document.getElementById('chatBox');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    
+    // Auto-scroll to bottom on load
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+        if (this.value.trim() === '') {
+            this.style.height = 'auto';
+        }
+    });
+
+    // Handle Enter to submit (Shift+Enter for new line)
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendSupportMessage();
+        }
+    });
+
+    async function sendSupportMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        // Add user message to UI
+        const userWrapper = document.createElement('div');
+        userWrapper.className = 'flex justify-end';
+        userWrapper.innerHTML = `
+            <div class="p-4 rounded-2xl rounded-tr-sm bg-[#0071e3] text-white text-sm max-w-[85%] shadow-sm whitespace-pre-wrap">${message.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
+        `;
+        chatBox.appendChild(userWrapper);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Clear input
+        messageInput.value = '';
+        messageInput.style.height = 'auto';
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+
+        // Add typing indicator
+        const typingWrapper = document.createElement('div');
+        typingWrapper.className = 'flex justify-start';
+        typingWrapper.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 mr-3 shrink-0 shadow-sm mt-1">
+                <i data-lucide="bot" class="w-4 h-4"></i>
+            </div>
+            <div class="p-4 rounded-2xl rounded-tl-sm bg-white border border-gray-100 shadow-sm flex items-center gap-1.5 h-[52px]">
+                <div class="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style="animation-delay: 0ms"></div>
+                <div class="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style="animation-delay: 150ms"></div>
+                <div class="w-2 h-2 rounded-full bg-violet-400 animate-bounce" style="animation-delay: 300ms"></div>
+            </div>
+        `;
+        chatBox.appendChild(typingWrapper);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append('message', message);
+
+            const response = await fetch('/support', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData.toString()
+            });
+
+            const data = await response.json();
+            
+            typingWrapper.remove();
+
+            if (data.error) {
+                appendAIError(data.error);
+                return;
+            }
+
+            // Append AI Response
+            const aiWrapper = document.createElement('div');
+            aiWrapper.className = 'flex justify-start';
+            aiWrapper.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center text-violet-600 mr-3 shrink-0 shadow-sm mt-1">
+                    <i data-lucide="bot" class="w-4 h-4"></i>
+                </div>
+                <div class="p-4 rounded-2xl rounded-tl-sm bg-white border border-gray-100 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm">
+                    ${data.response}
+                </div>
+            `;
+            chatBox.appendChild(aiWrapper);
+
+            if (data.is_genuine) {
+                // Show a subtle toast or banner for genuine requests
+                const noticeWrapper = document.createElement('div');
+                noticeWrapper.className = 'flex justify-center mt-2 mb-2';
+                noticeWrapper.innerHTML = `
+                    <span class="px-3 py-1 bg-emerald-50 text-emerald-600 text-xs font-medium rounded-full border border-emerald-100">
+                        <i data-lucide="check-circle-2" class="w-3 h-3 inline mr-1"></i> Forwarded to Admin Team
+                    </span>
+                `;
+                chatBox.appendChild(noticeWrapper);
+                lucide.createIcons();
+            }
+
+        } catch (error) {
+            console.error("Support chat error:", error);
+            typingWrapper.remove();
+            appendAIError("Connection error. Please try again later.");
+        } finally {
+            messageInput.disabled = false;
+            sendBtn.disabled = false;
+            messageInput.focus();
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    }
+
+    function appendAIError(errorMsg) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex justify-start';
+        wrapper.innerHTML = `
+            <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 mr-3 shrink-0 shadow-sm mt-1">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+            </div>
+            <div class="p-4 rounded-2xl rounded-tl-sm bg-red-50 border border-red-100 text-red-700 text-sm max-w-[85%] shadow-sm">
+                ${errorMsg}
+            </div>
+        `;
+        chatBox.appendChild(wrapper);
+        lucide.createIcons();
+    }
+</script>
 {% endblock %}
