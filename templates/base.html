@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Helix AI{% endblock %}</title>
     <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1d1d1f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Helix AI">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/logo.png') }}">
+    
     <!-- Tailwind CSS Play CDN with Typography plugin -->
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     
@@ -158,17 +167,17 @@
             {% endif %}
         </div>
 
-        <div class="flex items-center space-x-3 shrink-0">
+        <div class="flex items-center space-x-2 md:space-x-3 shrink-0">
             {% if current_user %}
-                <a href="{{ url_for('study.paste_syllabus') }}" class="px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition inline-flex items-center">
+                <a href="{{ url_for('study.paste_syllabus') }}" class="hidden md:inline-flex px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition items-center">
                     Import
                 </a>
-                <a href="{{ url_for('planner.view_planner') }}" class="px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition inline-flex items-center">
+                <a href="{{ url_for('planner.view_planner') }}" class="hidden md:inline-flex px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition items-center">
                     Planner
                 </a>
                 {% if current_user.subscription_tier != 'premium' %}
-                <a href="{{ url_for('billing.upgrade_page') }}" class="px-4 py-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-semibold hover:opacity-90 transition inline-flex items-center shadow-md shadow-violet-500/20">
-                    <i data-lucide="sparkles" class="w-4 h-4 mr-1.5"></i> Upgrade
+                <a href="{{ url_for('billing.upgrade_page') }}" class="px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-xs md:text-sm font-semibold hover:opacity-90 transition inline-flex items-center shadow-md shadow-violet-500/20 whitespace-nowrap">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 md:w-4 md:h-4 mr-1 md:mr-1.5"></i> Upgrade
                 </a>
                 {% endif %}
                 <a href="/settings" class="p-2 rounded-full bg-gray-100 text-gray-600 hover:text-[#1d1d1f] hover:bg-gray-200 transition flex items-center justify-center" aria-label="Settings">
@@ -549,5 +558,18 @@
         @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes slideDown { from { transform: translateY(0); opacity: 1; } to { transform: translateY(100%); opacity: 0; } }
     </style>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(registration => {
+                    console.log('SW registered: ', registration);
+                }).catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+            });
+        }
+    </script>
 </body>
 </html>

@@ -42,6 +42,16 @@ def create_app():
     app.register_blueprint(billing_bp)
     app.register_blueprint(chat_bp)
     
+    @app.route("/sw.js")
+    def serve_sw():
+        from flask import send_from_directory
+        return send_from_directory(app.static_folder, "sw.js", mimetype="application/javascript")
+
+    @app.route("/manifest.json")
+    def serve_manifest():
+        from flask import send_from_directory
+        return send_from_directory(app.static_folder, "manifest.json", mimetype="application/manifest+json")
+
     @app.route("/debug_session")
     def debug_session():
         from flask import session, request
