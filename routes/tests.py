@@ -1,10 +1,9 @@
-import os
 import uuid
 import json
-from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, current_app
-from werkzeug.utils import secure_filename
+import time
+from datetime import datetime
+from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from services.db_service import db_service
-from services.ai_service import ai_service
 from routes.dashboard import get_current_user
 
 tests_bp = Blueprint("tests", __name__)
@@ -20,113 +19,94 @@ def view_test(test_id):
         flash("Test not found.", "error")
         return redirect(url_for("dashboard.index"))
         
-    subject = db_service.query("SELECT * FROM subjects WHERE id = ?", (test["subject_id"],), one=True)
-    
     questions = json.loads(test["test_data"])
-    answers = db_service.query("SELECT * FROM weekly_test_answers WHERE test_id = ? ORDER BY question_index ASC", (test_id,))
     
-    answered_indices = [a["question_index"] for a in answers]
-    
-    # If all answered, show results
-    if len(answers) >= test["total_questions"] and test["status"] != "completed":
-        # Calculate total score
-        total_score = sum([a["score"] for a in answers])
-        db_service.execute("UPDATE weekly_tests SET status = 'completed', score = ? WHERE id = ?", (total_score, test_id))
-        test["status"] = "completed"
-        test["score"] = total_score
+    # Check if already completed
+    if test["status"] == "completed":
+        leaderboard_entry = db_service.query("SELECT * FROM leaderboard WHERE user_id = ? AND test_id = ?", (user["id"], test_id), one=True)
+        # Fetch user's answers to show what they got right/wrong
+        user_answers = db_service.query("SELECT * FROM weekly_test_answers WHERE test_id = ? ORDER BY question_index ASC", (test_id,))
         
-    return render_template("dashboard/take_test.html", test=test, subject=subject, questions=questions, answers=answers, answered_indices=answered_indices)
+        # Create a dict mapping question index to user answer object
+        ans_dict = {ans["question_index"]: ans for ans in user_answers}
+        
+        return render_template(
+            "dashboard/take_test.html", 
+            test=test, 
+            questions=questions, 
+            leaderboard=leaderboard_entry, 
+            is_completed=True,
+            user_answers=ans_dict
+        )
+        
+    # Start timer (store in session or just use form submission time, let's use created_at roughly, or pass start_time to template)
+    start_time = int(time.time())
+    
+    return render_template("dashboard/take_test.html", test=test, questions=questions, is_completed=False, start_time=start_time)
 
-@tests_bp.route("/test/<test_id>/submit", methods=["POST"])
-def submit_answer(test_id):
+
+@tests_bp.route("/test/<test_id>/submit_all", methods=["POST"])
+def submit_all_answers(test_id):
     user = get_current_user()
     if not user:
-        return jsonify({"error": "Unauthorized"}), 401
+        return redirect(url_for("auth.login"))
         
     test = db_service.query("SELECT * FROM weekly_tests WHERE id = ? AND user_id = ?", (test_id, user["id"]), one=True)
-    if not test:
-        return jsonify({"error": "Test not found"}), 404
+    if not test or test["status"] == "completed":
+        flash("Test not found or already completed.", "error")
+        return redirect(url_for("dashboard.index"))
         
-    question_index = int(request.form.get("question_index", -1))
-    text_answer = request.form.get("text_answer", "")
-    
     questions = json.loads(test["test_data"])
-    if question_index < 0 or question_index >= len(questions):
-        return jsonify({"error": "Invalid question index"}), 400
+    
+    start_time = int(request.form.get("start_time", int(time.time())))
+    time_taken_seconds = int(time.time()) - start_time
+    
+    correct_count = 0
+    wrong_count = 0
+    
+    # Store user answers in weekly_test_answers for review
+    for i, q in enumerate(questions):
+        user_choice = request.form.get(f"q_{i}", "")
+        correct_answer = q.get("correct_answer", "")
         
-    question_data = questions[question_index]
-    expected_answer = question_data.get("expected_answer", "")
-    
-    file = request.files.get("image_answer")
-    
-    image_path = None
-    extracted_text = ""
-    
-    if file and file.filename != "":
-        # Handle Image Upload (Handwritten Answer)
-        filename = secure_filename(file.filename)
-        file_ext = filename.rsplit(".", 1)[1].lower()
-        uploads_dir = os.path.join(current_app.root_path, "uploads")
-        os.makedirs(uploads_dir, exist_ok=True)
-        unique_filename = f"{uuid.uuid4()}.{file_ext}"
-        image_path = unique_filename
-        full_path = os.path.join(uploads_dir, unique_filename)
-        
-        file_bytes = file.read()
-        with open(full_path, "wb") as f:
-            f.write(file_bytes)
-            
-        # Extract text via Vision AI
-        try:
-            vision_result = ai_service.process_vision_document(file_bytes)
-            extracted_text = vision_result.get("full_text", "")
-        except Exception as e:
-            print(f"Vision AI Error: {e}")
-            extracted_text = "(Error extracting handwriting)"
-            
-    final_student_answer = text_answer
-    if extracted_text:
-        final_student_answer = extracted_text if not text_answer else f"{text_answer}\n\n[Handwritten Extraction]: {extracted_text}"
-        
-    # Grade the answer using AI
-    prompt = f"""
-    You are grading a Short Answer question.
-    Question: {question_data.get("question")}
-    Expected Answer/Rubric: {expected_answer}
-    
-    Student's Answer: {final_student_answer}
-    
-    Evaluate the student's answer. 
-    1. Score it out of 10.
-    2. Provide a 1-2 sentence feedback explaining the score.
-    
-    Return strict JSON:
-    {{
-        "score": <int 0-10>,
-        "feedback": "<string>"
-    }}
-    """
-    
-    score = 0
-    feedback = "Failed to evaluate."
-    
-    try:
-        response = ai_service._generate_partial(prompt)
-        if isinstance(response, dict) and response:
-            score = int(response.get("score", 0))
-            feedback = response.get("feedback", "Failed to evaluate.")
+        is_correct = False
+        if user_choice.strip() and user_choice.strip().lower() == correct_answer.strip().lower():
+            is_correct = True
+            correct_count += 1
         else:
-            print("Grading Error: Invalid response from AI", response)
-    except Exception as e:
-        print(f"Grading Error: {e}")
+            wrong_count += 1
+            
+        score_for_q = 5 if is_correct else 0
         
-    # Save Answer
-    ans_id = str(uuid.uuid4())
+        ans_id = str(uuid.uuid4())
+        db_service.execute(
+            """INSERT INTO weekly_test_answers (id, test_id, question_index, user_answer, score, feedback)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (ans_id, test_id, i, user_choice, score_for_q, q.get("explanation", ""))
+        )
+        
+    total_score = correct_count * 5  # 5 marks per question
+    percentage = (correct_count / len(questions)) * 100 if len(questions) > 0 else 0
+    
+    # Mark test as completed
+    db_service.execute("UPDATE weekly_tests SET status = 'completed', score = ? WHERE id = ?", (total_score, test_id))
+    
+    # Calculate week number roughly
+    week_number = datetime.now().isocalendar()[1]
+    
+    # Save to leaderboard
+    lid = str(uuid.uuid4())
+    # Ensure test_id exists in schema
+    try:
+        db_service.execute("ALTER TABLE leaderboard ADD COLUMN test_id TEXT")
+    except:
+        pass # Already exists
+        
     db_service.execute(
-        """INSERT INTO weekly_test_answers (id, test_id, question_index, user_answer, image_path, score, feedback)
-           VALUES (?, ?, ?, ?, ?, ?, ?)""",
-        (ans_id, test_id, question_index, final_student_answer, image_path, score, feedback)
+        """INSERT INTO leaderboard (id, user_id, test_id, score, percentage, correct_answers, wrong_answers, time_taken_seconds, week_number)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (lid, user["id"], test_id, total_score, percentage, correct_count, wrong_count, time_taken_seconds, week_number)
     )
     
-    flash(f"Answer submitted! You scored {score}/10 on this question.", "success")
+    flash(f"Test completed! You scored {total_score}/100.", "success")
     return redirect(url_for("tests.view_test", test_id=test_id))

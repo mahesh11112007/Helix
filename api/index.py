@@ -104,3 +104,16 @@ def create_app():
     return app
 
 app = create_app()
+
+# Start background replenishment thread only if not in testing/build mode
+if not os.environ.get("VERCEL_URL"):
+    import threading
+    from services.question_bank_service import question_bank_service
+    def run_replenishment():
+        import time
+        while True:
+            question_bank_service.replenish_bank()
+            time.sleep(60 * 60 * 6) # Every 6 hours
+            
+    thread = threading.Thread(target=run_replenishment, daemon=True)
+    thread.start()

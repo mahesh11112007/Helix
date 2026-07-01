@@ -509,3 +509,20 @@ def support():
         (user["id"],)
     )
     return render_template("dashboard/support.html", history=history)
+
+@dashboard_bp.route("/leaderboard")
+def leaderboard():
+    user = get_current_user()
+    if not user:
+        return redirect(url_for("auth.login"))
+        
+    # Fetch top 100 students on the global leaderboard
+    top_entries = db_service.query("""
+        SELECT l.*, p.full_name, p.avatar_url 
+        FROM leaderboard l
+        JOIN profiles p ON l.user_id = p.id
+        ORDER BY l.score DESC, l.time_taken_seconds ASC, l.created_at ASC
+        LIMIT 100
+    """)
+    
+    return render_template("dashboard/leaderboard.html", entries=top_entries)

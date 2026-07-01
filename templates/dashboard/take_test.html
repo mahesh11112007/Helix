@@ -1,102 +1,125 @@
 {% extends "base.html" %}
-{% block title %}Weekly Assessment: {{ subject.name }} - Helix AI{% endblock %}
+{% block title %}Weekly Assessment - Helix AI{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto mt-8">
     <div class="flex items-center justify-between mb-8">
         <div>
             <h1 class="text-3xl font-extrabold text-[#1d1d1f]">{{ test.title }}</h1>
-            <p class="text-gray-500 mt-2">Subject: {{ subject.name }}</p>
+            <p class="text-gray-500 mt-2">Score high to climb the Leaderboard!</p>
         </div>
         <a href="{{ url_for('dashboard.index') }}"
             class="px-4 py-2 rounded-full bg-gray-100 text-sm font-semibold hover:bg-gray-200 transition">Back to
             Dashboard</a>
     </div>
 
-    {% if test.status == 'completed' %}
+    {% if is_completed %}
     <div class="glass-card p-8 bg-gradient-to-br from-primary-600 to-primary-600 text-white mb-8 rounded-3xl shadow-lg">
         <h2 class="text-2xl font-bold mb-2">Test Completed! 🎉</h2>
-        <p class="opacity-90">You scored <span class="text-3xl font-black">{{ test.score }}</span> out of {{
-            test.total_questions * 10 }}.</p>
+        <div class="flex flex-wrap gap-8 mt-4">
+            <div>
+                <p class="text-sm opacity-80 uppercase tracking-wider font-semibold">Final Score</p>
+                <p class="text-4xl font-black">{{ test.score }} <span class="text-xl opacity-80">/ 100</span></p>
+            </div>
+            <div>
+                <p class="text-sm opacity-80 uppercase tracking-wider font-semibold">Percentage</p>
+                <p class="text-4xl font-black">{{ leaderboard.percentage|round(1) if leaderboard else 0 }}%</p>
+            </div>
+            <div>
+                <p class="text-sm opacity-80 uppercase tracking-wider font-semibold">Accuracy</p>
+                <p class="text-2xl font-bold mt-1 text-emerald-200">{{ leaderboard.correct_answers if leaderboard else 0 }} Correct <span class="text-white opacity-50 mx-2">|</span> <span class="text-red-300">{{ leaderboard.wrong_answers if leaderboard else 0 }} Wrong</span></p>
+            </div>
+            <div>
+                <p class="text-sm opacity-80 uppercase tracking-wider font-semibold">Time</p>
+                <p class="text-2xl font-bold mt-1">{{ leaderboard.time_taken_seconds if leaderboard else 0 }}s</p>
+            </div>
+        </div>
     </div>
     {% endif %}
 
     <div class="space-y-8">
-        {% for q in questions %}
-        {% set q_index = loop.index0 %}
-        <div
-            class="glass-card p-6 border {% if q_index in answered_indices %}border-emerald-200 bg-emerald-50/30{% else %}border-gray-200 bg-white{% endif %}">
-            <h3 class="text-lg font-bold text-[#1d1d1f] mb-4">
-                <span class="text-primary-600">Q{{ loop.index }}.</span> {{ q.question }}
-            </h3>
+        {% if not is_completed %}
+        <form action="{{ url_for('tests.submit_all_answers', test_id=test.id) }}" method="POST" id="testForm"
+            onsubmit="
+                const btn = this.querySelector('button[type=\\'submit\\']');
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-wait');
+                btn.innerHTML = 'Submitting...';
+            ">
+            <input type="hidden" name="start_time" value="{{ start_time }}">
+        {% endif %}
+            
+            {% for q in questions %}
+            {% set q_index = loop.index0 %}
+            <div class="glass-card p-8 border border-gray-200 bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] mb-8">
+                <div class="flex justify-between items-start mb-6">
+                    <h3 class="text-lg font-bold text-[#1d1d1f]">
+                        <span class="text-primary-600 bg-primary-50 px-3 py-1 rounded-lg text-sm mr-2">Q{{ loop.index }}</span>
+                        {{ q.question }}
+                    </h3>
+                    <span class="px-3 py-1 bg-gray-100 text-xs font-semibold text-gray-500 rounded-full">{{ q.difficulty }}</span>
+                </div>
 
-            {% if q_index in answered_indices %}
-            <!-- Show User's Answer -->
-            {% for ans in answers %}
-            {% if ans.question_index == q_index %}
-            <div class="mt-4 p-4 bg-white border border-emerald-100 rounded-xl shadow-sm">
-                <p class="text-sm font-semibold text-emerald-700 mb-2">Your Answer:</p>
-                <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ ans.user_answer }}</p>
-
-                {% if ans.image_path %}
-                <div class="mt-3">
-                    <p class="text-xs text-gray-500 mb-1">Uploaded Image:</p>
-                    <!-- In a real app we'd serve the file properly via route, here we'll assume it exists in uploads/ -->
-                    <div class="p-2 border border-dashed rounded bg-gray-50 text-xs text-gray-500">Image uploaded: {{
-                        ans.image_path }}</div>
+                <div class="space-y-3 pl-2">
+                    {% for option in q.options %}
+                    {% set is_selected = (is_completed and user_answers and user_answers[q_index].user_answer == option) %}
+                    {% set is_correct = (is_completed and option == q.correct_answer) %}
+                    
+                    {% set border_class = 'border-gray-200 hover:border-primary-300' %}
+                    {% set bg_class = 'bg-gray-50/50 hover:bg-primary-50/30' %}
+                    
+                    {% if is_completed %}
+                        {% if is_correct %}
+                            {% set border_class = 'border-emerald-500 ring-1 ring-emerald-500' %}
+                            {% set bg_class = 'bg-emerald-50' %}
+                        {% elif is_selected %}
+                            {% set border_class = 'border-red-400' %}
+                            {% set bg_class = 'bg-red-50' %}
+                        {% else %}
+                            {% set border_class = 'border-gray-200 opacity-60' %}
+                            {% set bg_class = 'bg-gray-50' %}
+                        {% endif %}
+                    {% endif %}
+                    
+                    <label class="flex items-center p-4 border {{ border_class }} {{ bg_class }} rounded-xl cursor-pointer transition-all">
+                        <input type="radio" name="q_{{ q_index }}" value="{{ option }}" class="w-5 h-5 text-primary-600 border-gray-300 focus:ring-primary-500" 
+                               {% if is_selected %}checked{% endif %} {% if is_completed %}disabled{% endif %} required>
+                        <span class="ml-3 text-sm font-medium {% if is_completed and is_correct %}text-emerald-800{% elif is_completed and is_selected %}text-red-800{% else %}text-gray-700{% endif %}">
+                            {{ option }}
+                        </span>
+                        
+                        {% if is_completed %}
+                            {% if is_correct %}
+                                <i data-lucide="check-circle" class="w-5 h-5 ml-auto text-emerald-500"></i>
+                            {% elif is_selected %}
+                                <i data-lucide="x-circle" class="w-5 h-5 ml-auto text-red-500"></i>
+                            {% endif %}
+                        {% endif %}
+                    </label>
+                    {% endfor %}
+                </div>
+                
+                {% if is_completed %}
+                <div class="mt-6 p-5 bg-gray-50 rounded-xl border border-gray-100">
+                    <p class="text-sm font-semibold text-gray-800 flex items-center gap-2 mb-2">
+                        <i data-lucide="info" class="w-4 h-4 text-primary-500"></i> Explanation
+                    </p>
+                    <p class="text-sm text-gray-600">{{ q.explanation }}</p>
                 </div>
                 {% endif %}
-
-                <hr class="my-4 border-gray-100">
-
-                <div class="flex justify-between items-start gap-4">
-                    <div>
-                        <p class="text-sm font-semibold text-gray-800">AI Feedback:</p>
-                        <p class="text-sm text-gray-600 mt-1">{{ ans.feedback }}</p>
-                    </div>
-                    <div class="text-center px-4 py-2 bg-emerald-100 rounded-lg">
-                        <span class="block text-2xl font-black text-emerald-700">{{ ans.score }}<span
-                                class="text-sm">/10</span></span>
-                    </div>
-                </div>
             </div>
-            {% endif %}
             {% endfor %}
-            {% else %}
-            <!-- Show Input Form -->
-            {% if test.status != 'completed' %}
-            <form action="{{ url_for('tests.submit_answer', test_id=test.id) }}" method="POST"
-                enctype="multipart/form-data" class="mt-4" onsubmit="
-                    const btn = this.querySelector('button[type=\\'submit\\']');
-                    btn.disabled = true;
-                    btn.classList.add('opacity-50', 'cursor-wait');
-                    btn.innerHTML = '⚙️ Grading via AI... ~5s';
-                ">
-                <input type="hidden" name="question_index" value="{{ q_index }}">
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Type your answer:</label>
-                    <textarea name="text_answer" rows="3"
-                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 text-sm transition-all"
-                        placeholder="Enter your detailed answer here..."></textarea>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">OR Upload Handwritten Answer
-                        (Image):</label>
-                    <input type="file" name="image_answer" accept="image/*"
-                        class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
-                </div>
-
+        {% if not is_completed %}
+            <div class="sticky bottom-8 bg-white/80 backdrop-blur-xl p-4 border border-gray-200 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.1)] flex justify-between items-center z-10">
+                <p class="text-sm font-medium text-gray-600">Answer all questions before submitting.</p>
                 <button type="submit"
-                    class="px-6 py-2 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-semibold shadow-sm transition">
-                    Submit Answer & Auto-Grade
+                    class="px-8 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold shadow-lg transition">
+                    Submit Test & View Score
                 </button>
-            </form>
-            {% endif %}
-            {% endif %}
-        </div>
-        {% endfor %}
+            </div>
+        </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

@@ -345,6 +345,44 @@ class DBService:
                 feedback TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"""))
+            
+            # Question Bank Table
+            cursor.execute(self._translate_schema("""
+            CREATE TABLE IF NOT EXISTS question_bank (
+                id TEXT PRIMARY KEY,
+                subject_id TEXT,
+                unit_id TEXT,
+                topic_id TEXT,
+                difficulty TEXT,
+                question TEXT,
+                options TEXT,
+                correct_answer TEXT,
+                explanation TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )"""))
+            
+            # User Attempted Questions Table
+            cursor.execute(self._translate_schema("""
+            CREATE TABLE IF NOT EXISTS user_attempted_questions (
+                user_id TEXT,
+                question_id TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (user_id, question_id)
+            )"""))
+            
+            # Leaderboard Table
+            cursor.execute(self._translate_schema("""
+            CREATE TABLE IF NOT EXISTS leaderboard (
+                id TEXT PRIMARY KEY,
+                user_id TEXT,
+                score INTEGER,
+                percentage REAL,
+                correct_answers INTEGER,
+                wrong_answers INTEGER,
+                time_taken_seconds INTEGER,
+                week_number INTEGER,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )"""))
 
             # Clear stale completed/failed tasks on startup to prevent timezone layout loops
             try:

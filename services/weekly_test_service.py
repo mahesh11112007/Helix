@@ -2,7 +2,6 @@ import uuid
 import json
 from datetime import datetime, timedelta
 from services.db_service import db_service
-from services.ai_service import ai_service
 
 class WeeklyTestService:
     def check_and_generate(self, user_id):
@@ -36,93 +35,84 @@ class WeeklyTestService:
             db_service.execute("DELETE FROM weekly_test_answers WHERE test_id IN (SELECT id FROM weekly_tests WHERE user_id = ?)", (user_id,))
             db_service.execute("DELETE FROM weekly_tests WHERE user_id = ?", (user_id,))
             
-            # Generate a new test in the background
-            self.queue_test_generation(user_id, active_sem["id"], cutoff_date)
+            # Generate a new test instantly from question bank
+            self.generate_instant_test(user_id, active_sem["id"])
                 
-    def queue_test_generation(self, user_id, sem_id, week_start_date):
-        """
-        Creates a background task to generate the test so the user doesn't wait on login.
-        """
-        task_id = str(uuid.uuid4())
-        db_service.execute(
-            """INSERT INTO background_tasks (id, user_id, task_type, status, message)
-               VALUES (?, ?, ?, ?, ?)""",
-            (task_id, user_id, "generate_weekly_test_all", "pending", "Generating Weekly Advanced Test")
-        )
-        
-        import threading
-        thread = threading.Thread(target=self._generate_test_task, args=(user_id, sem_id, task_id))
-        thread.daemon = True
-        thread.start()
-        
-    def _generate_test_task(self, user_id, sem_id, task_id):
+    def generate_instant_test(self, user_id, sem_id):
         try:
-            db_service.execute("UPDATE background_tasks SET status = 'in_progress' WHERE id = ?", (task_id,))
-            
             # 1. Fetch all subjects for this semester
             subjects = db_service.query("SELECT id, name FROM subjects WHERE semester_id = ?", (sem_id,))
+            subject_ids = [sub["id"] for sub in subjects]
             
-            topics_list = []
-            for sub in subjects:
-                units = db_service.query("SELECT id FROM units WHERE subject_id = ?", (sub["id"],))
-                for unit in units:
-                    topics = db_service.query("SELECT name FROM topics WHERE unit_id = ?", (unit["id"],))
-                    topics_list.extend([f"{sub['name']}: {t['name']}" for t in topics])
-                    
-            topic_str = ", ".join(topics_list[:30]) # Limit context to avoid huge prompts
+            if not subject_ids:
+                return
+
+            # Format subject_ids for SQL IN clause safely
+            placeholders = ','.join(['?'] * len(subject_ids))
             
-            # 2. Call AI to generate Short Answer questions
-            prompt = f"""
-            You are a strict academic examiner. Create a comprehensive, ADVANCED Assessment (Short Answer format) 
-            covering the following topics across multiple subjects: {topic_str}.
-            
-            Generate EXACTLY 20 advanced Short Answer questions, mixing ALL the available subjects. 
-            For each question, provide the "question" and the "expected_answer" (the grading rubric/key points).
-            
-            Output MUST be strict JSON in this format:
-            {{
-                "title": "Weekly Assessment: Mixed Advanced Review",
-                "questions": [
-                    {{
-                        "question": "Advanced question...",
-                        "expected_answer": "Key point 1, Key point 2..."
-                    }}
-                ]
-            }}
+            # 2. Fetch 20 random unseen questions from the bank for these subjects
+            query = f"""
+                SELECT * FROM question_bank 
+                WHERE subject_id IN ({placeholders}) 
+                AND id NOT IN (SELECT question_id FROM user_attempted_questions WHERE user_id = ?)
+                ORDER BY RANDOM() 
+                LIMIT 20
             """
+            # Params: subject_ids followed by user_id
+            params = tuple(subject_ids) + (user_id,)
+            questions = db_service.query(query, params)
             
-            response = ai_service._generate_partial(prompt)
-            # Find JSON block
-            test_created = False
-            if response and isinstance(response, dict) and "questions" in response:
-                json_data = response
+            # If not enough unseen questions, fetch any random questions to fill the gap
+            if len(questions) < 20:
+                needed = 20 - len(questions)
+                fallback_query = f"""
+                    SELECT * FROM question_bank 
+                    WHERE subject_id IN ({placeholders}) 
+                    ORDER BY RANDOM() 
+                    LIMIT ?
+                """
+                fallback_params = tuple(subject_ids) + (needed,)
+                fallback_questions = db_service.query(fallback_query, fallback_params)
                 
-                test_id = str(uuid.uuid4())
+                # Combine them, ensuring no exact duplicates in the current list if possible
+                existing_ids = {q["id"] for q in questions}
+                for fq in fallback_questions:
+                    if fq["id"] not in existing_ids:
+                        questions.append(fq)
+                        existing_ids.add(fq["id"])
+
+            if not questions:
+                # No questions exist in bank at all yet
+                print("No questions found in question bank for these subjects.")
+                return
+
+            # 3. Save test
+            test_id = str(uuid.uuid4())
+            # Convert questions to JSON array
+            test_data = []
+            for q in questions:
+                # Mark as attempted
                 db_service.execute(
-                    """INSERT INTO weekly_tests (id, user_id, subject_id, title, test_data, status, total_questions)
-                       VALUES (?, ?, 'ALL', ?, ?, 'pending_approval', ?)""",
-                    (test_id, user_id, json_data.get("title", "Weekly Assessment: Mixed Advanced Review"), json.dumps(json_data.get("questions", [])), len(json_data.get("questions", [])))
+                    "INSERT OR IGNORE INTO user_attempted_questions (user_id, question_id) VALUES (?, ?)", 
+                    (user_id, q["id"])
                 )
-                test_created = True
-                    
-            if not test_created:
-                # Fallback mock test due to API rate limits
-                test_id = str(uuid.uuid4())
-                mock_data = [
-                    {
-                        "question": "What is the most advanced concept you learned this week?",
-                        "expected_answer": "Any core concept."
-                    }
-                ] * 20
-                db_service.execute(
-                    """INSERT INTO weekly_tests (id, user_id, subject_id, title, test_data, status, total_questions)
-                       VALUES (?, ?, 'ALL', ?, ?, 'pending_approval', ?)""",
-                    (test_id, user_id, "Mock Weekly Assessment (AI Rate Limited)", json.dumps(mock_data), 20)
-                )
+                
+                test_data.append({
+                    "id": q["id"],
+                    "question": q["question"],
+                    "options": json.loads(q["options"]),
+                    "correct_answer": q["correct_answer"],
+                    "explanation": q["explanation"],
+                    "difficulty": q["difficulty"]
+                })
+                
+            db_service.execute(
+                """INSERT INTO weekly_tests (id, user_id, subject_id, title, test_data, status, total_questions)
+                   VALUES (?, ?, 'ALL', ?, ?, 'pending', ?)""",
+                (test_id, user_id, "Weekly Assessment: Advanced Review", json.dumps(test_data), len(test_data))
+            )
             
-            db_service.execute("UPDATE background_tasks SET status = 'completed' WHERE id = ?", (task_id,))
         except Exception as e:
-            print(f"Error generating weekly test: {e}")
-            db_service.execute("UPDATE background_tasks SET status = 'failed', message = ? WHERE id = ?", (str(e), task_id))
+            print(f"Error generating weekly test from bank: {e}")
 
 weekly_test_service = WeeklyTestService()
