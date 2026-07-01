@@ -112,11 +112,11 @@ def submit_answer(test_id):
     
     try:
         response = ai_service._generate_partial(prompt)
-        match = __import__('re').search(r'\{.*\}', response, __import__('re').DOTALL)
-        if match:
-            res_json = json.loads(match.group(0))
-            score = int(res_json.get("score", 0))
-            feedback = res_json.get("feedback", "")
+        if isinstance(response, dict) and response:
+            score = int(response.get("score", 0))
+            feedback = response.get("feedback", "Failed to evaluate.")
+        else:
+            print("Grading Error: Invalid response from AI", response)
     except Exception as e:
         print(f"Grading Error: {e}")
         
