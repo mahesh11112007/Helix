@@ -985,6 +985,11 @@ Return JSON: {{"viva_questions": [{{"question": "...", "answer": "..."}}]}}"""
                 else:
                     # Higher token limits for cloud APIs
                     tokens = 6144 if pkey == "notes_summary" else 2048
+                    
+                # STAGGER REQUESTS to prevent triggering burst rate limits on free providers like Groq
+                import time
+                time.sleep(1)
+                
                 future_to_key[executor.submit(self._generate_partial, prompt, tokens, 6, key, base_url, chat_model, custom_instr)] = pkey
             for future in concurrent.futures.as_completed(future_to_key):
                 try:
