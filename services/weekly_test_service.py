@@ -7,18 +7,16 @@ from services.ai_service import ai_service
 class WeeklyTestService:
     def check_and_generate(self, user_id):
         """
-        Check if the user needs weekly tests generated for their active subjects.
+        Check if the user needs a weekly test generated for their active semester.
         Tests are generated on Sundays.
         """
         today = datetime.now()
         
         # Determine the most recent Sunday (or today if it is Sunday)
-        # weekday() returns 0 for Monday, 6 for Sunday
         days_since_sunday = (today.weekday() - 6) % 7
         last_sunday = today - timedelta(days=days_since_sunday)
         last_sunday_start = last_sunday.replace(hour=0, minute=0, second=0, microsecond=0)
         
-        # Get user's active semester
         print(f"[DEBUG] check_and_generate for user_id: {user_id}")
         semesters = db_service.query("SELECT * FROM semesters WHERE user_id = ? ORDER BY created_at DESC", (user_id,))
         if not semesters:
@@ -27,20 +25,22 @@ class WeeklyTestService:
             
         print(f"[DEBUG] Found {len(semesters)} semesters for user {user_id}")
         active_sem = semesters[0]
-        subjects = db_service.query("SELECT * FROM subjects WHERE semester_id = ?", (active_sem["id"],))
         
-        for subject in subjects:
-            # Check if a test already exists for this subject since last Sunday
-            existing_test = db_service.query(
-                "SELECT id FROM weekly_tests WHERE user_id = ? AND subject_id = ? AND created_at >= ?",
-                (user_id, subject["id"], last_sunday_start.isoformat())
-            )
+        # Check if a combined test already exists for this week
+        existing_test = db_service.query(
+            "SELECT id FROM weekly_tests WHERE user_id = ? AND subject_id = 'ALL' AND created_at >= ?",
+            (user_id, last_sunday_start.isoformat())
+        )
+        
+        if not existing_test:
+            # Delete old tests to only keep the latest one (cleanup)
+            db_service.execute("DELETE FROM weekly_test_answers WHERE test_id IN (SELECT id FROM weekly_tests WHERE user_id = ?)", (user_id,))
+            db_service.execute("DELETE FROM weekly_tests WHERE user_id = ?", (user_id,))
             
-            if not existing_test:
-                # Generate a new test in the background
-                self.queue_test_generation(user_id, subject["id"], subject["name"], last_sunday_start)
+            # Generate a new test in the background
+            self.queue_test_generation(user_id, active_sem["id"], last_sunday_start)
                 
-    def queue_test_generation(self, user_id, subject_id, subject_name, week_start_date):
+    def queue_test_generation(self, user_id, sem_id, week_start_date):
         """
         Creates a background task to generate the test so the user doesn't wait on login.
         """
@@ -48,43 +48,44 @@ class WeeklyTestService:
         db_service.execute(
             """INSERT INTO background_tasks (id, user_id, task_type, status, message)
                VALUES (?, ?, ?, ?, ?)""",
-            (task_id, user_id, f"generate_weekly_test_{subject_id}", "pending", f"Generating Weekly Test for {subject_name}")
+            (task_id, user_id, "generate_weekly_test_all", "pending", "Generating Weekly Advanced Test")
         )
         
         import threading
-        thread = threading.Thread(target=self._generate_test_task, args=(user_id, subject_id, subject_name, task_id))
+        thread = threading.Thread(target=self._generate_test_task, args=(user_id, sem_id, task_id))
         thread.daemon = True
         thread.start()
         
-    def _generate_test_task(self, user_id, subject_id, subject_name, task_id):
+    def _generate_test_task(self, user_id, sem_id, task_id):
         try:
             db_service.execute("UPDATE background_tasks SET status = 'in_progress' WHERE id = ?", (task_id,))
             
-            # 1. Fetch topics for this subject
-            units = db_service.query("SELECT id, name FROM units WHERE subject_id = ?", (subject_id,))
+            # 1. Fetch all subjects for this semester
+            subjects = db_service.query("SELECT id, name FROM subjects WHERE semester_id = ?", (sem_id,))
+            
             topics_list = []
-            for unit in units:
-                topics = db_service.query("SELECT name FROM topics WHERE unit_id = ?", (unit["id"],))
-                topics_list.extend([t["name"] for t in topics])
-                
-            topic_str = ", ".join(topics_list[:15]) # Limit context to avoid huge prompts
+            for sub in subjects:
+                units = db_service.query("SELECT id FROM units WHERE subject_id = ?", (sub["id"],))
+                for unit in units:
+                    topics = db_service.query("SELECT name FROM topics WHERE unit_id = ?", (unit["id"],))
+                    topics_list.extend([f"{sub['name']}: {t['name']}" for t in topics])
+                    
+            topic_str = ", ".join(topics_list[:30]) # Limit context to avoid huge prompts
             
             # 2. Call AI to generate Short Answer questions
             prompt = f"""
-            You are a strict academic examiner. Create a comprehensive Weekly Assessment (Short Answer format) 
-            for the subject "{subject_name}". 
+            You are a strict academic examiner. Create a comprehensive, ADVANCED Weekly Assessment (Short Answer format) 
+            covering the following topics across multiple subjects: {topic_str}.
             
-            Here are some topics covered recently: {topic_str}.
-            
-            Generate exactly 10 Short Answer questions. 
+            Generate exactly 20 advanced Short Answer questions. 
             For each question, provide the "question" and the "expected_answer" (the grading rubric/key points).
             
             Output MUST be strict JSON in this format:
             {{
-                "title": "Weekly Assessment: {subject_name}",
+                "title": "Weekly Assessment: Advanced Review",
                 "questions": [
                     {{
-                        "question": "What is...",
+                        "question": "Advanced question...",
                         "expected_answer": "Key point 1, Key point 2..."
                     }}
                 ]
@@ -100,8 +101,8 @@ class WeeklyTestService:
                 test_id = str(uuid.uuid4())
                 db_service.execute(
                     """INSERT INTO weekly_tests (id, user_id, subject_id, title, test_data, status, total_questions)
-                       VALUES (?, ?, ?, ?, ?, 'pending', ?)""",
-                    (test_id, user_id, subject_id, json_data.get("title", f"{subject_name} Weekly Test"), json.dumps(json_data.get("questions", [])), len(json_data.get("questions", [])))
+                       VALUES (?, ?, 'ALL', ?, ?, 'pending', ?)""",
+                    (test_id, user_id, json_data.get("title", "Weekly Assessment: Advanced Review"), json.dumps(json_data.get("questions", [])), len(json_data.get("questions", [])))
                 )
                 test_created = True
                     
@@ -110,18 +111,14 @@ class WeeklyTestService:
                 test_id = str(uuid.uuid4())
                 mock_data = [
                     {
-                        "question": f"What is the most important concept you learned in {subject_name} this week?",
-                        "expected_answer": "Any core concept from the subject."
-                    },
-                    {
-                        "question": f"Explain a key theorem or formula related to {subject_name}.",
-                        "expected_answer": "A relevant theorem or formula and its explanation."
+                        "question": "What is the most advanced concept you learned this week?",
+                        "expected_answer": "Any core concept."
                     }
-                ]
+                ] * 20
                 db_service.execute(
                     """INSERT INTO weekly_tests (id, user_id, subject_id, title, test_data, status, total_questions)
-                       VALUES (?, ?, ?, ?, ?, 'pending', ?)""",
-                    (test_id, user_id, subject_id, f"{subject_name} Mock Weekly Test (AI Rate Limited)", json.dumps(mock_data), 2)
+                       VALUES (?, ?, 'ALL', ?, ?, 'pending', ?)""",
+                    (test_id, user_id, "Mock Weekly Assessment (AI Rate Limited)", json.dumps(mock_data), 20)
                 )
             
             db_service.execute("UPDATE background_tasks SET status = 'completed' WHERE id = ?", (task_id,))

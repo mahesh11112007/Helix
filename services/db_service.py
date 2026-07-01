@@ -332,6 +332,19 @@ class DBService:
                 total_questions INTEGER,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"""))
+            
+            # Weekly Test Answers Table
+            cursor.execute(self._translate_schema("""
+            CREATE TABLE IF NOT EXISTS weekly_test_answers (
+                id TEXT PRIMARY KEY,
+                test_id TEXT,
+                question_index INTEGER,
+                user_answer TEXT,
+                image_path TEXT,
+                score INTEGER,
+                feedback TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )"""))
 
             # Clear stale completed/failed tasks on startup to prevent timezone layout loops
             try:
