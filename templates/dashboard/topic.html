@@ -196,8 +196,10 @@
                 <span id="bookmark-icon">{{ '🔖' if is_bookmarked else '📑' }}</span>
             </button>
             <button onclick="printNotes()"
-                class="p-2.5 rounded-xl bg-gray-50 text-[#1d1d1f] border border-gray-200 hover:border-gray-500 transition-all"
-                title="Print">🖨️</button>
+                class="px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all border border-gray-200 hover:border-[#0071e3]/40 bg-white text-[#1d1d1f] flex items-center justify-center gap-1"
+                title="Print notes as PDF">
+                🖨️ <span class="hidden sm:inline">Print PDF</span>
+            </button>
 
             <form action="{{ url_for('files.upload_file', topic_id=topic.id) }}" method="POST"
                 enctype="multipart/form-data" class="inline-flex">
