@@ -70,39 +70,47 @@ class WeeklyTestService:
             if not subject_ids:
                 return
 
-            # Format subject_ids for SQL IN clause safely
-            placeholders = ','.join(['?'] * len(subject_ids))
+            num_subjects = len(subject_ids)
+            base_count = 20 // num_subjects
+            remainder = 20 % num_subjects
             
-            # 2. Fetch 20 random unseen questions from the bank for these subjects
-            query = f"""
-                SELECT * FROM question_bank 
-                WHERE subject_id IN ({placeholders}) 
-                AND id NOT IN (SELECT question_id FROM user_attempted_questions WHERE user_id = ?)
-                ORDER BY RANDOM() 
-                LIMIT 20
-            """
-            # Params: subject_ids followed by user_id
-            params = tuple(subject_ids) + (user_id,)
-            questions = db_service.query(query, params)
+            questions = []
             
-            # If not enough unseen questions, fetch any random questions to fill the gap
-            if len(questions) < 20:
-                needed = 20 - len(questions)
-                fallback_query = f"""
+            for i, sub_id in enumerate(subject_ids):
+                target_count = base_count + (1 if i < remainder else 0)
+                
+                # Fetch unseen questions for this specific subject
+                query = """
                     SELECT * FROM question_bank 
-                    WHERE subject_id IN ({placeholders}) 
+                    WHERE subject_id = ? 
+                    AND id NOT IN (SELECT question_id FROM user_attempted_questions WHERE user_id = ?)
                     ORDER BY RANDOM() 
                     LIMIT ?
                 """
-                fallback_params = tuple(subject_ids) + (needed,)
-                fallback_questions = db_service.query(fallback_query, fallback_params)
+                sub_questions = db_service.query(query, (sub_id, user_id, target_count))
                 
-                # Combine them, ensuring no exact duplicates in the current list if possible
-                existing_ids = {q["id"] for q in questions}
-                for fq in fallback_questions:
-                    if fq["id"] not in existing_ids:
-                        questions.append(fq)
-                        existing_ids.add(fq["id"])
+                # Fallback if not enough unseen questions for this subject
+                if len(sub_questions) < target_count:
+                    needed = target_count - len(sub_questions)
+                    fallback_query = """
+                        SELECT * FROM question_bank 
+                        WHERE subject_id = ? 
+                        ORDER BY RANDOM() 
+                        LIMIT ?
+                    """
+                    fallback_questions = db_service.query(fallback_query, (sub_id, needed))
+                    
+                    existing_ids = {q["id"] for q in sub_questions}
+                    for fq in fallback_questions:
+                        if fq["id"] not in existing_ids:
+                            sub_questions.append(fq)
+                            existing_ids.add(fq["id"])
+                
+                questions.extend(sub_questions)
+                
+            # Shuffle the final combined list so the test isn't grouped by subject
+            import random
+            random.shuffle(questions)
 
             if not questions:
                 # No questions exist in bank at all yet
