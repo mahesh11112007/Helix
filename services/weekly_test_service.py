@@ -12,10 +12,9 @@ class WeeklyTestService:
         """
         today = datetime.now()
         
-        # Determine the most recent Sunday (or today if it is Sunday)
-        days_since_sunday = (today.weekday() - 6) % 7
-        last_sunday = today - timedelta(days=days_since_sunday)
-        last_sunday_start = last_sunday.replace(hour=0, minute=0, second=0, microsecond=0)
+        # Determine the cutoff date (7 days ago)
+        seven_days_ago = today - timedelta(days=7)
+        cutoff_date = seven_days_ago.replace(hour=0, minute=0, second=0, microsecond=0)
         
         print(f"[DEBUG] check_and_generate for user_id: {user_id}")
         semesters = db_service.query("SELECT * FROM semesters WHERE user_id = ? ORDER BY created_at DESC", (user_id,))
@@ -26,10 +25,10 @@ class WeeklyTestService:
         print(f"[DEBUG] Found {len(semesters)} semesters for user {user_id}")
         active_sem = semesters[0]
         
-        # Check if a combined test already exists for this week
+        # Check if a combined test already exists in the last 7 days
         existing_test = db_service.query(
             "SELECT id FROM weekly_tests WHERE user_id = ? AND subject_id = 'ALL' AND created_at >= ?",
-            (user_id, last_sunday_start.isoformat())
+            (user_id, cutoff_date.isoformat())
         )
         
         if not existing_test:
@@ -38,7 +37,7 @@ class WeeklyTestService:
             db_service.execute("DELETE FROM weekly_tests WHERE user_id = ?", (user_id,))
             
             # Generate a new test in the background
-            self.queue_test_generation(user_id, active_sem["id"], last_sunday_start)
+            self.queue_test_generation(user_id, active_sem["id"], cutoff_date)
                 
     def queue_test_generation(self, user_id, sem_id, week_start_date):
         """
@@ -74,15 +73,15 @@ class WeeklyTestService:
             
             # 2. Call AI to generate Short Answer questions
             prompt = f"""
-            You are a strict academic examiner. Create a comprehensive, ADVANCED Weekly Assessment (Short Answer format) 
+            You are a strict academic examiner. Create a comprehensive, ADVANCED Assessment (Short Answer format) 
             covering the following topics across multiple subjects: {topic_str}.
             
-            Generate exactly 20 advanced Short Answer questions. 
+            Generate EXACTLY 20 advanced Short Answer questions, mixing ALL the available subjects. 
             For each question, provide the "question" and the "expected_answer" (the grading rubric/key points).
             
             Output MUST be strict JSON in this format:
             {{
-                "title": "Weekly Assessment: Advanced Review",
+                "title": "Weekly Assessment: Mixed Advanced Review",
                 "questions": [
                     {{
                         "question": "Advanced question...",
@@ -101,8 +100,8 @@ class WeeklyTestService:
                 test_id = str(uuid.uuid4())
                 db_service.execute(
                     """INSERT INTO weekly_tests (id, user_id, subject_id, title, test_data, status, total_questions)
-                       VALUES (?, ?, 'ALL', ?, ?, 'pending', ?)""",
-                    (test_id, user_id, json_data.get("title", "Weekly Assessment: Advanced Review"), json.dumps(json_data.get("questions", [])), len(json_data.get("questions", [])))
+                       VALUES (?, ?, 'ALL', ?, ?, 'pending_approval', ?)""",
+                    (test_id, user_id, json_data.get("title", "Weekly Assessment: Mixed Advanced Review"), json.dumps(json_data.get("questions", [])), len(json_data.get("questions", [])))
                 )
                 test_created = True
                     
@@ -117,7 +116,7 @@ class WeeklyTestService:
                 ] * 20
                 db_service.execute(
                     """INSERT INTO weekly_tests (id, user_id, subject_id, title, test_data, status, total_questions)
-                       VALUES (?, ?, 'ALL', ?, ?, 'pending', ?)""",
+                       VALUES (?, ?, 'ALL', ?, ?, 'pending_approval', ?)""",
                     (test_id, user_id, "Mock Weekly Assessment (AI Rate Limited)", json.dumps(mock_data), 20)
                 )
             

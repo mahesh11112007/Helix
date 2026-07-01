@@ -67,7 +67,10 @@ def dashboard():
     # Fetch Genuine Support Requests
     requests_list = db_service.query("SELECT sr.*, p.email, p.full_name FROM support_requests sr JOIN profiles p ON sr.user_id = p.id WHERE sr.is_genuine = 1 ORDER BY CASE WHEN sr.status = 'open' THEN 0 ELSE 1 END, sr.created_at DESC")
     
-    return render_template("admin/dashboard.html", settings=settings, users=users, proofs=proofs, requests=requests_list)
+    # Fetch Pending Weekly Tests
+    pending_tests = db_service.query("SELECT wt.*, p.email, p.full_name FROM weekly_tests wt JOIN profiles p ON wt.user_id = p.id WHERE wt.status = 'pending_approval' ORDER BY wt.created_at DESC")
+    
+    return render_template("admin/dashboard.html", settings=settings, users=users, proofs=proofs, requests=requests_list, pending_tests=pending_tests)
 
 @admin_bp.route("/proof/<proof_id>/<action>", methods=["POST"])
 def handle_proof(proof_id, action):
@@ -88,6 +91,25 @@ def handle_proof(proof_id, action):
     elif action == "reject":
         db_service.execute("UPDATE payment_proofs SET status = 'rejected' WHERE id = ?", (proof_id,))
         flash("Proof rejected.", "success")
+        
+    return redirect(url_for("admin.dashboard"))
+
+@admin_bp.route("/weekly-tests/<test_id>/<action>", methods=["POST"])
+def handle_weekly_test(test_id, action):
+    if not session.get("is_superadmin"):
+        return redirect(url_for("admin.login"))
+        
+    test = db_service.query("SELECT * FROM weekly_tests WHERE id = ?", (test_id,), one=True)
+    if not test:
+        flash("Test not found", "error")
+        return redirect(url_for("admin.dashboard"))
+        
+    if action == "approve":
+        db_service.execute("UPDATE weekly_tests SET status = 'pending' WHERE id = ?", (test_id,))
+        flash("Weekly test approved and is now visible to the user.", "success")
+    elif action == "reject":
+        db_service.execute("DELETE FROM weekly_tests WHERE id = ?", (test_id,))
+        flash("Weekly test rejected and deleted.", "success")
         
     return redirect(url_for("admin.dashboard"))
 
