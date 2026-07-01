@@ -218,17 +218,40 @@
         <!-- Left Sidebar: Table of Contents -->
         <aside
             class="flex flex-col w-full xl:w-64 border-b xl:border-b-0 xl:border-r border-gray-200 bg-white xl:custom-scroll xl:overflow-y-auto p-6 shrink-0">
-            <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">On This Page</h3>
-            <div class="space-y-4 mb-6">
-                <div class="h-1.5 w-full bg-[#333] rounded-full overflow-hidden">
-                    <div id="reading-progress" class="h-full bg-[#0071e3] w-0 transition-all duration-300"></div>
+            <details class="group xl:hidden">
+                <summary class="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-gray-500 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                    <span>On This Page</span>
+                    <svg class="w-4 h-4 transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </summary>
+                <div class="mt-6">
+                    <div class="space-y-4 mb-6">
+                        <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                            <div id="reading-progress-mobile" class="h-full bg-[#0071e3] w-0 transition-all duration-300"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 text-right" id="reading-percentage-mobile">0% Read</p>
+                    </div>
+                    <nav id="toc-nav-mobile" class="space-y-1.5 text-sm flex flex-col">
+                        <!-- TOC injected by JS -->
+                        <p class="text-gray-500 text-xs italic">Loading sections...</p>
+                    </nav>
                 </div>
-                <p class="text-xs text-gray-500 text-right" id="reading-percentage">0% Read</p>
+            </details>
+            
+            <div class="hidden xl:block">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">On This Page</h3>
+                <div class="space-y-4 mb-6">
+                    <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                        <div id="reading-progress" class="h-full bg-[#0071e3] w-0 transition-all duration-300"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 text-right" id="reading-percentage">0% Read</p>
+                </div>
+                <nav id="toc-nav" class="space-y-1.5 text-sm flex flex-col">
+                    <!-- TOC injected by JS -->
+                    <p class="text-gray-500 text-xs italic">Loading sections...</p>
+                </nav>
             </div>
-            <nav id="toc-nav" class="space-y-1.5 text-sm flex flex-col">
-                <!-- TOC injected by JS -->
-                <p class="text-gray-500 text-xs italic">Loading sections...</p>
-            </nav>
         </aside>
 
         <!-- Center: Main Learning Content -->
@@ -474,15 +497,23 @@
 
         // 3. Build Table of Contents
         const tocNav = document.getElementById('toc-nav');
+        const tocNavMobile = document.getElementById('toc-nav-mobile');
         if (tocList.length > 0) {
             tocNav.innerHTML = '';
+            if (tocNavMobile) tocNavMobile.innerHTML = '';
+            
             tocList.forEach((item, index) => {
                 const a = document.createElement('a');
                 a.href = '#' + item.id;
                 a.className = 'toc-link block px-3 py-2 rounded-lg text-gray-500 hover:bg-[#333] hover:text-[#1d1d1f] transition-all truncate';
                 a.textContent = item.title;
                 a.dataset.target = item.id;
+                
                 tocNav.appendChild(a);
+                if (tocNavMobile) {
+                    const aMobile = a.cloneNode(true);
+                    tocNavMobile.appendChild(aMobile);
+                }
             });
         }
 
@@ -490,15 +521,22 @@
         const scrollArea = document.getElementById('main-scroll-area');
         const progressBar = document.getElementById('reading-progress');
         const progressText = document.getElementById('reading-percentage');
-        const tocLinks = document.querySelectorAll('.toc-link');
+        const progressBarMobile = document.getElementById('reading-progress-mobile');
+        const progressTextMobile = document.getElementById('reading-percentage-mobile');
 
         scrollArea.addEventListener('scroll', () => {
             // Progress Bar
             const scrollTop = scrollArea.scrollTop;
             const scrollHeight = scrollArea.scrollHeight - scrollArea.clientHeight;
             const scrollPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-            progressBar.style.width = scrollPercent + '%';
-            progressText.textContent = Math.round(scrollPercent) + '% Read';
+            const roundedPercent = Math.round(scrollPercent) + '% Read';
+            
+            if (progressBar) progressBar.style.width = scrollPercent + '%';
+            if (progressText) progressText.textContent = roundedPercent;
+            if (progressBarMobile) progressBarMobile.style.width = scrollPercent + '%';
+            if (progressTextMobile) progressTextMobile.textContent = roundedPercent;
+
+            const tocLinks = document.querySelectorAll('.toc-link');
 
             // Highlight TOC
             let currentActive = null;
