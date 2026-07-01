@@ -105,16 +105,15 @@ def create_app():
 
 app = create_app()
 
-# Start background replenishment thread only if not in testing/build mode
-# and only once in development mode (Werkzeug starts two processes by default)
-if not os.environ.get("VERCEL_URL") and os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    import threading
-    from services.question_bank_service import question_bank_service
-    def run_replenishment():
-        import time
-        while True:
-            question_bank_service.replenish_bank()
-            time.sleep(60 * 60 * 6) # Every 6 hours
-            
-    thread = threading.Thread(target=run_replenishment, daemon=True)
-    thread.start()
+# Temporarily disabled to save API keys for users
+# if not os.environ.get("VERCEL_URL") and os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+#     import threading
+#     from services.question_bank_service import question_bank_service
+#     def run_replenishment():
+#         import time
+#         while True:
+#             question_bank_service.replenish_bank()
+#             time.sleep(60 * 60 * 6) # Every 6 hours
+#             
+#     thread = threading.Thread(target=run_replenishment, daemon=True)
+#     thread.start()
