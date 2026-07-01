@@ -3,12 +3,12 @@
 {% block content %}
 <div class="max-w-4xl mx-auto py-12">
     <div class="text-center mb-12 animate-fade-in-up">
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-violet-100 to-fuchsia-100 border border-violet-200 text-violet-800 font-semibold text-sm mb-6 shadow-sm">
-            <i data-lucide="sparkles" class="w-4 h-4 text-violet-500"></i>
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-primary-100 border border-primary-200 text-primary-800 font-semibold text-sm mb-6 shadow-sm">
+            <i data-lucide="sparkles" class="w-4 h-4 text-primary-500"></i>
             KiraakStudy Premium
         </div>
         <h1 class="text-4xl md:text-5xl font-extrabold font-outfit text-[#1d1d1f] tracking-tight mb-4">
-            Supercharge Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">Study Sessions</span>
+            Supercharge Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-600">Study Sessions</span>
         </h1>
         <p class="text-lg text-gray-500 max-w-2xl mx-auto">
             Get unlimited access to AI Study Decks, AI Planners, and limitless AI Chat. Pay once, use forever.
@@ -22,7 +22,7 @@
         </div>
         <h2 class="text-2xl font-bold text-green-900 mb-2">Welcome to Premium!</h2>
         <p class="text-green-700 mb-6">Your payment was successful and your account has been upgraded instantly.</p>
-        <a href="{{ url_for('dashboard.index') }}" class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition-all shadow-md shadow-green-600/20">
+        <a href="{{ url_for('dashboard.index') }}" class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-green-600 text-gray-900 font-semibold hover:bg-green-700 transition-all shadow-md shadow-green-600/20">
             Go to Dashboard
         </a>
     </div>
@@ -31,11 +31,11 @@
         <!-- Free Tier -->
         <div class="glass-card bg-white p-8 rounded-3xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] opacity-80 hover:opacity-100 transition-opacity duration-300">
             <h3 class="text-xl font-bold font-outfit text-[#1d1d1f] mb-2">Basic</h3>
-            <div class="text-3xl font-extrabold text-[#1d1d1f] mb-6">₹0<span class="text-sm font-medium text-gray-400">/forever</span></div>
+            <div class="text-3xl font-extrabold text-[#1d1d1f] mb-6">₹0<span class="text-sm font-medium text-gray-500">/forever</span></div>
             
             <ul class="space-y-4 mb-8">
                 <li class="flex items-start gap-3 text-sm text-gray-600">
-                    <i data-lucide="check" class="w-5 h-5 text-gray-400 shrink-0"></i>
+                    <i data-lucide="check" class="w-5 h-5 text-gray-500 shrink-0"></i>
                     The basic free plan
                 </li>
             </ul>
@@ -46,25 +46,25 @@
         </div>
 
         <!-- Premium Tier -->
-        <div class="glass-card bg-gradient-to-b from-white to-violet-50 p-8 rounded-3xl border-2 border-violet-500 shadow-[0_8px_30px_rgba(139,92,246,0.15)] relative transform md:-translate-y-4">
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-xs font-bold uppercase tracking-wider py-1 px-4 rounded-full shadow-lg">
+        <div class="glass-card bg-gradient-to-b from-white to-primary-50 p-8 rounded-3xl border-2 border-primary-500 shadow-[0_8px_30px_rgba(139,92,246,0.15)] relative transform md:-translate-y-4">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-primary-600 to-primary-600 text-white text-xs font-bold uppercase tracking-wider py-1 px-4 rounded-full shadow-lg">
                 Most Popular
             </div>
             
-            <h3 class="text-xl font-bold font-outfit text-violet-900 mb-2">Premium</h3>
+            <h3 class="text-xl font-bold font-outfit text-primary-900 mb-2">Premium</h3>
             <div class="text-4xl font-extrabold text-[#1d1d1f] mb-6">₹49<span class="text-sm font-medium text-gray-500">/month</span></div>
             
             <ul class="space-y-4 mb-8">
                 <li class="flex items-start gap-3 text-sm font-medium text-gray-800">
-                    <div class="p-0.5 bg-violet-100 rounded-full text-violet-600 shrink-0"><i data-lucide="check" class="w-4 h-4"></i></div>
+                    <div class="p-0.5 bg-primary-100 rounded-full text-primary-600 shrink-0"><i data-lucide="check" class="w-4 h-4"></i></div>
                     50 AI Chats per day
                 </li>
                 <li class="flex items-start gap-3 text-sm font-medium text-gray-800">
-                    <div class="p-0.5 bg-violet-100 rounded-full text-violet-600 shrink-0"><i data-lucide="check" class="w-4 h-4"></i></div>
+                    <div class="p-0.5 bg-primary-100 rounded-full text-primary-600 shrink-0"><i data-lucide="check" class="w-4 h-4"></i></div>
                     20 AI Study Decks
                 </li>
                 <li class="flex items-start gap-3 text-sm font-medium text-gray-800">
-                    <div class="p-0.5 bg-violet-100 rounded-full text-violet-600 shrink-0"><i data-lucide="check" class="w-4 h-4"></i></div>
+                    <div class="p-0.5 bg-primary-100 rounded-full text-primary-600 shrink-0"><i data-lucide="check" class="w-4 h-4"></i></div>
                     20 AI Command Bar
                 </li>
             </ul>
@@ -72,10 +72,10 @@
             <form action="{{ url_for('billing.checkout') }}" method="POST">
                 <div class="mb-4">
                     <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Mobile Number <span class="text-red-500">*</span></label>
-                    <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}" placeholder="10-digit mobile number" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all text-sm">
+                    <input type="tel" id="phone" name="phone" required pattern="[0-9]{10}" placeholder="10-digit mobile number" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-sm">
                 </div>
                 <button type="submit" class="w-full py-4 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-semibold transition-all shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 group">
-                    <i data-lucide="credit-card" class="w-5 h-5 text-gray-300 group-hover:text-white transition-colors"></i>
+                    <i data-lucide="credit-card" class="w-5 h-5 text-gray-600 group-hover:text-gray-900 transition-colors"></i>
                     Pay with UPI / Card
                 </button>
                 <div class="mt-3 text-center text-xs text-gray-500 flex items-center justify-center gap-1">
@@ -88,7 +88,7 @@
     <!-- Payment Proof Upload Section -->
     <div class="mt-16 max-w-2xl mx-auto glass-card bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
         <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-full bg-violet-100 text-violet-600 flex items-center justify-center">
+            <div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center">
                 <i data-lucide="upload-cloud" class="w-5 h-5"></i>
             </div>
             <div>
@@ -99,7 +99,7 @@
         
         <form action="{{ url_for('billing.upload_proof') }}" method="POST" enctype="multipart/form-data" class="mt-6 flex flex-col sm:flex-row items-center gap-4">
             <div class="flex-1 w-full relative">
-                <input type="file" id="proof_image" name="proof_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 transition-all border border-gray-200 rounded-xl bg-gray-50 p-1" required>
+                <input type="file" id="proof_image" name="proof_image" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 transition-all border border-gray-200 rounded-xl bg-gray-50 p-1" required>
             </div>
             <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-semibold transition-all shadow-md whitespace-nowrap">
                 Submit Proof

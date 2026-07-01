@@ -27,11 +27,11 @@
             <div class="flex items-center space-x-6">
                 <div class="text-center">
                     <span class="block text-3xl font-bold text-[#0071e3]">{{ profile.study_streak or 0 }}</span>
-                    <span class="text-[10px] uppercase font-bold tracking-widest text-gray-400">Day Streak</span>
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-gray-500">Day Streak</span>
                 </div>
                 <div class="text-center">
                     <span class="block text-3xl font-bold text-gray-800">Active</span>
-                    <span class="text-[10px] uppercase font-bold tracking-widest text-gray-400">Status</span>
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-gray-500">Status</span>
                 </div>
             </div>
         </div>
@@ -47,11 +47,11 @@
                 <span class="text-sm font-semibold text-[#1d1d1f]">Import Syllabus</span>
             </a>
             <a href="/analytics" class="glass-card p-6 text-center hover:bg-gray-50 transition-all duration-200 block">
-                <i data-lucide="bar-chart-2" class="w-8 h-8 mx-auto mb-3 text-amber-500"></i>
+                <i data-lucide="bar-chart-2" class="w-8 h-8 mx-auto mb-3 text-accent-500"></i>
                 <span class="text-sm font-semibold text-[#1d1d1f]">View Analytics</span>
             </a>
             <a href="/search" class="glass-card p-6 text-center hover:bg-gray-50 transition-all duration-200 block">
-                <i data-lucide="search" class="w-8 h-8 mx-auto mb-3 text-violet-500"></i>
+                <i data-lucide="search" class="w-8 h-8 mx-auto mb-3 text-primary-500"></i>
                 <span class="text-sm font-semibold text-[#1d1d1f]">Search Notes</span>
             </a>
         </div>
@@ -62,7 +62,7 @@
                 <h2 class="text-xl font-bold text-[#1d1d1f]">Your Semesters</h2>
                 <form action="{{ url_for('dashboard.add_semester') }}" method="POST" class="flex items-center space-x-2">
                     <input type="text" name="name" placeholder="e.g. Semester 5" required class="px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] text-[#1d1d1f]">
-                    <button type="submit" class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white transition">
+                    <button type="submit" class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-gray-900 transition">
                         + Add
                     </button>
                 </form>
@@ -80,7 +80,7 @@
             {% else %}
                 <div class="text-center py-12 border border-dashed border-gray-200 rounded-2xl">
                     <p class="text-gray-500 mb-2">No semesters created yet.</p>
-                    <p class="text-xs text-gray-400">Tip: Paste a syllabus to auto-generate all semesters, units, and topics!</p>
+                    <p class="text-xs text-gray-500">Tip: Paste a syllabus to auto-generate all semesters, units, and topics!</p>
                 </div>
             {% endif %}
         </div>
@@ -100,7 +100,7 @@
                                 {% if file.ocr_text %}
                                     <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[10px] uppercase font-bold">AI Processed</span>
                                 {% else %}
-                                    <span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-[10px] uppercase font-bold">Processing</span>
+                                    <span class="px-2.5 py-1 rounded-full bg-accent-100 text-accent-700 text-[10px] uppercase font-bold">Processing</span>
                                 {% endif %}
                                 <a href="{{ url_for('files.download_file', file_id=file.id) }}" class="text-[#0071e3] hover:text-[#0077ed] text-xs font-semibold">Download</a>
                             </div>
@@ -117,17 +117,17 @@
     <div class="space-y-6">
         <!-- Pomodoro Timer -->
         <div class="glass-card p-8 text-center">
-            <h2 class="text-lg font-bold mb-2 flex justify-center items-center gap-2 text-[#1d1d1f]"><i data-lucide="timer" class="w-5 h-5 text-gray-400"></i> Pomodoro Focus</h2>
+            <h2 class="text-lg font-bold mb-2 flex justify-center items-center gap-2 text-[#1d1d1f]"><i data-lucide="timer" class="w-5 h-5 text-gray-500"></i> Pomodoro Focus</h2>
             <div id="pomodoro-display" class="text-4xl font-black my-6 font-mono tracking-wider text-[#1d1d1f]">25:00</div>
             <div class="flex justify-center space-x-3">
-                <button id="pomodoro-toggle" onclick="togglePomodoro()" class="px-5 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-bold text-white transition">Start</button>
+                <button id="pomodoro-toggle" onclick="togglePomodoro()" class="px-5 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-bold text-gray-900 transition">Start</button>
                 <button onclick="resetPomodoro()" class="px-5 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm font-semibold text-[#1d1d1f] transition">Reset</button>
             </div>
         </div>
 
         <!-- AI Study Suggestions -->
         <div class="glass-card p-8">
-            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-[#1d1d1f]"><i data-lucide="lightbulb" class="w-5 h-5 text-amber-500"></i> AI Study Coach</h2>
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-[#1d1d1f]"><i data-lucide="lightbulb" class="w-5 h-5 text-accent-500"></i> AI Study Coach</h2>
             <ul class="space-y-3">
                 {% for suggestion in ai_suggestions %}
                     <li class="text-sm p-4 rounded-xl bg-gray-50 border border-gray-100 text-gray-700">
@@ -155,14 +155,14 @@
         </div>
 
         <!-- Pending Weekly Tests -->
-        <div class="glass-card p-8 border border-indigo-200 bg-indigo-50/30">
-            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-700"><i data-lucide="clipboard-list" class="w-5 h-5"></i> Weekly Assessments</h2>
+        <div class="glass-card p-8 border border-primary-200 bg-primary-50/30">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-primary-700"><i data-lucide="clipboard-list" class="w-5 h-5"></i> Weekly Assessments</h2>
             {% if pending_tests %}
                 <div class="space-y-3">
                     {% for test in pending_tests %}
-                        <div class="p-4 rounded-xl bg-white border border-indigo-100 flex flex-col gap-3">
+                        <div class="p-4 rounded-xl bg-white border border-primary-100 flex flex-col gap-3">
                             <span class="block font-bold text-sm text-[#1d1d1f]">{{ test.title }}</span>
-                            <a href="/test/{{ test.id }}" class="text-center px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">Take Test</a>
+                            <a href="/test/{{ test.id }}" class="text-center px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold transition">Take Test</a>
                         </div>
                     {% endfor %}
                 </div>

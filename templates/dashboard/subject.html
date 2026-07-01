@@ -22,7 +22,7 @@
         <form action="{{ url_for('dashboard.add_unit', sub_id=subject.id) }}" method="POST" class="flex items-center space-x-2">
             <input type="number" name="number" placeholder="Unit No." required min="1" class="w-20 px-3 py-2 rounded-full bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
             <input type="text" name="name" placeholder="Unit Title" required class="px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all w-48">
-            <button type="submit" class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all flex items-center">
+            <button type="submit" class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-gray-900 shadow-sm transition-all flex items-center">
                 + Add Unit
             </button>
         </form>
@@ -62,7 +62,7 @@
                             {% endfor %}
                         </div>
                     {% else %}
-                        <div class="p-4 text-xs text-gray-400 italic">No topics added to this unit yet.</div>
+                        <div class="p-4 text-xs text-gray-500 italic">No topics added to this unit yet.</div>
                     {% endif %}
                 </div>
             {% endfor %}
@@ -70,7 +70,7 @@
     {% else %}
         <div class="text-center py-12 border-2 border-dashed border-gray-200 rounded-2xl bg-white">
             <p class="text-gray-500 font-medium">No units added yet.</p>
-            <p class="text-xs text-gray-400 mt-1">Use the form above to add your first unit.</p>
+            <p class="text-xs text-gray-500 mt-1">Use the form above to add your first unit.</p>
         </div>
     {% endif %}
 </div>

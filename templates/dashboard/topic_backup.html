@@ -23,7 +23,7 @@
         <div class="flex items-center space-x-3 flex-wrap gap-y-2">
             <!-- Complete Toggle -->
             <button id="complete-btn" onclick="toggleComplete('{{ topic.id }}')"
-                class="px-4 py-2 rounded-full text-sm font-bold shadow-sm transition border border-gray-200 hover:border-emerald-500/40 {{ 'bg-emerald-500 text-white border-emerald-500' if topic.is_completed else 'bg-white text-[#1d1d1f]' }}"
+                class="px-4 py-2 rounded-full text-sm font-bold shadow-sm transition border border-gray-200 hover:border-emerald-500/40 {{ 'bg-emerald-500 text-gray-900 border-emerald-500' if topic.is_completed else 'bg-white text-[#1d1d1f]' }}"
                 title="Mark this topic as completed">
                 <span id="complete-icon">{{ '✅' if topic.is_completed else '⭕' }}</span>
                 <span id="complete-text" class="hidden sm:inline ml-1">{{ 'Completed' if topic.is_completed else 'Mark
@@ -54,16 +54,16 @@
                 // Show inside notes area
                 const notesContainer = document.querySelector('#printable-notes .space-y-4') || document.querySelector('#printable-notes');
                 const loadingHtml = `
-                    <div class='p-5 rounded-2xl bg-gray-50 border border-indigo-200 shadow-sm animate-pulse'>
-                        <h3 class='h-6 bg-indigo-200 rounded w-1/3 mb-4'></h3>
+                    <div class='p-5 rounded-2xl bg-gray-50 border border-primary-200 shadow-sm animate-pulse'>
+                        <h3 class='h-6 bg-primary-200 rounded w-1/3 mb-4'></h3>
                         <div class='space-y-2'>
                             <div class='h-4 bg-gray-200 rounded w-full'></div>
                             <div class='h-4 bg-gray-200 rounded w-5/6'></div>
                             <div class='h-4 bg-gray-200 rounded w-4/6'></div>
                             <div class='h-4 bg-gray-200 rounded w-full'></div>
                         </div>
-                        <div class='mt-4 flex items-center gap-2 text-indigo-600 text-sm font-bold'>
-                            <svg class='animate-spin h-4 w-4 text-indigo-600' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'><circle class='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' stroke-width='4'></circle><path class='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path></svg>
+                        <div class='mt-4 flex items-center gap-2 text-primary-600 text-sm font-bold'>
+                            <svg class='animate-spin h-4 w-4 text-primary-600' xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'><circle class='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' stroke-width='4'></circle><path class='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path></svg>
                             AI is generating comprehensive materials... Estimated time: ~20 seconds
                         </div>
                     </div>
@@ -77,27 +77,27 @@
                 
                 // Show global toast
                 const toast = document.createElement('div');
-                toast.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white px-6 py-4 rounded-xl shadow-lg flex flex-col gap-1 z-50 animate-bounce';
+                toast.className = 'fixed bottom-4 right-4 bg-primary-600 text-gray-900 px-6 py-4 rounded-xl shadow-lg flex flex-col gap-1 z-50 animate-bounce';
                 toast.innerHTML = '<div class=\\'font-bold text-sm flex items-center gap-2\\'><svg class=\\'animate-spin h-4 w-4\\' viewBox=\\'0 0 24 24\\'><circle class=\\'opacity-25\\' cx=\\'12\\' cy=\\'12\\' r=\\'10\\' stroke=\\'currentColor\\' stroke-width=\\'4\\' fill=\\'none\\'></circle><path class=\\'opacity-75\\' fill=\\'currentColor\\' d=\\'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z\\'></path></svg> Generating AI Study Deck...</div><div class=\\'text-xs opacity-80\\'>Estimated time: ~20s</div>';
                 document.body.appendChild(toast);
             ">
                 <div class="flex flex-wrap gap-2">
                     <button type="submit"
-                        class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all">
+                        class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-gray-900 shadow-sm transition-all">
                         Generate Notes
                     </button>
                     <button type="submit"
-                        class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all">
+                        class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-gray-900 shadow-sm transition-all">
                         Generate Flash Cards
                     </button>
                     <button type="submit"
-                        class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all">
+                        class="px-4 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-gray-900 shadow-sm transition-all">
                         Generate Quizzes
                     </button>
                 </div>
             </form>
             <a href="{{ url_for('study.explain_topic_ai', topic_id=topic.id) }}"
-                class="px-4 py-2 rounded-full bg-[#1d1d1f] hover:bg-black text-sm font-semibold text-white shadow-sm transition-all">
+                class="px-4 py-2 rounded-full bg-[#1d1d1f] hover:bg-black text-sm font-semibold text-gray-900 shadow-sm transition-all">
                 AI Tutor Explain
             </a>
         </div>
@@ -117,7 +117,7 @@
                         <input type="file" name="file" required
                             class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-[#0071e3]/10 file:text-[#0071e3] hover:file:bg-[#0071e3]/20 transition-all cursor-pointer">
                         <button type="submit"
-                            class="px-4 py-1.5 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-xs font-semibold text-white shadow-sm transition-all">Upload</button>
+                            class="px-4 py-1.5 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-xs font-semibold text-gray-900 shadow-sm transition-all">Upload</button>
                     </form>
                 </div>
 
@@ -170,7 +170,7 @@
                 {% else %}
                 <div class="text-center py-12 border-2 border-dashed border-gray-200 bg-gray-50 rounded-2xl">
                     <p class="text-sm text-gray-500 font-medium">No documents uploaded yet.</p>
-                    <p class="text-xs text-gray-400 mt-1">Upload printed notes, handwritten documents, or PDFs for AI
+                    <p class="text-xs text-gray-500 mt-1">Upload printed notes, handwritten documents, or PDFs for AI
                         Vision
                         processing.</p>
                 </div>
@@ -215,7 +215,7 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <p class="text-sm text-gray-400">No generated notes yet. Click the "Generate Notes" button above to get started.</p>
+                <p class="text-sm text-gray-500">No generated notes yet. Click the "Generate Notes" button above to get started.</p>
                 {% endif %}
             </div>
         </div>
@@ -228,12 +228,12 @@
                 <p class="text-xs opacity-70 mb-4">Leverage spaced repetition to master this topic.</p>
                 {% if flashcards %}
                 <a href="{{ url_for('study.review_flashcards', topic_id=topic.id) }}"
-                    class="block w-full py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] font-semibold transition-all text-white shadow-sm">
+                    class="block w-full py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] font-semibold transition-all text-gray-900 shadow-sm">
                     Review {{ flashcards | length }} Cards
                 </a>
                 {% else %}
                 <button disabled
-                    class="w-full py-3 rounded-full bg-gray-100 text-gray-400 font-semibold cursor-not-allowed border border-gray-200">
+                    class="w-full py-3 rounded-full bg-gray-100 text-gray-500 font-semibold cursor-not-allowed border border-gray-200">
                     No Flashcards Available
                 </button>
                 {% endif %}
@@ -249,7 +249,7 @@
                         class="p-3 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-between shadow-sm hover:shadow transition-all group">
                         <span class="text-sm font-medium text-[#1d1d1f] truncate pr-2">{{ quiz.title }}</span>
                         <a href="{{ url_for('study.play_quiz', quiz_id=quiz.id) }}"
-                            class="px-4 py-1.5 rounded-full bg-gray-200 text-xs font-semibold hover:bg-[#0071e3] hover:text-white transition-all text-[#1d1d1f]">Start</a>
+                            class="px-4 py-1.5 rounded-full bg-gray-200 text-xs font-semibold hover:bg-[#0071e3] hover:text-gray-900 transition-all text-[#1d1d1f]">Start</a>
                     </div>
                     {% endfor %}
                 </div>
@@ -288,12 +288,12 @@
                             {% if chat_sessions %}
                             {% for session in chat_sessions %}
                             <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, session_id=session.id) }}"
-                                class="block w-full px-3 py-2 rounded-lg text-xs font-medium truncate transition-all {% if active_session_id == session.id %}bg-[#0071e3] text-white shadow-sm font-bold{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                                class="block w-full px-3 py-2 rounded-lg text-xs font-medium truncate transition-all {% if active_session_id == session.id %}bg-[#0071e3] text-gray-900 shadow-sm font-bold{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
                                 {{ session.title }}
                             </a>
                             {% endfor %}
                             {% else %}
-                            <p class="text-xs text-gray-400 p-2 text-center mt-4">No history found</p>
+                            <p class="text-xs text-gray-500 p-2 text-center mt-4">No history found</p>
                             {% endif %}
                         </div>
                     </div>
@@ -305,7 +305,7 @@
                         <div class="absolute top-2 left-2 z-10">
                             <button
                                 onclick="document.getElementById('topic-chat-sidebar').classList.remove('-translate-x-full')"
-                                class="p-1.5 rounded-lg bg-white/80 backdrop-blur border border-gray-200 text-gray-500 hover:text-violet-600 hover:bg-white shadow-sm transition-all"
+                                class="p-1.5 rounded-lg bg-white/80 backdrop-blur border border-gray-200 text-gray-500 hover:text-primary-600 hover:bg-white shadow-sm transition-all"
                                 title="Toggle History">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -321,7 +321,7 @@
                             {% if msg.role == 'user' %}
                             <div class="flex justify-end">
                                 <div
-                                    class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm whitespace-pre-wrap">
+                                    class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-gray-900 text-sm max-w-[85%] break-words shadow-sm whitespace-pre-wrap">
                                     {{ msg.content }}</div>
                             </div>
                             {% else %}
@@ -329,7 +329,7 @@
                                 <div class="ai-message p-4 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto"
                                     data-markdown="{{ msg.content | escape }}"></div>
                                 <button onclick="copyToClipboard(this)" data-content="{{ msg.content | escape }}"
-                                    class="absolute -right-2 -bottom-2 opacity-0 group-hover:opacity-100 bg-white border border-gray-200 text-gray-500 rounded-full p-1.5 shadow-sm hover:text-violet-600 transition-all text-xs"
+                                    class="absolute -right-2 -bottom-2 opacity-0 group-hover:opacity-100 bg-white border border-gray-200 text-gray-500 rounded-full p-1.5 shadow-sm hover:text-primary-600 transition-all text-xs"
                                     title="Copy"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                         stroke-linecap="round" stroke-linejoin="round">
@@ -355,7 +355,7 @@
                             <textarea id="chat-input" rows="1" placeholder="Ask a question..." required
                                 class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none overflow-hidden min-h-[40px] max-h-[120px] leading-relaxed"></textarea>
                             <button type="submit"
-                                class="px-5 py-2 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all self-end h-[40px]">Send</button>
+                                class="px-5 py-2 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-gray-900 shadow-sm transition-all self-end h-[40px]">Send</button>
                         </form>
                     </div>
                 </div>
@@ -370,10 +370,10 @@
             onclick="document.getElementById('archive-body').classList.toggle('hidden')">
             <h2 class="text-lg font-extrabold text-[#1d1d1f] flex items-center gap-2">
                 🗃️ Archived Study Decks
-                <span class="text-xs font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{{
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{{
                     archived_notes|length + archived_quizzes|length }}</span>
             </h2>
-            <span class="text-gray-400 text-xs font-medium">Click to expand/collapse</span>
+            <span class="text-gray-500 text-xs font-medium">Click to expand/collapse</span>
         </div>
         <div id="archive-body" class="hidden space-y-4">
             {% for note in archived_notes %}
@@ -382,9 +382,9 @@
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 mb-1">
                         <span
-                            class="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Archived
+                            class="text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Archived
                             Note</span>
-                        <span class="text-[10px] text-gray-400">{{ note.created_at }}</span>
+                        <span class="text-[10px] text-gray-500">{{ note.created_at }}</span>
                     </div>
                     <h4 class="font-bold text-sm text-gray-600 truncate">{{ note.title }}</h4>
                     <div class="text-xs text-gray-500 mt-1 line-clamp-2">{{ note.content[:200] }}...</div>
@@ -402,9 +402,9 @@
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 mb-1">
                         <span
-                            class="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Archived
+                            class="text-[10px] font-bold uppercase tracking-wider text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Archived
                             Quiz</span>
-                        <span class="text-[10px] text-gray-400">{{ quiz.created_at }}</span>
+                        <span class="text-[10px] text-gray-500">{{ quiz.created_at }}</span>
                     </div>
                     <h4 class="font-bold text-sm text-gray-600 truncate">{{ quiz.title }}</h4>
                 </div>
@@ -481,7 +481,7 @@
                 const userWrapper = document.createElement('div');
                 userWrapper.className = 'flex justify-end';
                 const userDiv = document.createElement('div');
-                userDiv.className = 'p-2.5 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm';
+                userDiv.className = 'p-2.5 rounded-2xl rounded-br-sm bg-[#0071e3] text-gray-900 text-sm max-w-[85%] break-words shadow-sm';
                 userDiv.innerText = message;
                 userWrapper.appendChild(userDiv);
                 chatBox.appendChild(userWrapper);
@@ -595,11 +595,11 @@
                     icon.innerText = '✅';
                     text.innerText = 'Completed';
                     btn.classList.remove('bg-white', 'text-[#1d1d1f]');
-                    btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-500');
+                    btn.classList.add('bg-emerald-500', 'text-gray-900', 'border-emerald-500');
                 } else {
                     icon.innerText = '⭕';
                     text.innerText = 'Mark Complete';
-                    btn.classList.remove('bg-emerald-500', 'text-white', 'border-emerald-500');
+                    btn.classList.remove('bg-emerald-500', 'text-gray-900', 'border-emerald-500');
                     btn.classList.add('bg-white', 'text-[#1d1d1f]');
                 }
             }
@@ -629,7 +629,7 @@
             if (pre.querySelector('.copy-code-btn')) return;
             pre.style.position = 'relative';
             const btn = document.createElement('button');
-            btn.className = 'copy-code-btn absolute top-2 right-2 bg-gray-700/50 hover:bg-gray-700 text-white p-1.5 rounded transition-colors shadow-sm';
+            btn.className = 'copy-code-btn absolute top-2 right-2 bg-gray-700/50 hover:bg-gray-700 text-gray-900 p-1.5 rounded transition-colors shadow-sm';
             btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
             btn.onclick = () => {
                 const codeNode = pre.querySelector('code');

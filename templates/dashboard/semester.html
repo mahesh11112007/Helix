@@ -19,7 +19,7 @@
         <form action="{{ url_for('dashboard.add_subject', sem_id=semester.id) }}" method="POST" class="flex flex-wrap items-center gap-3">
             <input type="text" name="name" placeholder="Subject Name (e.g. DBMS)" required class="px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
             <input type="text" name="code" placeholder="Subject Code" class="px-4 py-2 rounded-full bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20 text-[#1d1d1f] transition-all">
-            <button type="submit" class="px-5 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-white shadow-sm transition-all flex items-center">
+            <button type="submit" class="px-5 py-2 rounded-full bg-[#0071e3] hover:bg-[#0077ed] text-sm font-semibold text-gray-900 shadow-sm transition-all flex items-center">
                 <i data-lucide="plus" class="w-4 h-4 mr-1"></i> Add Subject
             </button>
         </form>
@@ -43,7 +43,7 @@
     {% else %}
         <div class="text-center py-12 border-2 border-dashed border-gray-200 bg-gray-50 rounded-2xl">
             <p class="text-gray-500 font-medium mb-1">No subjects found in this semester.</p>
-            <p class="text-xs text-gray-400">Create subjects manually above or import using a course syllabus.</p>
+            <p class="text-xs text-gray-500">Create subjects manually above or import using a course syllabus.</p>
         </div>
     {% endif %}
 </div>

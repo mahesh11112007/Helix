@@ -7,7 +7,7 @@
     <div class="text-sm opacity-70 text-left">
         <a href="{{ url_for('dashboard.index') }}" class="hover:underline">Dashboard</a> &rarr; 
         <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id) }}" class="hover:underline">{{ topic.name }}</a> &rarr;
-        <span class="font-bold text-violet-400">Flashcard Review</span>
+        <span class="font-bold text-primary-400">Flashcard Review</span>
     </div>
 
     <!-- Active Card Container -->
@@ -38,7 +38,7 @@
             <button id="prev-btn" onclick="prevCard()" class="px-6 py-3 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 text-sm font-bold border border-gray-200 transition-all shadow-sm opacity-50 cursor-not-allowed" disabled>
                 &larr; Previous
             </button>
-            <button id="next-btn" onclick="nextCard()" class="px-6 py-3 rounded-full bg-[#0071e3]/10 text-[#0071e3] hover:bg-[#0071e3] hover:text-white text-sm font-bold border border-[#0071e3]/20 transition-all shadow-sm">
+            <button id="next-btn" onclick="nextCard()" class="px-6 py-3 rounded-full bg-[#0071e3]/10 text-[#0071e3] hover:bg-[#0071e3] hover:text-gray-900 text-sm font-bold border border-[#0071e3]/20 transition-all shadow-sm">
                 Next Card &rarr;
             </button>
         </div>

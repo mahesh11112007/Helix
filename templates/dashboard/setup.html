@@ -2,9 +2,9 @@
 {% block title %}Setup Your Syllabus - KiraakStudy AI{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto mt-12 bg-[#1A1A1A] p-8 rounded-2xl shadow-lg border border-[#333]">
-    <h2 class="text-3xl font-semibold mb-2 text-white">Let's set up your syllabus</h2>
-    <p class="text-gray-400 mb-8">Select your course details to automatically load your entire syllabus, subjects, and topics.</p>
+<div class="max-w-2xl mx-auto mt-12 bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
+    <h2 class="text-3xl font-semibold mb-2 text-gray-900">Let's set up your syllabus</h2>
+    <p class="text-gray-500 mb-8">Select your course details to automatically load your entire syllabus, subjects, and topics.</p>
 
     <form method="POST" action="{{ url_for('dashboard.setup') }}" class="space-y-6" onsubmit="
         const btn = document.getElementById('submitBtn');
@@ -13,14 +13,14 @@
         btn.innerHTML = '⚙️ Importing Syllabus... ~5s';
         
         const toast = document.createElement('div');
-        toast.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white px-6 py-4 rounded-xl shadow-lg flex flex-col gap-1 z-50 animate-bounce';
+        toast.className = 'fixed bottom-4 right-4 bg-primary-600 text-gray-900 px-6 py-4 rounded-xl shadow-lg flex flex-col gap-1 z-50 animate-bounce';
         toast.innerHTML = '<div class=\\'font-bold text-sm flex items-center gap-2\\'><svg class=\\'animate-spin h-4 w-4\\' viewBox=\\'0 0 24 24\\'><circle class=\\'opacity-25\\' cx=\\'12\\' cy=\\'12\\' r=\\'10\\' stroke=\\'currentColor\\' stroke-width=\\'4\\' fill=\\'none\\'></circle><path class=\\'opacity-75\\' fill=\\'currentColor\\' d=\\'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z\\'></path></svg> Importing Syllabus...</div><div class=\\'text-xs opacity-80\\'>Estimated time: ~5s</div>';
         document.body.appendChild(toast);
     ">
         
         <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Education Level</label>
-            <select id="education" name="education" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors appearance-none">
+            <label class="block text-sm font-medium text-gray-600 mb-2">Education Level</label>
+            <select id="education" name="education" required class="w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-primary-500 transition-colors appearance-none">
                 <option value="">Select Education</option>
                 {% for edu in educations %}
                 <option value="{{ edu.id }}">{{ edu.name }}</option>
@@ -29,27 +29,27 @@
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Board / University</label>
-            <select id="board" name="board" required disabled class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none">
+            <label class="block text-sm font-medium text-gray-600 mb-2">Board / University</label>
+            <select id="board" name="board" required disabled class="w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-primary-500 transition-colors disabled:opacity-50 appearance-none">
                 <option value="">Select Board</option>
             </select>
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Year / Semester</label>
-            <select id="year" name="year" required disabled class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none">
+            <label class="block text-sm font-medium text-gray-600 mb-2">Year / Semester</label>
+            <select id="year" name="year" required disabled class="w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-primary-500 transition-colors disabled:opacity-50 appearance-none">
                 <option value="">Select Year</option>
             </select>
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Group / Branch</label>
-            <select id="group" name="group" required disabled class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors disabled:opacity-50 appearance-none">
+            <label class="block text-sm font-medium text-gray-600 mb-2">Group / Branch</label>
+            <select id="group" name="group" required disabled class="w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-primary-500 transition-colors disabled:opacity-50 appearance-none">
                 <option value="">Select Group</option>
             </select>
         </div>
 
-        <button type="submit" id="submitBtn" disabled class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        <button type="submit" id="submitBtn" disabled class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             Load My Syllabus
         </button>
     </form>
