@@ -37,6 +37,7 @@ def dashboard():
         
     if request.method == "POST":
         keys_to_save = {
+            "BACKGROUND_KEY_PERCENTAGE": request.form.get("background_key_percentage", "50").strip(),
             "GEMINI_API_KEYS": request.form.get("gemini_keys", "").strip(),
             "NVIDIA_NIM_API_KEYS": request.form.get("nvidia_keys", "").strip(),
             "GROQ_API_KEYS": request.form.get("groq_keys", "").strip(),

@@ -27,10 +27,11 @@ class AIService:
         self._key_index = 0
 
 
-    def get_prioritized_configs(self):
+    def get_prioritized_configs(self, task_type="live"):
         """
         Returns a strict priority list of API configurations (key, base_url, chat_model, vision_model, platform)
         Priority: Gemini -> Groq -> Cerebras -> OpenRouter
+        Supports intelligent load balancing based on BACKGROUND_KEY_PERCENTAGE.
         """
         from flask import session
         from services.db_service import db_service
@@ -49,10 +50,16 @@ class AIService:
         
         # Load keys from DB and Env
         combined = []
+        bg_percentage = 50
         try:
             rows = db_service.query("SELECT key_name, key_value FROM system_settings")
             if rows:
                 for row in rows:
+                    if row["key_name"] == "BACKGROUND_KEY_PERCENTAGE" and row["key_value"]:
+                        try:
+                            bg_percentage = int(row["key_value"])
+                        except ValueError:
+                            pass
                     if row["key_name"] in allowed_db_keys and row["key_value"]:
                         val = row["key_value"].strip()
                         if val and "your_" not in val.lower() and "replace" not in val.lower():
@@ -103,16 +110,38 @@ class AIService:
         for k in all_keys:
             all_keys[k] = list(set(all_keys[k]))
             
-        # Priority Order: Gemini -> Groq -> Cerebras -> OpenRouter
+        # Priority Order: Gemini -> Groq -> Cerebras -> OpenRouter -> Nvidia -> OpenAI
         priority_order = ["gemini", "groq", "cerebras", "openrouter", "nvidia", "openai"]
         
-        configs = []
+        all_ordered_keys = []
         for plat in priority_order:
             for key in all_keys[plat]:
-                cfg = self._get_config_for_key(key, plat)
-                if cfg:
-                    configs.append(cfg)
-                    
+                all_ordered_keys.append({"key": key, "platform": plat})
+                
+        total_keys = len(all_ordered_keys)
+        if total_keys == 0:
+            return []
+            
+        bg_count = max(1, int(total_keys * (bg_percentage / 100.0))) if bg_percentage > 0 else 0
+        live_count = total_keys - bg_count
+        
+        # If there's only 1 key, both live and background have to share it to avoid breaking
+        if total_keys == 1:
+            bg_keys = all_ordered_keys
+            live_keys = all_ordered_keys
+        else:
+            # Top tier keys for live, bottom tier for background
+            live_keys = all_ordered_keys[:live_count] if live_count > 0 else []
+            bg_keys = all_ordered_keys[live_count:] if bg_count > 0 else []
+            
+        selected_keys = bg_keys if task_type == "background" else live_keys
+        
+        configs = []
+        for item in selected_keys:
+            cfg = self._get_config_for_key(item["key"], item["platform"])
+            if cfg:
+                configs.append(cfg)
+                
         return configs
 
     def _get_config_for_key(self, key, platform):
@@ -132,7 +161,7 @@ class AIService:
 
     def _get_config(self):
         """Restored for backward compatibility with methods not yet refactored to use get_prioritized_configs."""
-        configs = self.get_prioritized_configs()
+        configs = self.get_prioritized_configs(task_type="live")
         if configs:
             cfg = configs[0]
             # Returns: key, base_url, chat_model, vision_model
@@ -768,13 +797,13 @@ Other Subjects:
 - Use examples and analogies whenever they improve understanding.
 - Expand difficult concepts instead of summarizing them."""
 
-    def _generate_partial(self, prompt, max_tokens=4096, retries=5, key=None, base_url=None, chat_model=None, custom_instr=""):
+    def _generate_partial(self, prompt, max_tokens=4096, retries=5, key=None, base_url=None, chat_model=None, custom_instr="", task_type="live"):
         """Call the LLM API with strict priority fallback and robust JSON extraction."""
         import requests
         import time
         import json
         
-        configs = self.get_prioritized_configs()
+        configs = self.get_prioritized_configs(task_type=task_type)
         if not configs:
             return {}
             

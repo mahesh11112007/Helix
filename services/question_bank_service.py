@@ -48,8 +48,8 @@ class QuestionBankService:
                     except Exception as e:
                         from services.ai_service import RateLimitExhaustedError
                         if isinstance(e, RateLimitExhaustedError):
-                            print(f"[QuestionBank] Rate Limit Exhausted across all providers! Queueing for 10 minutes...")
-                            time.sleep(600)
+                            print(f"[QuestionBank] Rate Limit Exhausted across all allocated Background providers! Queueing for 60 minutes...")
+                            time.sleep(3600)
                         else:
                             print(f"[QuestionBank] Error generating questions for {topic['topic_name']}: {e}")
                     
@@ -77,7 +77,7 @@ class QuestionBankService:
         """
         
         try:
-            response = ai_service._generate_partial(prompt)
+            response = ai_service._generate_partial(prompt, task_type="background")
             if response and isinstance(response, dict) and "questions" in response:
                 questions = response.get("questions", [])
                 for q in questions:

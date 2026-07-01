@@ -230,6 +230,20 @@
         <div class="glass-card bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100">
             <form action="{{ url_for('admin.dashboard') }}" method="POST" class="space-y-6">
                 
+                <!-- Allocation Settings -->
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                    <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4 text-primary-500"></i> Background Task Key Allocation
+                    </label>
+                    <p class="text-xs text-gray-500 mb-4">Set the percentage of your total API keys that should be strictly reserved for background generation tasks (like building the Question Bank). The remaining keys will be reserved for Live Users. We recommend 50%.</p>
+                    <div class="flex items-center gap-4">
+                        <input type="range" name="background_key_percentage" min="0" max="100" value="{{ settings.get('BACKGROUND_KEY_PERCENTAGE', '50') }}" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600" oninput="document.getElementById('alloc-val').innerText = this.value + '%'">
+                        <span id="alloc-val" class="font-bold text-primary-700 w-12 text-right">{{ settings.get('BACKGROUND_KEY_PERCENTAGE', '50') }}%</span>
+                    </div>
+                </div>
+                
+                <hr class="border-gray-100">
+
                 <!-- Gemini Keys -->
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
