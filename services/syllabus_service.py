@@ -3,8 +3,13 @@ import os
 from collections import defaultdict
 
 class SyllabusService:
-    def __init__(self, data_dir="data/syllabus"):
-        self.data_dir = data_dir
+    def __init__(self, data_dir=None):
+        if data_dir is None:
+            # Construct absolute path relative to this file's location
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            self.data_dir = os.path.join(base_dir, "data", "syllabus")
+        else:
+            self.data_dir = data_dir
 
     PRETTY_NAMES = {
         "intermediate": "Intermediate",
