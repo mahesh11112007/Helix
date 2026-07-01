@@ -14,9 +14,9 @@
 
     <!-- Tabs Navigation -->
     <div class="flex overflow-x-auto gap-2 mb-6 border-b border-gray-200 pb-2 custom-scrollbar">
-        <button onclick="switchTab('proofs-tab')" id="nav-proofs-tab" class="tab-btn active px-4 py-2 rounded-xl text-sm font-semibold bg-violet-50 text-violet-700 transition-all whitespace-nowrap flex items-center gap-2">
+        <button onclick="switchTab('proofs-tab')" id="nav-proofs-tab" class="tab-btn active px-4 py-2 rounded-xl text-sm font-semibold bg-primary-50 text-primary-700 transition-all whitespace-nowrap flex items-center gap-2">
             <i data-lucide="receipt" class="w-4 h-4"></i> Payment Proofs
-            {% if proofs|length > 0 %}<span class="bg-violet-600 text-white text-xs px-2 py-0.5 rounded-full">{{ proofs|length }}</span>{% endif %}
+            {% if proofs|length > 0 %}<span class="bg-primary-600 text-white text-xs px-2 py-0.5 rounded-full">{{ proofs|length }}</span>{% endif %}
         </button>
         <button onclick="switchTab('requests-tab')" id="nav-requests-tab" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold text-gray-500 hover:bg-gray-50 hover:text-[#1d1d1f] transition-all whitespace-nowrap flex items-center gap-2">
             <i data-lucide="message-square" class="w-4 h-4"></i> Support Requests
@@ -35,7 +35,7 @@
         <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
             <div class="p-6 border-b border-gray-100 bg-gray-50/50">
                 <h2 class="text-xl font-bold font-outfit text-[#1d1d1f] flex items-center gap-2">
-                    <i data-lucide="receipt" class="w-5 h-5 text-violet-500"></i> Pending & Recent Proofs
+                    <i data-lucide="receipt" class="w-5 h-5 text-primary-500"></i> Pending & Recent Proofs
                 </h2>
             </div>
             {% if proofs and proofs|length > 0 %}
@@ -53,13 +53,13 @@
                     <tbody class="divide-y divide-gray-100">
                         {% for proof in proofs %}
                         <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="py-4 px-6 text-sm text-gray-500 whitespace-nowrap">{{ proof.created_at[:16] }}</td>
+                            <td class="py-4 px-6 text-sm text-gray-500 whitespace-nowrap">{{ (proof.created_at|string)[:16] }}</td>
                             <td class="py-4 px-6">
                                 <div class="font-medium text-[#1d1d1f]">{{ proof.full_name or 'No Name' }}</div>
                                 <div class="text-xs text-gray-500">{{ proof.email }}</div>
                             </td>
                             <td class="py-4 px-6">
-                                <a href="{{ url_for('static', filename=proof.file_path.replace('static/', '')) if proof.file_path.startswith('static/') else url_for('files.download_file', file_id=proof.file_path) }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-violet-600 font-medium hover:underline">
+                                <a href="{{ url_for('static', filename=proof.file_path.replace('static/', '')) if proof.file_path.startswith('static/') else url_for('files.download_file', file_id=proof.file_path) }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-primary-600 font-medium hover:underline">
                                     <i data-lucide="image" class="w-4 h-4"></i> View Image
                                 </a>
                             </td>
@@ -83,7 +83,7 @@
                                     </form>
                                 </div>
                                 {% else %}
-                                <span class="text-sm text-gray-400">Resolved</span>
+                                <span class="text-sm text-gray-500">Resolved</span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -93,7 +93,7 @@
             </div>
             {% else %}
             <div class="p-12 text-center">
-                <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 text-gray-400">
+                <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 text-gray-500">
                     <i data-lucide="check-circle" class="w-8 h-8"></i>
                 </div>
                 <h3 class="text-lg font-bold text-[#1d1d1f] mb-1">All Caught Up!</h3>
@@ -108,7 +108,7 @@
         <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
             <div class="p-6 border-b border-gray-100 bg-gray-50/50">
                 <h2 class="text-xl font-bold font-outfit text-[#1d1d1f] flex items-center gap-2">
-                    <i data-lucide="message-square" class="w-5 h-5 text-blue-500"></i> Genuine Support Requests
+                    <i data-lucide="message-square" class="w-5 h-5 text-primary-500"></i> Genuine Support Requests
                 </h2>
                 <p class="text-xs text-gray-500 mt-1">Filtered by AI triage.</p>
             </div>
@@ -118,12 +118,12 @@
                 <div class="p-6 hover:bg-gray-50/50 transition-colors">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                            <div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold">
                                 {{ req.full_name[0]|upper if req.full_name else 'U' }}
                             </div>
                             <div>
                                 <h3 class="font-bold text-[#1d1d1f] text-sm">{{ req.full_name or 'Unknown User' }}</h3>
-                                <p class="text-xs text-gray-500">{{ req.email }} â€¢ {{ req.created_at[:16] }}</p>
+                                <p class="text-xs text-gray-500">{{ req.email }} â€¢ {{ (req.created_at|string)[:16] }}</p>
                             </div>
                         </div>
                         {% if req.status == 'open' %}
@@ -141,18 +141,18 @@
                             <strong>User Message:</strong><br/>
                             {{ req.message }}
                         </div>
-                        <div class="bg-blue-50/50 p-4 rounded-xl text-sm text-gray-700 border border-blue-100">
+                        <div class="bg-primary-50/50 p-4 rounded-xl text-sm text-gray-700 border border-primary-100">
                             <strong>AI Triage Response:</strong><br/>
                             {{ req.ai_response }}
                         </div>
                         {% if req.status == 'open' %}
                         <form action="{{ url_for('admin.reply_request', request_id=req.id) }}" method="POST" class="mt-4 border-t border-gray-100 pt-4">
                             <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                <i data-lucide="mail" class="w-4 h-4 text-blue-500"></i> Reply via Email (Resend)
+                                <i data-lucide="mail" class="w-4 h-4 text-primary-500"></i> Reply via Email (Resend)
                             </label>
-                            <textarea name="reply_message" rows="3" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all text-[#1d1d1f] resize-y" placeholder="Type your response to the user here... This will be sent as an email and mark the request as resolved." required></textarea>
+                            <textarea name="reply_message" rows="3" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all text-[#1d1d1f] resize-y" placeholder="Type your response to the user here... This will be sent as an email and mark the request as resolved." required></textarea>
                             <div class="mt-3 flex justify-end">
-                                <button type="submit" class="px-5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold transition-all shadow-md flex items-center gap-2">
+                                <button type="submit" class="px-5 py-2 rounded-xl bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold transition-all shadow-md flex items-center gap-2">
                                     <i data-lucide="send" class="w-4 h-4"></i> Send Email & Close Request
                                 </button>
                             </div>
@@ -164,7 +164,7 @@
             </div>
             {% else %}
             <div class="p-12 text-center">
-                <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 text-gray-400">
+                <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 text-gray-500">
                     <i data-lucide="inbox" class="w-8 h-8"></i>
                 </div>
                 <h3 class="text-lg font-bold text-[#1d1d1f] mb-1">Inbox Zero</h3>
@@ -179,7 +179,7 @@
         <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100 overflow-hidden">
             <div class="p-6 border-b border-gray-100 bg-gray-50/50">
                 <h2 class="text-xl font-bold font-outfit text-[#1d1d1f] flex items-center gap-2">
-                    <i data-lucide="users" class="w-5 h-5 text-fuchsia-500"></i> Manage Users
+                    <i data-lucide="users" class="w-5 h-5 text-primary-500"></i> Manage Users
                 </h2>
                 <p class="text-xs text-gray-500 mt-1">Passwords are securely hashed. Reset passwords via email if requested.</p>
             </div>
@@ -201,11 +201,11 @@
                                 <div class="text-xs text-gray-500">{{ user.email }}</div>
                             </td>
                             <td class="py-4 px-6">
-                                <span class="px-2.5 py-1 rounded-full text-xs font-medium capitalize {% if user.subscription_tier == 'premium' %}bg-violet-100 text-violet-700{% else %}bg-gray-100 text-gray-700{% endif %}">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-medium capitalize {% if user.subscription_tier == 'premium' %}bg-primary-100 text-primary-700{% else %}bg-gray-100 text-gray-700{% endif %}">
                                     {{ user.subscription_tier }}
                                 </span>
                             </td>
-                            <td class="py-4 px-6 text-sm text-gray-500">{{ user.created_at[:10] }}</td>
+                            <td class="py-4 px-6 text-sm text-gray-500">{{ (user.created_at|string)[:10] }}</td>
                             <td class="py-4 px-6 text-right">
                                 <form action="{{ url_for('admin.reset_password', user_id=user.id) }}" method="POST" onsubmit="return confirm('Send a password reset email to {{ user.email }}?');">
                                     <button class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-[#1d1d1f] rounded-lg text-sm font-semibold transition-colors">
@@ -229,10 +229,10 @@
                 <!-- Gemini Keys -->
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                        <i data-lucide="sparkles" class="w-4 h-4 text-blue-500"></i> Gemini API Keys
+                        <i data-lucide="sparkles" class="w-4 h-4 text-primary-500"></i> Gemini API Keys
                     </label>
                     <p class="text-xs text-gray-500 mb-3">Paste your Google Gemini keys here, separated by commas (e.g., <code class="bg-gray-100 px-1 rounded">AIzaSy..., AIzaSy...</code>)</p>
-                    <textarea name="gemini_keys" rows="3" class="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all font-mono text-gray-600 resize-y">{{ settings.get('GEMINI_API_KEYS', '') }}</textarea>
+                    <textarea name="gemini_keys" rows="3" class="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all font-mono text-gray-600 resize-y">{{ settings.get('GEMINI_API_KEYS', '') }}</textarea>
                 </div>
                 
                 <hr class="border-gray-100">
@@ -243,7 +243,7 @@
                         <i data-lucide="cpu" class="w-4 h-4 text-green-500"></i> NVIDIA NIM API Keys
                     </label>
                     <p class="text-xs text-gray-500 mb-3">Paste your NVIDIA NIM keys here, separated by commas (e.g., <code class="bg-gray-100 px-1 rounded">nvapi-..., nvapi-...</code>)</p>
-                    <textarea name="nvidia_keys" rows="3" class="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all font-mono text-gray-600 resize-y">{{ settings.get('NVIDIA_NIM_API_KEYS', '') }}</textarea>
+                    <textarea name="nvidia_keys" rows="3" class="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all font-mono text-gray-600 resize-y">{{ settings.get('NVIDIA_NIM_API_KEYS', '') }}</textarea>
                 </div>
 
                 <hr class="border-gray-100">
@@ -251,10 +251,10 @@
                 <!-- Groq Keys -->
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                        <i data-lucide="zap" class="w-4 h-4 text-orange-500"></i> Groq API Keys
+                        <i data-lucide="zap" class="w-4 h-4 text-accent-500"></i> Groq API Keys
                     </label>
                     <p class="text-xs text-gray-500 mb-3">Paste your Groq keys here, separated by commas (e.g., <code class="bg-gray-100 px-1 rounded">gsk_..., gsk_...</code>)</p>
-                    <textarea name="groq_keys" rows="3" class="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all font-mono text-gray-600 resize-y">{{ settings.get('GROQ_API_KEYS', '') }}</textarea>
+                    <textarea name="groq_keys" rows="3" class="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all font-mono text-gray-600 resize-y">{{ settings.get('GROQ_API_KEYS', '') }}</textarea>
                 </div>
 
                 <hr class="border-gray-100">
@@ -262,14 +262,14 @@
                 <!-- OpenRouter Keys -->
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                        <i data-lucide="globe" class="w-4 h-4 text-indigo-500"></i> OpenRouter API Keys
+                        <i data-lucide="globe" class="w-4 h-4 text-primary-500"></i> OpenRouter API Keys
                     </label>
                     <p class="text-xs text-gray-500 mb-3">Paste your OpenRouter keys here, separated by commas (e.g., <code class="bg-gray-100 px-1 rounded">sk-or-..., sk-or-...</code>)</p>
-                    <textarea name="openrouter_keys" rows="3" class="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all font-mono text-gray-600 resize-y">{{ settings.get('OPENROUTER_API_KEYS', '') }}</textarea>
+                    <textarea name="openrouter_keys" rows="3" class="w-full px-5 py-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all font-mono text-gray-600 resize-y">{{ settings.get('OPENROUTER_API_KEYS', '') }}</textarea>
                 </div>
 
                 <div class="pt-4">
-                    <button type="submit" class="w-full py-4 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold transition-all shadow-md shadow-violet-500/25 flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full py-4 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold transition-all shadow-md shadow-primary-500/25 flex items-center justify-center gap-2">
                         <i data-lucide="save" class="w-5 h-5"></i> Save All Keys to Database
                     </button>
                 </div>
@@ -281,9 +281,9 @@
 
     <!-- Syllabus Tab -->
     <div id="syllabus-tab" class="tab-content hidden">
-        <div class="glass-card bg-[#1A1A1A] p-8 rounded-3xl border border-[#333] shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
-            <h2 class="text-2xl font-bold text-white mb-2">Upload Syllabus PDF</h2>
-            <p class="text-gray-400 text-sm mb-6">Upload a raw syllabus PDF to automatically parse and insert it into the global database structure.</p>
+        <div class="glass-card bg-white p-8 rounded-3xl border border-gray-200 shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Upload Syllabus PDF</h2>
+            <p class="text-gray-500 text-sm mb-6">Upload a raw syllabus PDF to automatically parse and insert it into the global database structure.</p>
 
             <form method="POST" action="{{ url_for('admin.upload_syllabus') }}" enctype="multipart/form-data" class="space-y-5" onsubmit="
                 const btn = document.getElementById('submitBtn');
@@ -292,31 +292,31 @@
                 btn.innerHTML = '⚙️ AI is processing PDF... ~20s';
             ">
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Education Level (e.g. "Diploma")</label>
-                    <input type="text" name="education" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="Diploma">
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Education Level (e.g. "Diploma")</label>
+                    <input type="text" name="education" required class="w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-primary-500 transition-colors" placeholder="Diploma">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Board (e.g. "SBTET TG")</label>
-                    <input type="text" name="board" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="SBTET TG">
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Board (e.g. "SBTET TG")</label>
+                    <input type="text" name="board" required class="w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-primary-500 transition-colors" placeholder="SBTET TG">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Semester / Year (e.g. "c24_1st_sem")</label>
-                    <input type="text" name="year" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="c24_1st_sem">
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Semester / Year (e.g. "c24_1st_sem")</label>
+                    <input type="text" name="year" required class="w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-primary-500 transition-colors" placeholder="c24_1st_sem">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Group / Branch (e.g. "EEE")</label>
-                    <input type="text" name="group" required class="w-full bg-[#242424] text-white border border-[#333] rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="EEE">
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Group / Branch (e.g. "EEE")</label>
+                    <input type="text" name="group" required class="w-full bg-gray-50 text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:border-primary-500 transition-colors" placeholder="EEE">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-300 mb-2">Upload Syllabus PDF</label>
-                    <input type="file" name="pdf_file" accept=".pdf" required class="w-full text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700">
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Upload Syllabus PDF</label>
+                    <input type="file" name="pdf_file" accept=".pdf" required class="w-full text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700">
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors mt-2">
+                <button type="submit" id="submitBtn" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-lg transition-colors mt-2">
                     Upload and Parse PDF
                 </button>
             </form>
@@ -333,7 +333,7 @@ function switchTab(tabId) {
     
     // Reset all tab buttons
     document.querySelectorAll('.tab-btn').forEach(el => {
-        el.classList.remove('bg-violet-50', 'text-violet-700');
+        el.classList.remove('bg-primary-50', 'text-primary-700');
         el.classList.add('text-gray-500', 'hover:bg-gray-50', 'hover:text-[#1d1d1f]');
     });
     
@@ -347,7 +347,7 @@ function switchTab(tabId) {
     // Highlight selected button
     const btn = document.getElementById('nav-' + tabId);
     if(btn) {
-        btn.classList.add('bg-violet-50', 'text-violet-700');
+        btn.classList.add('bg-primary-50', 'text-primary-700');
         btn.classList.remove('text-gray-500', 'hover:bg-gray-50', 'hover:text-[#1d1d1f]');
     }
 }

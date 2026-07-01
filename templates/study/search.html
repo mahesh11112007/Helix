@@ -24,7 +24,7 @@
                 autofocus
                 class="flex-1 px-3 py-3 bg-transparent text-base focus:outline-none placeholder:opacity-40"
             >
-            <button type="submit" class="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-sm font-bold text-white transition shrink-0">
+            <button type="submit" class="px-6 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-sm font-bold text-white transition shrink-0">
                 Search
             </button>
         </div>
@@ -37,14 +37,14 @@
             {% if results.subjects %}
             <div>
                 <h2 class="text-lg font-bold mb-4 flex items-center gap-2 font-outfit">
-                    <span class="w-8 h-8 rounded-lg bg-violet-600/20 flex items-center justify-center text-sm">📚</span>
+                    <span class="w-8 h-8 rounded-lg bg-primary-600/20 flex items-center justify-center text-sm">📚</span>
                     Subjects
                     <span class="text-xs opacity-50 font-normal ml-1">({{ results.subjects|length }})</span>
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {% for subject in results.subjects %}
-                    <a href="/subject/{{ subject.id }}" class="glass-card p-4 rounded-xl border border-white/5 hover:border-violet-500/30 hover:shadow-lg hover:shadow-violet-500/5 transition-all duration-200 group block">
-                        <h3 class="font-bold text-violet-300 group-hover:text-violet-200 transition">{{ subject.name }}</h3>
+                    <a href="/subject/{{ subject.id }}" class="glass-card p-4 rounded-xl border border-white/5 hover:border-primary-500/30 hover:shadow-lg hover:shadow-primary-500/5 transition-all duration-200 group block">
+                        <h3 class="font-bold text-primary-300 group-hover:text-primary-200 transition">{{ subject.name }}</h3>
                         {% if subject.semester_name %}
                         <span class="text-xs opacity-50 mt-1 block">{{ subject.semester_name }}</span>
                         {% endif %}
@@ -58,14 +58,14 @@
             {% if results.topics %}
             <div>
                 <h2 class="text-lg font-bold mb-4 flex items-center gap-2 font-outfit">
-                    <span class="w-8 h-8 rounded-lg bg-indigo-600/20 flex items-center justify-center text-sm">📖</span>
+                    <span class="w-8 h-8 rounded-lg bg-primary-600/20 flex items-center justify-center text-sm">📖</span>
                     Topics
                     <span class="text-xs opacity-50 font-normal ml-1">({{ results.topics|length }})</span>
                 </h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {% for topic in results.topics %}
-                    <a href="/topic/{{ topic.id }}" class="glass-card p-4 rounded-xl border border-white/5 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-200 group block">
-                        <h3 class="font-bold text-indigo-300 group-hover:text-indigo-200 transition">{{ topic.name }}</h3>
+                    <a href="/topic/{{ topic.id }}" class="glass-card p-4 rounded-xl border border-white/5 hover:border-primary-500/30 hover:shadow-lg hover:shadow-primary-500/5 transition-all duration-200 group block">
+                        <h3 class="font-bold text-primary-300 group-hover:text-primary-200 transition">{{ topic.name }}</h3>
                         {% if topic.subject_name %}
                         <span class="text-xs opacity-50 mt-1 block">{{ topic.subject_name }}</span>
                         {% endif %}
@@ -100,7 +100,7 @@
             {% if results.files %}
             <div>
                 <h2 class="text-lg font-bold mb-4 flex items-center gap-2 font-outfit">
-                    <span class="w-8 h-8 rounded-lg bg-amber-600/20 flex items-center justify-center text-sm">📁</span>
+                    <span class="w-8 h-8 rounded-lg bg-accent-600/20 flex items-center justify-center text-sm">📁</span>
                     Files
                     <span class="text-xs opacity-50 font-normal ml-1">({{ results.files|length }})</span>
                 </h2>
@@ -108,9 +108,9 @@
                     {% for file in results.files %}
                     <div class="glass-card p-4 rounded-xl border border-white/5">
                         <div class="flex items-center gap-3">
-                            <span class="w-10 h-10 rounded-lg bg-amber-600/20 flex items-center justify-center text-lg shrink-0">📄</span>
+                            <span class="w-10 h-10 rounded-lg bg-accent-600/20 flex items-center justify-center text-lg shrink-0">📄</span>
                             <div class="min-w-0">
-                                <h3 class="font-bold text-amber-300 text-sm truncate">{{ file.name }}</h3>
+                                <h3 class="font-bold text-accent-300 text-sm truncate">{{ file.name }}</h3>
                                 {% if file.file_type %}
                                 <span class="text-[10px] uppercase opacity-50 font-bold">{{ file.file_type }}</span>
                                 {% endif %}

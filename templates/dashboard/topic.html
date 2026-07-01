@@ -104,7 +104,7 @@
             </div>
             <h1 class="text-2xl font-bold text-[#1d1d1f] flex items-center gap-3">
                 {{ topic.name }}
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">Intermediate</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-500/20 text-primary-400 border border-primary-500/30">Intermediate</span>
             </h1>
         </div>
         
@@ -206,7 +206,7 @@
                     </form>
                     
                     {% if flashcards %}
-                    <a href="{{ url_for('study.review_flashcards', topic_id=topic.id) }}" class="mt-2 w-full text-left px-4 py-3 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 font-bold flex items-center justify-between group transition-all">
+                    <a href="{{ url_for('study.review_flashcards', topic_id=topic.id) }}" class="mt-2 w-full text-left px-4 py-3 rounded-xl bg-primary-500/10 hover:bg-primary-500/20 border border-primary-500/30 text-primary-400 font-bold flex items-center justify-between group transition-all">
                         <span class="flex items-center gap-3"><span>⚡</span> Flashcards ({{ flashcards | length }})</span>
                         <span>Play</span>
                     </a>
@@ -246,7 +246,7 @@
                         {% for msg in chat_history %}
                         {% if msg.role == 'user' %}
                         <div class="flex justify-end">
-                            <div class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-white text-sm max-w-[85%] break-words shadow-sm">{{ msg.content }}</div>
+                            <div class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-gray-900 text-sm max-w-[85%] break-words shadow-sm">{{ msg.content }}</div>
                         </div>
                         {% else %}
                         <div class="flex justify-start relative group">
@@ -267,7 +267,7 @@
                         <input type="hidden" id="chat-session-id" name="session_id" value="{{ active_session_id or '' }}">
                         <div class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl p-1">
                             <textarea id="chat-input" rows="1" placeholder="Ask a question..." required class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none min-h-[36px] max-h-[100px]"></textarea>
-                            <button type="submit" class="p-2 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] text-white transition-all shadow-sm">
+                            <button type="submit" class="p-2 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] text-gray-900 transition-all shadow-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                             </button>
                         </div>
@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="text-3xl mb-3">🤔</span>
                     <h4 class="text-[#1d1d1f] text-lg font-bold mb-2">Test Your Understanding</h4>
                     <p class="text-sm text-gray-500 mb-4">Take a quick pause to reflect on what you just learned.</p>
-                    <button onclick="generateMiniQuiz('${quizId}')" class="px-5 py-2.5 rounded-full bg-[#0071e3] text-white font-bold hover:bg-[#0077ed] transition-all shadow-sm">Start Quick Check</button>
+                    <button onclick="generateMiniQuiz('${quizId}')" class="px-5 py-2.5 rounded-full bg-[#0071e3] text-gray-900 font-bold hover:bg-[#0077ed] transition-all shadow-sm">Start Quick Check</button>
                 `;
                 container.appendChild(quiz);
             }

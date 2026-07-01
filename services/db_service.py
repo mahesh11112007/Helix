@@ -69,7 +69,7 @@ class DBService:
                 google_id TEXT UNIQUE,
                 last_active TEXT,
                 math_learning_level TEXT,
-                is_premium BOOLEAN DEFAULT 0,
+                is_premium BOOLEAN DEFAULT FALSE,
                 premium_request_status TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"""))
@@ -335,14 +335,20 @@ class DBService:
 
             # Clear stale completed/failed tasks on startup to prevent timezone layout loops
             try:
+                if self.use_postgres: cursor.execute("SAVEPOINT sp1")
                 cursor.execute("DELETE FROM background_tasks WHERE status IN ('completed', 'failed')")
+                if self.use_postgres: cursor.execute("RELEASE SAVEPOINT sp1")
             except Exception:
+                if self.use_postgres: cursor.execute("ROLLBACK TO SAVEPOINT sp1")
                 pass
                 
             # Migration: add math_learning_level to profiles if it doesn't exist
             try:
+                if self.use_postgres: cursor.execute("SAVEPOINT sp2")
                 cursor.execute("ALTER TABLE profiles ADD COLUMN math_learning_level TEXT")
+                if self.use_postgres: cursor.execute("RELEASE SAVEPOINT sp2")
             except Exception:
+                if self.use_postgres: cursor.execute("ROLLBACK TO SAVEPOINT sp2")
                 pass
                 
             conn.commit()

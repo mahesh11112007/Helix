@@ -29,12 +29,36 @@
         theme: {
           extend: {
             colors: {
-              primary: '#8b5cf6',
-              'primary-hover': '#7c3aed',
+              primary: {
+                50: '#eef0ff',
+                100: '#e0e4ff',
+                200: '#c7cdff',
+                300: '#a3aaff',
+                400: '#7e7dff',
+                500: '#5c54ff',
+                600: '#4848e5',
+                700: '#3d3ddb',
+                800: '#3232bb',
+                900: '#2c2d93',
+                950: '#1a1a54',
+              },
+              accent: {
+                50: '#fff6ec',
+                100: '#ffecd3',
+                200: '#ffd3a5',
+                300: '#ffb26d',
+                400: '#ff8a00',
+                500: '#fa6c00',
+                600: '#e55300',
+                700: '#be3a02',
+                800: '#972f09',
+                900: '#7a280c',
+                950: '#421104',
+              },
             },
             fontFamily: {
-              sans: ['Inter', 'Outfit', 'sans-serif'],
-              outfit: ['Outfit', 'sans-serif'],
+              sans: ['Lexend', 'sans-serif'],
+              lexend: ['Lexend', 'sans-serif'],
             }
           }
         }
@@ -43,7 +67,7 @@
     <!-- Google Fonts: Inter + Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- MathJax Configuration & Library -->
     <script>
       window.MathJax = {
@@ -162,7 +186,7 @@
                 <i data-lucide="help-circle" class="w-4 h-4"></i> Support
             </a>
             <button onclick="openCommandBar()" class="text-sm font-medium text-gray-500 hover:text-[#1d1d1f] transition flex items-center gap-1.5">
-                <i data-lucide="terminal" class="w-4 h-4"></i> Command <kbd class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 font-mono text-gray-400">Ctrl+K</kbd>
+                <i data-lucide="terminal" class="w-4 h-4"></i> Command <kbd class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-gray-100 border border-gray-200 font-mono text-gray-500">Ctrl+K</kbd>
             </button>
             {% endif %}
         </div>
@@ -182,7 +206,7 @@
                 <a href="{{ url_for('auth.login') }}" class="px-4 py-2 rounded-full bg-gray-100 text-[#1d1d1f] text-sm font-semibold hover:bg-gray-200 transition">
                     Login
                 </a>
-                <a href="{{ url_for('auth.signup') }}" class="px-4 py-2 rounded-full bg-[#0071e3] text-white text-sm font-semibold hover:bg-[#0077ed] transition">
+                <a href="{{ url_for('auth.signup') }}" class="px-4 py-2 rounded-full bg-[#0071e3] text-gray-900 text-sm font-semibold hover:bg-[#0077ed] transition">
                     Sign Up
                 </a>
             {% endif %}
@@ -244,16 +268,16 @@
     <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 py-8 text-center text-sm opacity-70">
         <div class="max-w-2xl mx-auto px-4">
             <p class="mb-4">────────────────────────────────────────────</p>
-            <p class="italic mb-2 text-violet-800 dark:text-violet-300 font-medium">"Mastery isn't achieved by studying everything once, <br> but by understanding one concept deeply and practicing it relentlessly."</p>
+            <p class="italic mb-2 text-primary-800 dark:text-primary-300 font-medium">"Mastery isn't achieved by studying everything once, <br> but by understanding one concept deeply and practicing it relentlessly."</p>
             <p class="font-bold tracking-widest uppercase text-[10px] mb-4">Learn • Practice • Master</p>
             <div class="flex flex-wrap justify-center gap-4 mb-4 text-xs">
-                <a href="/contact" class="hover:text-violet-600 transition">Contact</a>
-                <span class="text-gray-300">•</span>
-                <a href="/terms" class="hover:text-violet-600 transition">Terms & Conditions</a>
-                <span class="text-gray-300">•</span>
-                <a href="/refund-policy" class="hover:text-violet-600 transition">Refund Policy</a>
-                <span class="text-gray-300">•</span>
-                <a href="/privacy-policy" class="hover:text-violet-600 transition">Privacy Policy</a>
+                <a href="/contact" class="hover:text-primary-600 transition">Contact</a>
+                <span class="text-gray-600">•</span>
+                <a href="/terms" class="hover:text-primary-600 transition">Terms & Conditions</a>
+                <span class="text-gray-600">•</span>
+                <a href="/refund-policy" class="hover:text-primary-600 transition">Refund Policy</a>
+                <span class="text-gray-600">•</span>
+                <a href="/privacy-policy" class="hover:text-primary-600 transition">Privacy Policy</a>
             </div>
             <p class="text-xs">&copy; 2026 Helix AI. Built with ❤️.</p>
         </div>
@@ -283,7 +307,7 @@
                             toast.className = 'glass-card bg-white/95 border border-gray-200 p-4 rounded-2xl shadow-lg w-72 pointer-events-auto transform transition-all animate-slide-in';
                         }
                         
-                        let icon = '<div class="w-8 h-8 rounded-full bg-blue-100 text-[#0071e3] flex items-center justify-center animate-pulse"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M4.93 4.93l2.83 2.83"></path><path d="M16.24 16.24l2.83 2.83"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="M4.93 19.07l2.83-2.83"></path><path d="M16.24 7.76l2.83-2.83"></path></svg></div>';
+                        let icon = '<div class="w-8 h-8 rounded-full bg-primary-100 text-[#0071e3] flex items-center justify-center animate-pulse"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"></path><path d="M12 18v4"></path><path d="M4.93 4.93l2.83 2.83"></path><path d="M16.24 16.24l2.83 2.83"></path><path d="M2 12h4"></path><path d="M18 12h4"></path><path d="M4.93 19.07l2.83-2.83"></path><path d="M16.24 7.76l2.83-2.83"></path></svg></div>';
                         let progressHtml = '';
                         
                         if (task.status === 'completed') {
@@ -296,7 +320,7 @@
                                 <div class="w-full bg-gray-100 rounded-full h-1.5 mt-3 overflow-hidden">
                                     <div class="bg-[#0071e3] h-1.5 rounded-full transition-all duration-500" style="width: ${percent}%"></div>
                                 </div>
-                                <p class="text-[10px] text-gray-400 mt-1 text-right">${task.completed_items} / ${task.total_items}</p>
+                                <p class="text-[10px] text-gray-500 mt-1 text-right">${task.completed_items} / ${task.total_items}</p>
                             `;
                         }
                         
@@ -342,13 +366,13 @@
 
         <!-- Modal -->
         <div class="relative flex items-start justify-center pt-[15vh]">
-            <div class="w-full max-w-2xl mx-4 glass-card border border-white/10 shadow-2xl shadow-violet-500/10 overflow-hidden animate-fade-in">
+            <div class="w-full max-w-2xl mx-4 glass-card border border-white/10 shadow-2xl shadow-primary-500/10 overflow-hidden animate-fade-in">
                 <!-- Header -->
                 <div class="px-5 pt-5 pb-3 border-b border-white/5">
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-2">
                             <span class="text-lg">🤖</span>
-                            <h3 class="text-sm font-bold text-violet-300 font-outfit">AI Command Bar</h3>
+                            <h3 class="text-sm font-bold text-primary-300 font-outfit">AI Command Bar</h3>
                         </div>
                         <button onclick="closeCommandBar()" class="text-xs opacity-50 hover:opacity-100 transition flex items-center gap-1">
                             <kbd class="px-1.5 py-0.5 rounded bg-white/10 border border-white/10 font-mono text-[10px]">Esc</kbd>
@@ -365,14 +389,14 @@
                                 type="text"
                                 id="ai-command-input"
                                 placeholder='Ask AI anything... e.g. "Create 5th sem DBMS normalization"'
-                                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 transition placeholder:opacity-40"
+                                class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20 transition placeholder:opacity-40"
                                 autocomplete="off"
                             >
                         </div>
                         <button
                             type="submit"
                             id="ai-command-submit"
-                            class="px-5 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-sm font-bold text-white transition flex items-center gap-2 shrink-0"
+                            class="px-5 py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-sm font-bold text-white transition flex items-center gap-2 shrink-0"
                         >
                             <span id="ai-cmd-btn-text">Send</span>
                             <svg id="ai-cmd-spinner" class="hidden animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -388,16 +412,16 @@
 
                 <!-- Quick Suggestions -->
                 <div class="px-5 pb-4 flex flex-wrap gap-2">
-                    <button type="button" onclick="fillCommand('Create syllabus for Semester 5: Subject AI, Unit 1 Intro, Topics: Agents, Search')" class="text-[11px] px-4 py-1.5 rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white border border-white/20 hover:opacity-90 shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all font-bold">
+                    <button type="button" onclick="fillCommand('Create syllabus for Semester 5: Subject AI, Unit 1 Intro, Topics: Agents, Search')" class="text-[11px] px-4 py-1.5 rounded-lg bg-gradient-to-r from-primary-500 to-primary-500 text-white border border-white/20 hover:opacity-90 shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all font-bold">
                         📋 Syllabus template
                     </button>
-                    <button type="button" onclick="fillCommand('Create a study plan for my next exam')" class="text-[11px] px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:bg-violet-600/10 hover:border-violet-500/20 transition">
+                    <button type="button" onclick="fillCommand('Create a study plan for my next exam')" class="text-[11px] px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:bg-primary-600/10 hover:border-primary-500/20 transition">
                         📅 Create study plan
                     </button>
-                    <button type="button" onclick="fillCommand('Generate quiz for my weakest topic')" class="text-[11px] px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:bg-violet-600/10 hover:border-violet-500/20 transition">
+                    <button type="button" onclick="fillCommand('Generate quiz for my weakest topic')" class="text-[11px] px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:bg-primary-600/10 hover:border-primary-500/20 transition">
                         📝 Generate quiz
                     </button>
-                    <button type="button" onclick="fillCommand('What should I study today?')" class="text-[11px] px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:bg-violet-600/10 hover:border-violet-500/20 transition">
+                    <button type="button" onclick="fillCommand('What should I study today?')" class="text-[11px] px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:bg-primary-600/10 hover:border-primary-500/20 transition">
                         💡 Study suggestion
                     </button>
                 </div>
@@ -514,12 +538,12 @@
         <div class="max-w-3xl mx-auto p-4">
             <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <div class="flex items-start gap-3 flex-1">
-                    <div class="p-2 bg-violet-50 rounded-xl text-violet-500 shrink-0">
+                    <div class="p-2 bg-primary-50 rounded-xl text-primary-500 shrink-0">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/></svg>
                     </div>
                     <div>
                         <p class="text-sm text-[#1d1d1f] font-semibold">We use cookies</p>
-                        <p class="text-xs text-gray-500 mt-0.5">We use essential cookies only to keep you logged in. No tracking or advertising cookies. <a href="/privacy-policy" class="text-violet-600 hover:text-violet-700 underline underline-offset-2">Learn more</a></p>
+                        <p class="text-xs text-gray-500 mt-0.5">We use essential cookies only to keep you logged in. No tracking or advertising cookies. <a href="/privacy-policy" class="text-primary-600 hover:text-primary-700 underline underline-offset-2">Learn more</a></p>
                     </div>
                 </div>
                 <div class="flex gap-2 shrink-0 w-full sm:w-auto">

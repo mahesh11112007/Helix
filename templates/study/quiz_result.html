@@ -7,8 +7,8 @@
     <h2 class="text-3xl font-extrabold text-[#1d1d1f]">Quiz Completed!</h2>
     
     <div class="py-6">
-        <span class="block text-6xl font-black {% if accuracy >= 70 %}text-green-500{% else %}text-amber-500{% endif %}">{{ score }} / {{ total }}</span>
-        <span class="text-sm uppercase font-bold tracking-widest text-gray-400 mt-2 block">Your Score ({{ accuracy | round(1) }}% Accuracy)</span>
+        <span class="block text-6xl font-black {% if accuracy >= 70 %}text-green-500{% else %}text-accent-500{% endif %}">{{ score }} / {{ total }}</span>
+        <span class="text-sm uppercase font-bold tracking-widest text-gray-500 mt-2 block">Your Score ({{ accuracy | round(1) }}% Accuracy)</span>
     </div>
 
     <!-- Review questions and explanations -->
@@ -25,7 +25,7 @@
         {% endfor %}
     </div>
 
-    <a href="{{ url_for('dashboard.index') }}" class="inline-block px-8 py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] font-bold transition-all text-white shadow-sm mt-4">
+    <a href="{{ url_for('dashboard.index') }}" class="inline-block px-8 py-3 rounded-full bg-[#0071e3] hover:bg-[#0077ed] font-bold transition-all text-gray-900 shadow-sm mt-4">
         Back to Dashboard
     </a>
 </div>
