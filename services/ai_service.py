@@ -675,6 +675,25 @@ Document Context:
             if viva_result:
                 extracted["viva_questions"] = viva_result
 
+        # Extra extraction for single mini-quiz keys if we're trying to extract a single quiz
+        q_match = re.search(r'"question"\s*:\s*"((?:[^"\\]|\\.)*)"', text, re.DOTALL)
+        if q_match:
+            extracted["question"] = q_match.group(1).replace('\\n', '\n').replace('\\"', '"')
+            
+        opts_match = re.search(r'"options"\s*:\s*(\[.*?\])', text, re.DOTALL)
+        if opts_match:
+            opts_result = _try_parse(opts_match.group(1))
+            if opts_result:
+                extracted["options"] = opts_result
+                
+        idx_match = re.search(r'"correct_index"\s*:\s*(\d+)', text)
+        if idx_match:
+            extracted["correct_index"] = int(idx_match.group(1))
+            
+        exp_match = re.search(r'"explanation"\s*:\s*"((?:[^"\\]|\\.)*)"', text, re.DOTALL)
+        if exp_match:
+            extracted["explanation"] = exp_match.group(1).replace('\\n', '\n').replace('\\"', '"')
+
         if extracted:
             return clean_strings(extracted)
 
@@ -1351,7 +1370,7 @@ Understanding {topic_name} requires working through real examples and practice p
             return {"answer": "Our AI support is temporarily offline. We have forwarded your request to the admin team.", "needs_admin": True}
             
         system_prompt = """
-        You are the official Customer Support AI for KiraakStudy AI. 
+        You are the official Customer Support AI for Helix AI. 
         Your primary role is to assist users with billing, platform issues, and account management. 
         
         CRITICAL RULES:

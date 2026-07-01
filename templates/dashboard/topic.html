@@ -1,89 +1,150 @@
 {% extends "base.html" %}
-{% block title %}{{ topic.name }} - KiraakStudy AI
+{% block title %}{{ topic.name }} - Helix AI
 
 
 {% endblock %}
 
 {% block content %}
 <style>
-/* Custom Scrollbar for sidebars */
-.custom-scroll::-webkit-scrollbar { width: 4px; }
-.custom-scroll::-webkit-scrollbar-track { background: transparent; }
-.custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    /* Custom Scrollbar for sidebars */
+    .custom-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
 
-/* Learning Cards Styles */
-.learning-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.learning-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-}
-.card-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid #333;
-    padding-bottom: 12px;
-}
-.card-icon {
-    font-size: 1.5rem;
-    padding: 8px;
-    border-radius: 12px;
-    background: #2a2a2c;
-}
-.card-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #1d1d1f;
-    margin: 0;
-}
-.type-definition .card-icon { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
-.type-formula .card-icon { color: #a855f7; background: rgba(168, 85, 247, 0.1); }
-.type-example .card-icon { color: #10b981; background: rgba(16, 185, 129, 0.1); }
-.type-warning .card-icon { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
-.type-important .card-icon { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-.type-concept .card-icon { color: #6366f1; background: rgba(99, 102, 241, 0.1); }
+    .custom-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-/* MathJax Overrides */
-.MathJax { color: #e5e7eb !important; font-size: 110% !important; }
+    .custom-scroll::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 4px;
+    }
 
-/* Hide original raw notes once JS takes over */
-#raw-notes-container { display: none; }
+    /* Learning Cards Styles */
+    .learning-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-/* Mini Quiz Styles */
-.mini-quiz {
-    background: linear-gradient(145deg, #1e1e24, #1a1a1f);
-    border: 1px solid #3b82f6;
-    border-radius: 16px;
-    padding: 20px;
-    margin: 32px 0;
-}
+    .learning-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid #333;
+        padding-bottom: 12px;
+    }
+
+    .card-icon {
+        font-size: 1.5rem;
+        padding: 8px;
+        border-radius: 12px;
+        background: #2a2a2c;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1d1d1f;
+        margin: 0;
+    }
+
+    .type-definition .card-icon {
+        color: #3b82f6;
+        background: rgba(59, 130, 246, 0.1);
+    }
+
+    .type-formula .card-icon {
+        color: #a855f7;
+        background: rgba(168, 85, 247, 0.1);
+    }
+
+    .type-example .card-icon {
+        color: #10b981;
+        background: rgba(16, 185, 129, 0.1);
+    }
+
+    .type-warning .card-icon {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    .type-important .card-icon {
+        color: #f59e0b;
+        background: rgba(245, 158, 11, 0.1);
+    }
+
+    .type-concept .card-icon {
+        color: #6366f1;
+        background: rgba(99, 102, 241, 0.1);
+    }
+
+    /* MathJax Overrides */
+    .MathJax, mjx-container, .mjx-container {
+        color: #000 !important;
+        font-size: 110% !important;
+    }
+
+    /* Hide original raw notes once JS takes over */
+    #raw-notes-container {
+        display: none;
+    }
+
+    /* Mini Quiz Styles */
+    .mini-quiz {
+        background: linear-gradient(145deg, #1e1e24, #1a1a1f);
+        border: 1px solid #3b82f6;
+        border-radius: 16px;
+        padding: 20px;
+        margin: 32px 0;
+    }
 
     @media print {
+
         /* Hide UI elements */
-        nav, aside, footer, .sticky, button, form, .no-print, .mini-quiz, .chat-section, .files-section {
+        nav,
+        aside,
+        footer,
+        .sticky,
+        button,
+        form,
+        .no-print,
+        .mini-quiz,
+        .chat-section,
+        .files-section {
             display: none !important;
         }
+
         /* Remove height constraints to allow flowing to multiple pages */
-        body, html, main, .flex-col, .h-[calc(100vh-80px)], .overflow-hidden, .overflow-y-auto {
+        body,
+        html,
+        main,
+        .flex-col,
+        .h-[calc(100vh-80px)],
+        .overflow-hidden,
+        .overflow-y-auto {
             height: auto !important;
             min-height: auto !important;
             overflow: visible !important;
             display: block !important;
         }
+
         /* Expand the main content */
         .flex-1 {
             flex: none !important;
             width: 100% !important;
         }
+
         /* Ensure dark text on white background for printing */
         * {
             color: black !important;
@@ -95,38 +156,54 @@
 
 <div class="flex flex-col h-[calc(100vh-80px)] -mt-6 -mx-4 sm:-mx-6 lg:-mx-8">
     <!-- Top Header Bar (Sticky) -->
-    <div class="sticky top-0 z-40 bg-gray-50/90 backdrop-blur-xl border-b border-gray-200 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div
+        class="sticky top-0 z-40 bg-gray-50/90 backdrop-blur-xl border-b border-gray-200 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-3 text-sm text-gray-500 mb-1">
-                <a href="{{ url_for('dashboard.view_subject', sub_id=topic.subject_id) }}" class="hover:text-[#1d1d1f] transition-colors">{{ topic.subject_name }}</a>
+                <a href="{{ url_for('dashboard.view_subject', sub_id=topic.subject_id) }}"
+                    class="hover:text-[#1d1d1f] transition-colors">{{ topic.subject_name }}</a>
                 <span>/</span>
                 <span class="text-[#0071e3] font-semibold">{{ topic.unit_name }}</span>
             </div>
             <h1 class="text-2xl font-bold text-[#1d1d1f] flex items-center gap-3">
                 {{ topic.name }}
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-500/20 text-primary-400 border border-primary-500/30">Intermediate</span>
+                <span
+                    class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-500/20 text-primary-400 border border-primary-500/30">Intermediate</span>
             </h1>
         </div>
-        
+
         <div class="flex items-center gap-3 flex-wrap">
             <div class="flex items-center gap-4 mr-4 text-sm text-gray-500">
                 <div class="flex items-center gap-1.5" title="Estimated Reading Time">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
                     <span>15 min read</span>
                 </div>
             </div>
-            
-            <button onclick="toggleComplete('{{ topic.id }}')" id="complete-btn" class="px-4 py-2 rounded-xl text-sm font-bold transition-all border {{ 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' if topic.is_completed else 'bg-gray-50 text-[#1d1d1f] border-gray-200 hover:border-gray-500' }}">
+
+            <button onclick="toggleComplete('{{ topic.id }}')" id="complete-btn"
+                class="px-4 py-2 rounded-xl text-sm font-bold transition-all border {{ 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' if topic.is_completed else 'bg-gray-50 text-[#1d1d1f] border-gray-200 hover:border-gray-500' }}">
                 <span id="complete-icon">{{ '✅' if topic.is_completed else '⭕' }}</span>
-                <span id="complete-text" class="ml-1">{{ 'Completed' if topic.is_completed else 'Mark Complete' }}</span>
+                <span id="complete-text" class="ml-1">{{ 'Completed' if topic.is_completed else 'Mark Complete'
+                    }}</span>
             </button>
-            <button onclick="toggleBookmark('{{ topic.id }}')" id="bookmark-btn" class="p-2.5 rounded-xl transition-all border {{ 'bg-[#0071e3]/20 text-[#0071e3] border-[#0071e3]/50' if is_bookmarked else 'bg-gray-50 text-[#1d1d1f] border-gray-200 hover:border-gray-500' }}" title="Bookmark">
+            <button onclick="toggleBookmark('{{ topic.id }}')" id="bookmark-btn"
+                class="p-2.5 rounded-xl transition-all border {{ 'bg-[#0071e3]/20 text-[#0071e3] border-[#0071e3]/50' if is_bookmarked else 'bg-gray-50 text-[#1d1d1f] border-gray-200 hover:border-gray-500' }}"
+                title="Bookmark">
                 <span id="bookmark-icon">{{ '🔖' if is_bookmarked else '📑' }}</span>
             </button>
-            <button onclick="printNotes()" class="p-2.5 rounded-xl bg-gray-50 text-[#1d1d1f] border border-gray-200 hover:border-gray-500 transition-all" title="Print">🖨️</button>
+            <button onclick="printNotes()"
+                class="p-2.5 rounded-xl bg-gray-50 text-[#1d1d1f] border border-gray-200 hover:border-gray-500 transition-all"
+                title="Print">🖨️</button>
 
-            <form action="{{ url_for('files.upload_file', topic_id=topic.id) }}" method="POST" enctype="multipart/form-data" class="inline-flex">
-                <label class="p-2.5 rounded-xl bg-gray-50 text-[#1d1d1f] border border-gray-200 hover:border-gray-500 transition-all cursor-pointer" title="Upload File">
+            <form action="{{ url_for('files.upload_file', topic_id=topic.id) }}" method="POST"
+                enctype="multipart/form-data" class="inline-flex">
+                <label
+                    class="p-2.5 rounded-xl bg-gray-50 text-[#1d1d1f] border border-gray-200 hover:border-gray-500 transition-all cursor-pointer"
+                    title="Upload File">
                     📎
                     <input type="file" name="file" class="hidden" onchange="this.form.submit()">
                 </label>
@@ -137,9 +214,10 @@
 
     <!-- 3-Column Layout -->
     <div class="flex flex-col xl:flex-row flex-1 overflow-y-auto xl:overflow-hidden">
-        
+
         <!-- Left Sidebar: Table of Contents -->
-        <aside class="flex flex-col w-full xl:w-64 border-b xl:border-b-0 xl:border-r border-gray-200 bg-white xl:custom-scroll xl:overflow-y-auto p-6 shrink-0">
+        <aside
+            class="flex flex-col w-full xl:w-64 border-b xl:border-b-0 xl:border-r border-gray-200 bg-white xl:custom-scroll xl:overflow-y-auto p-6 shrink-0">
             <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">On This Page</h3>
             <div class="space-y-4 mb-6">
                 <div class="h-1.5 w-full bg-[#333] rounded-full overflow-hidden">
@@ -154,69 +232,83 @@
         </aside>
 
         <!-- Center: Main Learning Content -->
-        <main class="flex-1 xl:custom-scroll overflow-visible xl:overflow-y-auto bg-gray-50 p-6 lg:p-10 relative scroll-smooth" id="main-scroll-area">
+        <main
+            class="flex-1 xl:custom-scroll overflow-visible xl:overflow-y-auto bg-gray-50 p-6 lg:p-10 relative scroll-smooth"
+            id="main-scroll-area">
             <div class="max-w-3xl mx-auto pb-32">
-                
+
                 <!-- Raw Notes Container (Hidden, used as source) -->
                 <div id="raw-notes-container">
                     {% if notes %}
-                        {% for note in notes %}
-                            <h2>{{ note.title }}</h2>
-                            <div class="markdown-body">{{ note.content | escape }}</div>
-                        {% endfor %}
+                    {% for note in notes %}
+                    <h2>{{ note.title }}</h2>
+                    <div class="markdown-body">{{ note.content | escape }}</div>
+                    {% endfor %}
                     {% endif %}
                 </div>
 
                 <!-- Structured Learning Cards Container -->
                 <div id="structured-content" class="space-y-8">
                     {% if not notes %}
-                        <div class="text-center py-20 bg-white rounded-2xl border border-gray-200">
-                            <div class="text-6xl mb-4">📚</div>
-                            <h2 class="text-2xl font-bold text-[#1d1d1f] mb-2">Ready to start learning?</h2>
-                            <p class="text-gray-500 max-w-md mx-auto">Generate AI-powered notes, flashcards, and quizzes customized specifically for your syllabus.</p>
-                            <form action="{{ url_for('study.generate_resources', topic_id=topic.id) }}" method="POST" class="mt-8 flex justify-center gap-3">
-                                <button type="submit" class="px-6 py-3 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-[#1d1d1f] font-bold shadow-lg transition-all transform hover:-translate-y-1">
-                                    Generate Learning Material
-                                </button>
-                            </form>
-                        </div>
+                    <div class="text-center py-20 bg-white rounded-2xl border border-gray-200">
+                        <div class="text-6xl mb-4">📚</div>
+                        <h2 class="text-2xl font-bold text-[#1d1d1f] mb-2">Ready to start learning?</h2>
+                        <p class="text-gray-500 max-w-md mx-auto">Generate AI-powered notes, flashcards, and quizzes
+                            customized specifically for your syllabus.</p>
+                        <form action="{{ url_for('study.generate_resources', topic_id=topic.id) }}" method="POST"
+                            class="mt-8 flex justify-center gap-3">
+                            <button type="submit"
+                                class="px-6 py-3 rounded-xl bg-[#0071e3] hover:bg-[#0077ed] text-[#1d1d1f] font-bold shadow-lg transition-all transform hover:-translate-y-1">
+                                Generate Learning Material
+                            </button>
+                        </form>
+                    </div>
                     {% else %}
-                        <!-- JS will inject styled cards here -->
+                    <!-- JS will inject styled cards here -->
                     {% endif %}
                 </div>
 
-                
 
 
 
-</div></main>
+
+            </div>
+        </main>
 
         <!-- Right Sidebar: Learning Assistant -->
-        <aside class="flex flex-col w-full xl:w-80 border-t xl:border-t-0 xl:border-l border-gray-200 bg-white xl:custom-scroll xl:overflow-y-auto shrink-0">
+        <aside
+            class="flex flex-col w-full xl:w-80 border-t xl:border-t-0 xl:border-l border-gray-200 bg-white xl:custom-scroll xl:overflow-y-auto shrink-0">
             <div class="p-6 space-y-8">
-                
+
                 <!-- Quick Actions -->
                 <div>
                     <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">Learning Tools</h3>
-                    <form action="{{ url_for('study.generate_resources', topic_id=topic.id) }}" method="POST" class="grid grid-cols-1 gap-2" onsubmit="this.querySelector('button').innerHTML = 'Generating...'; this.querySelector('button').disabled = true;">
-                        <button type="submit" class="w-full text-left px-4 py-3 rounded-xl bg-gray-50 hover:bg-[#333] border border-gray-200 text-[#1d1d1f] font-medium flex items-center justify-between group transition-all">
+                    <form action="{{ url_for('study.generate_resources', topic_id=topic.id) }}" method="POST"
+                        class="grid grid-cols-1 gap-2"
+                        onsubmit="this.querySelector('button').innerHTML = 'Generating...'; this.querySelector('button').disabled = true;">
+                        <button type="submit"
+                            class="w-full text-left px-4 py-3 rounded-xl bg-gray-50 hover:bg-[#333] border border-gray-200 text-[#1d1d1f] font-medium flex items-center justify-between group transition-all">
                             <span class="flex items-center gap-3"><span>📝</span> Generate Notes</span>
                             <span class="opacity-0 group-hover:opacity-100 text-gray-500">→</span>
                         </button>
                     </form>
-                    
+
                     {% if flashcards %}
-                    <a href="{{ url_for('study.review_flashcards', topic_id=topic.id) }}" class="mt-2 w-full text-left px-4 py-3 rounded-xl bg-primary-500/10 hover:bg-primary-500/20 border border-primary-500/30 text-primary-400 font-bold flex items-center justify-between group transition-all">
-                        <span class="flex items-center gap-3"><span>⚡</span> Flashcards ({{ flashcards | length }})</span>
+                    <a href="{{ url_for('study.review_flashcards', topic_id=topic.id) }}"
+                        class="mt-2 w-full text-left px-4 py-3 rounded-xl bg-primary-500/10 hover:bg-primary-500/20 border border-primary-500/30 text-primary-400 font-bold flex items-center justify-between group transition-all">
+                        <span class="flex items-center gap-3"><span>⚡</span> Flashcards ({{ flashcards | length
+                            }})</span>
                         <span>Play</span>
                     </a>
                     {% endif %}
-                    
+
                     {% if quizzes %}
                     <div class="mt-2 space-y-2">
                         {% for quiz in quizzes %}
-                        <a href="{{ url_for('study.play_quiz', quiz_id=quiz.id) }}" class="w-full text-left px-4 py-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-between group transition-all">
-                            <span class="flex items-center gap-3 truncate pr-2"><span>🎯</span> {{ quiz.title[:20] }}...</span>
+                        <a href="{{ url_for('study.play_quiz', quiz_id=quiz.id) }}"
+                            class="w-full text-left px-4 py-3 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold flex items-center justify-between group transition-all">
+                            <span class="flex items-center gap-3 truncate pr-2"><span>🎯</span> {{ quiz.title[:20]
+                                }}...</span>
                             <span>Play</span>
                         </a>
                         {% endfor %}
@@ -227,7 +319,8 @@
                 <!-- Learning Mode Selector -->
                 <div>
                     <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3">Experience Level</h3>
-                    <select class="w-full bg-gray-50 border border-gray-200 text-[#1d1d1f] text-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#0071e3] outline-none appearance-none">
+                    <select
+                        class="w-full bg-gray-50 border border-gray-200 text-[#1d1d1f] text-sm rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#0071e3] outline-none appearance-none">
                         <option value="beginner">👶 Beginner (Simple & Detailed)</option>
                         <option value="intermediate" selected>🧑‍🎓 Intermediate (Standard)</option>
                         <option value="topper">🧠 Topper (Advanced & PYQs)</option>
@@ -235,40 +328,55 @@
                 </div>
 
                 <!-- AI Tutor Chat Embed -->
-                <div class="flex flex-col h-[500px] border border-gray-200 rounded-2xl overflow-hidden mt-4 shadow-sm bg-gray-50">
+                <div
+                    class="flex flex-col h-[500px] border border-gray-200 rounded-2xl overflow-hidden mt-4 shadow-sm bg-gray-50">
                     <div class="p-4 border-b border-gray-200 bg-white flex justify-between items-center">
                         <h3 class="font-bold text-[#1d1d1f] flex items-center gap-2"><span>💬</span> AI Assistant</h3>
-                        <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}" class="text-xs px-2 py-1 bg-gray-100 rounded text-[#0071e3] hover:bg-gray-200 font-semibold transition-colors">+ New</a>
+                        <a href="{{ url_for('dashboard.view_topic', topic_id=topic.id, new=1) }}"
+                            class="text-xs px-2 py-1 bg-gray-100 rounded text-[#0071e3] hover:bg-gray-200 font-semibold transition-colors">+
+                            New</a>
                     </div>
-                    
+
                     <div id="chat-box" class="flex-1 p-4 overflow-y-auto custom-scroll space-y-4">
                         {% if chat_history %}
                         {% for msg in chat_history %}
                         {% if msg.role == 'user' %}
                         <div class="flex justify-end">
-                            <div class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-gray-900 text-sm max-w-[85%] break-words shadow-sm">{{ msg.content }}</div>
+                            <div
+                                class="p-3 rounded-2xl rounded-br-sm bg-[#0071e3] text-gray-900 text-sm max-w-[85%] break-words shadow-sm">
+                                {{ msg.content }}</div>
                         </div>
                         {% else %}
                         <div class="flex justify-start relative group">
-                            <div class="ai-message p-3 rounded-2xl rounded-bl-sm bg-white border border-gray-200 text-gray-800 text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto" data-markdown="{{ msg.content | escape }}"></div>
+                            <div class="ai-message p-3 rounded-2xl rounded-bl-sm bg-white border border-gray-200 text-gray-800 text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto"
+                                data-markdown="{{ msg.content | escape }}"></div>
                         </div>
                         {% endif %}
                         {% endfor %}
                         {% else %}
                         <div class="flex justify-start">
-                            <div class="p-3 rounded-2xl rounded-bl-sm bg-white border border-gray-200 text-gray-800 text-sm max-w-[85%] shadow-sm">
+                            <div
+                                class="p-3 rounded-2xl rounded-bl-sm bg-white border border-gray-200 text-gray-800 text-sm max-w-[85%] shadow-sm">
                                 Hello! Ask me anything about this topic or attached files.
                             </div>
                         </div>
                         {% endif %}
                     </div>
-                    
+
                     <form id="chat-form" class="p-3 bg-white border-t border-gray-200">
-                        <input type="hidden" id="chat-session-id" name="session_id" value="{{ active_session_id or '' }}">
+                        <input type="hidden" id="chat-session-id" name="session_id"
+                            value="{{ active_session_id or '' }}">
                         <div class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-xl p-1">
-                            <textarea id="chat-input" rows="1" placeholder="Ask a question..." required class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none min-h-[36px] max-h-[100px]"></textarea>
-                            <button type="submit" class="p-2 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] text-gray-900 transition-all shadow-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            <textarea id="chat-input" rows="1" placeholder="Ask a question..." required
+                                class="flex-1 px-3 py-2 bg-transparent text-sm focus:outline-none text-[#1d1d1f] resize-none min-h-[36px] max-h-[100px]"></textarea>
+                            <button type="submit"
+                                class="p-2 rounded-lg bg-[#0071e3] hover:bg-[#0077ed] text-gray-900 transition-all shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
                             </button>
                         </div>
                     </form>
@@ -278,357 +386,297 @@
     </div>
 </div>
 
-<!-- MathJax for Rendering Formulas -->
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<script>
-window.MathJax = {
-  tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
-  svg: { fontCache: 'global' }
-};
-</script>
-
 <!-- Scripts for Content Transformation & Interactivity -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Extract raw markdown and convert to HTML
-    const rawContainers = document.querySelectorAll('#raw-notes-container .markdown-body');
-    if (rawContainers.length === 0) return;
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Extract raw markdown and convert to HTML
+        const rawContainers = document.querySelectorAll('#raw-notes-container .markdown-body');
+        if (rawContainers.length === 0) return;
 
-    let fullMarkdown = '';
-    rawContainers.forEach(container => {
-        fullMarkdown += '\n\n' + container.textContent;
-    });
+        let fullMarkdown = '';
+        rawContainers.forEach(container => {
+            fullMarkdown += '\n\n' + container.textContent;
+        });
 
-    const htmlContent = marked.parse(fullMarkdown);
-    
-    // 2. Parse HTML into Learning Cards
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, 'text/html');
-    const container = document.getElementById('structured-content');
-    
-    let currentCard = null;
-    let cardContent = null;
-    let sectionCount = 0;
+        const htmlContent = window.parseMarkdownWithMath ? window.parseMarkdownWithMath(fullMarkdown) : marked.parse(fullMarkdown);
 
-    // Helper to create a card
-    function createCard(titleText, elementType) {
-        const typeMatch = titleText.toLowerCase();
-        let typeClass = 'type-concept';
-        let icon = '💡';
+        // 2. Parse HTML into Learning Cards
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        const container = document.getElementById('structured-content');
 
-        if (typeMatch.includes('definition') || typeMatch.includes('what is')) { typeClass = 'type-definition'; icon = '📖'; }
-        else if (typeMatch.includes('formula') || typeMatch.includes('equation')) { typeClass = 'type-formula'; icon = '∑'; }
-        else if (typeMatch.includes('example') || typeMatch.includes('application')) { typeClass = 'type-example'; icon = '🎯'; }
-        else if (typeMatch.includes('warning') || typeMatch.includes('mistake')) { typeClass = 'type-warning'; icon = '⚠️'; }
-        else if (typeMatch.includes('important') || typeMatch.includes('note')) { typeClass = 'type-important'; icon = '⭐'; }
+        let currentCard = null;
+        let cardContent = null;
+        let sectionCount = 0;
 
-        const card = document.createElement('div');
-        card.className = `learning-card ${typeClass}`;
-        card.id = 'section-' + sectionCount;
-        
-        const header = document.createElement('div');
-        header.className = 'card-header';
-        header.innerHTML = `<span class="card-icon">${icon}</span><h3 class="card-title text-[#1d1d1f]">${titleText}</h3>`;
-        
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'text-gray-600 leading-relaxed space-y-4 prose max-w-none';
-        
-        card.appendChild(header);
-        card.appendChild(contentDiv);
-        return { card, contentDiv, title: titleText, id: card.id };
-    }
+        // Helper to create a card
+        function createCard(titleText, elementType) {
+            const typeMatch = titleText.toLowerCase();
+            let typeClass = 'type-concept';
+            let icon = '💡';
 
-    const tocList = [];
+            if (typeMatch.includes('definition') || typeMatch.includes('what is')) { typeClass = 'type-definition'; icon = '📖'; }
+            else if (typeMatch.includes('formula') || typeMatch.includes('equation')) { typeClass = 'type-formula'; icon = '∑'; }
+            else if (typeMatch.includes('example') || typeMatch.includes('application')) { typeClass = 'type-example'; icon = '🎯'; }
+            else if (typeMatch.includes('warning') || typeMatch.includes('mistake')) { typeClass = 'type-warning'; icon = '⚠️'; }
+            else if (typeMatch.includes('important') || typeMatch.includes('note')) { typeClass = 'type-important'; icon = '⭐'; }
 
-    Array.from(doc.body.children).forEach(node => {
-        if (node.tagName.match(/^H[1-4]$/)) {
-            sectionCount++;
-            const cardObj = createCard(node.textContent, node.tagName);
-            currentCard = cardObj.card;
-            cardContent = cardObj.contentDiv;
-            container.appendChild(currentCard);
-            
-            tocList.push({ title: cardObj.title, id: cardObj.id });
-            
-            // Randomly insert a mini-quiz after every 3 sections
-            if (sectionCount % 3 === 0) {
-                const quizId = 'quiz-' + sectionCount;
-                const quiz = document.createElement('div');
-                quiz.className = 'mini-quiz flex flex-col items-center text-center p-6 border border-gray-200 rounded-xl bg-white shadow-sm my-6';
-                quiz.id = quizId;
-                quiz.innerHTML = `
-                    <span class="text-3xl mb-3">🤔</span>
-                    <h4 class="text-[#1d1d1f] text-lg font-bold mb-2">Test Your Understanding</h4>
-                    <p class="text-sm text-gray-500 mb-4">Take a quick pause to reflect on what you just learned.</p>
-                    <button onclick="generateMiniQuiz('${quizId}')" class="px-5 py-2.5 rounded-full bg-[#0071e3] text-gray-900 font-bold hover:bg-[#0077ed] transition-all shadow-sm">Start Quick Check</button>
-                `;
-                container.appendChild(quiz);
-            }
-        } else if (cardContent) {
-            // Apply Tailwind prose classes to elements
-            if (node.tagName === 'P') node.classList.add('mb-4');
-            if (node.tagName === 'UL') node.classList.add('list-disc', 'list-inside', 'mb-4', 'space-y-1');
-            if (node.tagName === 'OL') node.classList.add('list-decimal', 'list-inside', 'mb-4', 'space-y-1');
-            if (node.tagName === 'PRE') node.classList.add('bg-gray-50', 'p-4', 'rounded-xl', 'overflow-x-auto', 'border', 'border-gray-200', 'my-4');
-            cardContent.appendChild(node.cloneNode(true));
-        } else {
-            // If text appears before any heading, wrap it in a generic card
-            if (node.textContent.trim()) {
+            const card = document.createElement('div');
+            card.className = `learning-card ${typeClass}`;
+            card.id = 'section-' + sectionCount;
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            header.innerHTML = `<span class="card-icon">${icon}</span><h3 class="card-title text-[#1d1d1f]">${titleText}</h3>`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'text-gray-600 leading-relaxed space-y-4 prose max-w-none';
+
+            card.appendChild(header);
+            card.appendChild(contentDiv);
+            return { card, contentDiv, title: titleText, id: card.id };
+        }
+
+        const tocList = [];
+
+        Array.from(doc.body.children).forEach(node => {
+            if (node.tagName.match(/^H[1-4]$/)) {
                 sectionCount++;
-                const cardObj = createCard("Overview", "H2");
+                const cardObj = createCard(node.textContent, node.tagName);
                 currentCard = cardObj.card;
                 cardContent = cardObj.contentDiv;
-                cardContent.appendChild(node.cloneNode(true));
                 container.appendChild(currentCard);
+
                 tocList.push({ title: cardObj.title, id: cardObj.id });
-            }
-        }
-    });
 
-    // 3. Build Table of Contents
-    const tocNav = document.getElementById('toc-nav');
-    if (tocList.length > 0) {
-        tocNav.innerHTML = '';
-        tocList.forEach((item, index) => {
-            const a = document.createElement('a');
-            a.href = '#' + item.id;
-            a.className = 'toc-link block px-3 py-2 rounded-lg text-gray-500 hover:bg-[#333] hover:text-[#1d1d1f] transition-all truncate';
-            a.textContent = item.title;
-            a.dataset.target = item.id;
-            tocNav.appendChild(a);
-        });
-    }
 
-    // 4. Scroll Tracking for TOC & Progress Bar
-    const scrollArea = document.getElementById('main-scroll-area');
-    const progressBar = document.getElementById('reading-progress');
-    const progressText = document.getElementById('reading-percentage');
-    const tocLinks = document.querySelectorAll('.toc-link');
-
-    scrollArea.addEventListener('scroll', () => {
-        // Progress Bar
-        const scrollTop = scrollArea.scrollTop;
-        const scrollHeight = scrollArea.scrollHeight - scrollArea.clientHeight;
-        const scrollPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-        progressBar.style.width = scrollPercent + '%';
-        progressText.textContent = Math.round(scrollPercent) + '% Read';
-
-        // Highlight TOC
-        let currentActive = null;
-        const cards = document.querySelectorAll('.learning-card');
-        cards.forEach(card => {
-            const rect = card.getBoundingClientRect();
-            // If card is near top of viewport
-            if (rect.top <= 200 && rect.bottom >= 100) {
-                currentActive = card.id;
-            }
-        });
-
-        if (currentActive) {
-            tocLinks.forEach(link => {
-                if (link.dataset.target === currentActive) {
-                    link.classList.add('bg-[#0071e3]/20', 'text-[#0071e3]', 'font-bold');
-                    link.classList.remove('text-gray-500', 'hover:bg-[#333]');
-                } else {
-                    link.classList.remove('bg-[#0071e3]/20', 'text-[#0071e3]', 'font-bold');
-                    link.classList.add('text-gray-500', 'hover:bg-[#333]');
+            } else if (cardContent) {
+                // Apply Tailwind prose classes to elements
+                if (node.tagName === 'P') node.classList.add('mb-4');
+                if (node.tagName === 'UL') node.classList.add('list-disc', 'list-inside', 'mb-4', 'space-y-1');
+                if (node.tagName === 'OL') node.classList.add('list-decimal', 'list-inside', 'mb-4', 'space-y-1');
+                if (node.tagName === 'PRE') node.classList.add('bg-gray-50', 'p-4', 'rounded-xl', 'overflow-x-auto', 'border', 'border-gray-200', 'my-4');
+                cardContent.appendChild(node.cloneNode(true));
+            } else {
+                // If text appears before any heading, wrap it in a generic card
+                if (node.textContent.trim()) {
+                    sectionCount++;
+                    const cardObj = createCard("Overview", "H2");
+                    currentCard = cardObj.card;
+                    cardContent = cardObj.contentDiv;
+                    cardContent.appendChild(node.cloneNode(true));
+                    container.appendChild(currentCard);
+                    tocList.push({ title: cardObj.title, id: cardObj.id });
                 }
+            }
+        });
+
+        // 3. Build Table of Contents
+        const tocNav = document.getElementById('toc-nav');
+        if (tocList.length > 0) {
+            tocNav.innerHTML = '';
+            tocList.forEach((item, index) => {
+                const a = document.createElement('a');
+                a.href = '#' + item.id;
+                a.className = 'toc-link block px-3 py-2 rounded-lg text-gray-500 hover:bg-[#333] hover:text-[#1d1d1f] transition-all truncate';
+                a.textContent = item.title;
+                a.dataset.target = item.id;
+                tocNav.appendChild(a);
             });
         }
+
+        // 4. Scroll Tracking for TOC & Progress Bar
+        const scrollArea = document.getElementById('main-scroll-area');
+        const progressBar = document.getElementById('reading-progress');
+        const progressText = document.getElementById('reading-percentage');
+        const tocLinks = document.querySelectorAll('.toc-link');
+
+        scrollArea.addEventListener('scroll', () => {
+            // Progress Bar
+            const scrollTop = scrollArea.scrollTop;
+            const scrollHeight = scrollArea.scrollHeight - scrollArea.clientHeight;
+            const scrollPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            progressBar.style.width = scrollPercent + '%';
+            progressText.textContent = Math.round(scrollPercent) + '% Read';
+
+            // Highlight TOC
+            let currentActive = null;
+            const cards = document.querySelectorAll('.learning-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                // If card is near top of viewport
+                if (rect.top <= 200 && rect.bottom >= 100) {
+                    currentActive = card.id;
+                }
+            });
+
+            if (currentActive) {
+                tocLinks.forEach(link => {
+                    if (link.dataset.target === currentActive) {
+                        link.classList.add('bg-[#0071e3]/20', 'text-[#0071e3]', 'font-bold');
+                        link.classList.remove('text-gray-500', 'hover:bg-[#333]');
+                    } else {
+                        link.classList.remove('bg-[#0071e3]/20', 'text-[#0071e3]', 'font-bold');
+                        link.classList.add('text-gray-500', 'hover:bg-[#333]');
+                    }
+                });
+            }
+        });
+
+        // Typeset math equations in structured content robustly
+        const tryTypeset = (attempts = 0) => {
+            const container = document.getElementById('structured-content');
+            if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+                if (typeof window.MathJax.typesetClear === 'function') {
+                    window.MathJax.typesetClear();
+                }
+                window.MathJax.typesetPromise([container]).then(() => {
+                    console.log('MathJax typeset complete on structured content');
+                }).catch(err => console.error(err));
+            } else if (attempts < 20) {
+                setTimeout(() => tryTypeset(attempts + 1), 200);
+            }
+        };
+        tryTypeset();
+        tryTypeset();
     });
-});
 </script>
 
 <script>
-const chatForm = document.getElementById('chat-form');
-        const chatInput = document.getElementById('chat-input');
-        const chatBox = document.getElementById('chat-box');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatBox = document.getElementById('chat-box');
 
-        // Set Marked.js options
-        if (typeof marked !== 'undefined') {
-            marked.setOptions({ breaks: true, gfm: true });
+    // Set Marked.js options
+    if (typeof marked !== 'undefined') {
+        marked.setOptions({ breaks: true, gfm: true });
 
-            // Render all existing notes
-            document.querySelectorAll('.note-content').forEach(el => {
-                const md = el.getAttribute('data-markdown');
-                if (md) el.innerHTML = parseMarkdownWithMath(md);
-            });
+        // Render all existing notes
+        document.querySelectorAll('.note-content').forEach(el => {
+            const md = el.getAttribute('data-markdown');
+            if (md) el.innerHTML = parseMarkdownWithMath(md);
+        });
 
-            // Render all existing chat messages
-            document.querySelectorAll('.ai-message').forEach(el => {
-                const md = el.getAttribute('data-markdown');
-                if (md) {
-                    el.innerHTML = parseMarkdownWithMath(md);
-                    if (typeof hljs !== 'undefined') {
-                        el.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-                    }
-                    addCodeCopyButtons(el);
+        // Render all existing chat messages
+        document.querySelectorAll('.ai-message').forEach(el => {
+            const md = el.getAttribute('data-markdown');
+            if (md) {
+                el.innerHTML = parseMarkdownWithMath(md);
+                if (typeof hljs !== 'undefined') {
+                    el.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
                 }
-            });
-
-            // Typeset math equations
-            if (window.typesetMath) {
-                window.typesetMath();
+                addCodeCopyButtons(el);
             }
+        });
 
-            // Scroll to bottom on load
+        // Typeset math equations
+        if (window.typesetMath) {
+            window.typesetMath();
+        }
+
+        // Scroll to bottom on load
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Auto-expand textarea
+    chatInput.addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    // Shift+Enter to newline, Enter to submit
+    chatInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Append user message
+            const userWrapper = document.createElement('div');
+            userWrapper.className = 'flex justify-end';
+            const userDiv = document.createElement('div');
+            userDiv.className = 'p-2.5 rounded-2xl rounded-br-sm bg-[#0071e3] text-[#1d1d1f] text-sm max-w-[85%] break-words shadow-sm';
+            userDiv.innerText = message;
+            userWrapper.appendChild(userDiv);
+            chatBox.appendChild(userWrapper);
+            chatInput.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
-        }
 
-        // Auto-expand textarea
-        chatInput.addEventListener('input', function () {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
+            // Append typing indicator
+            const typingWrapper = document.createElement('div');
+            typingWrapper.className = 'flex justify-start';
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'p-3 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm max-w-[85%] animate-pulse';
+            typingDiv.innerText = 'AI is typing...';
+            typingWrapper.appendChild(typingDiv);
+            chatBox.appendChild(typingWrapper);
+            chatBox.scrollTop = chatBox.scrollHeight;
 
-        // Shift+Enter to newline, Enter to submit
-        chatInput.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                chatForm.dispatchEvent(new Event('submit'));
-            }
-        });
-
-        if (chatForm) {
-            chatForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const message = chatInput.value.trim();
-                if (!message) return;
-
-                // Append user message
-                const userWrapper = document.createElement('div');
-                userWrapper.className = 'flex justify-end';
-                const userDiv = document.createElement('div');
-                userDiv.className = 'p-2.5 rounded-2xl rounded-br-sm bg-[#0071e3] text-[#1d1d1f] text-sm max-w-[85%] break-words shadow-sm';
-                userDiv.innerText = message;
-                userWrapper.appendChild(userDiv);
-                chatBox.appendChild(userWrapper);
-                chatInput.value = '';
-                chatBox.scrollTop = chatBox.scrollHeight;
-
-                // Append typing indicator
-                const typingWrapper = document.createElement('div');
-                typingWrapper.className = 'flex justify-start';
-                const typingDiv = document.createElement('div');
-                typingDiv.className = 'p-3 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm max-w-[85%] animate-pulse';
-                typingDiv.innerText = 'AI is typing...';
-                typingWrapper.appendChild(typingDiv);
-                chatBox.appendChild(typingWrapper);
-                chatBox.scrollTop = chatBox.scrollHeight;
-
-                // Send to server
-                try {
-                    const sessionId = document.getElementById('chat-session-id').value;
-                    const bodyParams = new URLSearchParams();
-                    bodyParams.append('message', message);
-                    if (sessionId) {
-                        bodyParams.append('session_id', sessionId);
-                    }
-
-                    const response = await fetch('{{ url_for("study.chat_with_topic", topic_id=topic.id) }}', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                        body: bodyParams.toString()
-                    });
-                    const data = await response.json();
-
-                    if (data.session_id && !document.getElementById('chat-session-id').value) {
-                        document.getElementById('chat-session-id').value = data.session_id;
-                    }
-
-                    // Remove typing indicator with actual AI response
-                    typingWrapper.remove();
-
-                    const aiWrapper = document.createElement('div');
-                    aiWrapper.className = 'flex justify-start';
-                    const aiDiv = document.createElement('div');
-                    aiDiv.className = 'p-3 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto';
-
-                    if (data.response && typeof marked !== 'undefined') {
-                        aiDiv.innerHTML = parseMarkdownWithMath(data.response);
-                        // Apply highlighting if available
-                        if (typeof hljs !== 'undefined') {
-                            aiDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-                        }
-                        addCodeCopyButtons(aiDiv);
-                    } else {
-                        aiDiv.innerText = data.response || data.error || 'No response received.';
-                    }
-
-                    aiWrapper.appendChild(aiDiv);
-                    chatBox.appendChild(aiWrapper);
-                    chatBox.scrollTop = chatBox.scrollHeight;
-
-                    // Typeset new math equations
-                    if (window.typesetMath) {
-                        window.typesetMath(aiDiv);
-                    }
-                } catch (err) {
-                    typingDiv.innerText = 'Failed to connect. Please try again.';
-                    typingDiv.classList.remove('animate-pulse');
-                    typingDiv.classList.add('text-red-500', 'bg-red-50', 'border-red-200');
-                    console.error(err);
+            // Send to server
+            try {
+                const sessionId = document.getElementById('chat-session-id').value;
+                const bodyParams = new URLSearchParams();
+                bodyParams.append('message', message);
+                if (sessionId) {
+                    bodyParams.append('session_id', sessionId);
                 }
-            });
-        }
 
-    async function generateMiniQuiz(quizId) {
-        const quizContainer = document.getElementById(quizId);
-        if (!quizContainer) return;
-        
-        quizContainer.innerHTML = '<span class="text-2xl mb-2 animate-spin">⏳</span><h4 class="text-[#1d1d1f] font-bold">Generating question...</h4>';
-        
-        try {
-            const response = await fetch('/topic/{{ topic.id }}/mini-quiz', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            const data = await response.json();
-            
-            if (data.error) {
-                quizContainer.innerHTML = '<span class="text-2xl mb-2">❌</span><h4 class="text-red-500 font-bold">Error</h4><p class="text-sm text-gray-500">' + data.error + '</p>';
-                return;
-            }
-            
-            let optionsHtml = '';
-            data.options.forEach((opt, idx) => {
-                optionsHtml += `<button onclick="checkAnswer(this, ${idx}, ${data.correct_index}, '${data.explanation.replace(/'/g, "\'")}')" class="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all text-sm font-medium">${opt}</button>`;
-            });
-            
-            quizContainer.innerHTML = `
-                <div class="w-full text-left">
-                    <h4 class="text-[#1d1d1f] font-bold mb-4 text-lg">${data.question}</h4>
-                    <div class="space-y-2">${optionsHtml}</div>
-                    <div class="quiz-explanation hidden mt-4 p-4 rounded-lg bg-[#0071e3]/10 text-[#0071e3] text-sm"></div>
-                </div>
-            `;
-        } catch (e) {
-            quizContainer.innerHTML = '<span class="text-2xl mb-2">❌</span><h4 class="text-red-500 font-bold">Error</h4><p class="text-sm text-gray-500">Failed to load quiz.</p>';
-        }
-    }
-    
-    // Check answer function for quizzes
-    function checkAnswer(btn, selected, correct, explanation) {
-        const container = btn.parentElement.parentElement;
-        const buttons = container.querySelectorAll('button');
-        const expDiv = container.querySelector('.quiz-explanation');
-        
-        buttons.forEach((b, idx) => {
-            b.disabled = true;
-            if (idx === correct) {
-                b.className = "w-full text-left p-3 rounded-lg border border-green-500 bg-green-50 text-green-700 text-sm font-bold";
-            } else if (idx === selected && selected !== correct) {
-                b.className = "w-full text-left p-3 rounded-lg border border-red-500 bg-red-50 text-red-700 text-sm font-bold";
-            } else {
-                b.className = "w-full text-left p-3 rounded-lg border border-gray-200 opacity-50 text-sm font-medium";
+                const response = await fetch('{{ url_for("study.chat_with_topic", topic_id=topic.id) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: bodyParams.toString()
+                });
+                const data = await response.json();
+
+                if (data.session_id && !document.getElementById('chat-session-id').value) {
+                    document.getElementById('chat-session-id').value = data.session_id;
+                }
+
+                // Remove typing indicator with actual AI response
+                typingWrapper.remove();
+
+                const aiWrapper = document.createElement('div');
+                aiWrapper.className = 'flex justify-start';
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'p-3 rounded-2xl rounded-bl-sm bg-gray-100 border border-gray-200 text-[#1d1d1f] text-sm prose prose-sm max-w-[85%] shadow-sm overflow-x-auto';
+
+                if (data.response && typeof marked !== 'undefined') {
+                    aiDiv.innerHTML = parseMarkdownWithMath(data.response);
+                    // Apply highlighting if available
+                    if (typeof hljs !== 'undefined') {
+                        aiDiv.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
+                    }
+                    addCodeCopyButtons(aiDiv);
+                } else {
+                    aiDiv.innerText = data.response || data.error || 'No response received.';
+                }
+
+                aiWrapper.appendChild(aiDiv);
+                chatBox.appendChild(aiWrapper);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Typeset new math equations
+                if (window.typesetMath) {
+                    window.typesetMath(aiDiv);
+                }
+            } catch (err) {
+                typingDiv.innerText = 'Failed to connect. Please try again.';
+                typingDiv.classList.remove('animate-pulse');
+                typingDiv.classList.add('text-red-500', 'bg-red-50', 'border-red-200');
+                console.error(err);
             }
         });
-        
-        expDiv.innerHTML = '<strong>' + (selected === correct ? '✅ Correct!' : '❌ Incorrect.') + '</strong><br>' + explanation;
-        expDiv.classList.remove('hidden');
     }
+
+
 
     function printNotes() {
         const rawContainers = document.querySelectorAll('#raw-notes-container .markdown-body');
@@ -638,14 +686,14 @@ const chatForm = document.getElementById('chat-form');
             txt.innerHTML = container.innerHTML;
             fullMarkdown += txt.value + '\n\n';
         });
-        
+
         let htmlContent = '';
         if (typeof marked !== 'undefined') {
             htmlContent = marked.parse(fullMarkdown);
         } else {
             htmlContent = '<pre>' + fullMarkdown + '</pre>';
         }
-        
+
         const printWindow = window.open('', '_blank');
         printWindow.document.write(`
             <!DOCTYPE html>
@@ -670,7 +718,7 @@ const chatForm = document.getElementById('chat-form');
                 </style>
             </head>
             <body>
-                <div class="watermark">KiraakStudy AI</div>
+                <div class="watermark">Helix AI</div>
                 <div class="header-info">
                     <h1>{{ topic.name }}</h1>
                     <p>{{ topic.subject_name }} - {{ topic.unit_name }}</p>
@@ -698,7 +746,7 @@ const chatForm = document.getElementById('chat-form');
         printWindow.document.close();
     }
 
-    
+
     // Toggle Complete
     async function toggleComplete(topicId) {
         try {
@@ -707,7 +755,7 @@ const chatForm = document.getElementById('chat-form');
             const btn = document.getElementById('complete-btn');
             const icon = document.getElementById('complete-icon');
             const text = document.getElementById('complete-text');
-            
+
             if (data.is_completed) {
                 btn.className = 'px-4 py-2 rounded-xl text-sm font-bold transition-all border bg-emerald-500/20 text-emerald-400 border-emerald-500/50';
                 icon.innerText = '✅';
@@ -730,7 +778,7 @@ const chatForm = document.getElementById('chat-form');
             const data = await response.json();
             const btn = document.getElementById('bookmark-btn');
             const icon = document.getElementById('bookmark-icon');
-            
+
             if (data.status === 'added') {
                 btn.className = 'p-2.5 rounded-xl transition-all border bg-[#0071e3]/20 text-[#0071e3] border-[#0071e3]/50';
                 icon.innerText = '🔖';

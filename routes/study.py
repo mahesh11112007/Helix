@@ -284,6 +284,9 @@ def mini_quiz(topic_id):
         return jsonify({"error": "Topic not found"}), 404
         
     try:
+        data = request.get_json(silent=True) or {}
+        context_text = data.get("context", "")
+        
         profile = db_service.query("SELECT api_keys, ai_platform, is_premium FROM profiles WHERE id = ?", (user_id,), one=True)
         if profile:
             profile = dict(profile)
@@ -293,15 +296,42 @@ def mini_quiz(topic_id):
         
         is_premium = bool(profile.get("is_premium")) if profile else False
         
-        if not key:
+        if key:
+            # User has their own key, infer platform and model
+            if key.startswith("sk-or-"):
+                base_url = "https://openrouter.ai/api/v1"
+                chat_model = "google/gemini-2.0-flash-exp:free"
+            elif key.startswith("nvapi-"):
+                base_url = "https://integrate.api.nvidia.com/v1"
+                chat_model = "meta/llama-3.1-8b-instruct"
+            elif key.startswith("AIza") or key.startswith("AQ."):
+                base_url = "https://generativelanguage.googleapis.com/v1beta/openai"
+                chat_model = "gemini-2.5-flash"
+            elif key.startswith("gsk_"):
+                base_url = "https://api.groq.com/openai/v1"
+                chat_model = "llama-3.3-70b-versatile"
+            elif key.startswith("sk-"):
+                base_url = "https://api.openai.com/v1"
+                chat_model = "gpt-4o-mini"
+            else:
+                base_url = "https://integrate.api.nvidia.com/v1"
+                chat_model = "meta/llama-3.1-8b-instruct"
+        else:
             if is_premium:
                 key, base_url, chat_model, _ = ai_service._get_config()
             else:
                 return jsonify({"error": "Upgrade to Premium to generate mini quizzes."}), 403
                 
         import json
-        prompt = f'''Generate exactly ONE multiple choice question based on the topic: {topic['name']}.
-Return ONLY valid JSON in this exact format, with no markdown code blocks or other text:
+        
+        if context_text:
+            prompt_topic = f"the specific sub-topics '{context_text}' from the overall topic '{topic['name']}'"
+        else:
+            prompt_topic = f"the topic '{topic['name']}'"
+            
+        prompt = f'''Generate exactly ONE multiple choice question based on {prompt_topic}.
+Return ONLY valid JSON in this exact format, with no markdown code blocks or other text.
+Do NOT include any newlines or unescaped quotes inside the JSON string values. Keep all text values on a single line.
 {{
   "question": "The question text here",
   "options": ["Option A", "Option B", "Option C", "Option D"],
@@ -310,30 +340,27 @@ Return ONLY valid JSON in this exact format, with no markdown code blocks or oth
 }}
 '''
         
-        if not base_url:
-            base_url = "https://integrate.api.nvidia.com/v1"
-            chat_model = "meta/llama-3.1-8b-instruct"
+        # Leverage ai_service's built-in key rotation, retry logic, and JSON parsing
+        response_data = ai_service._generate_partial(
+            prompt=prompt,
+            max_tokens=500,
+            key=key,
+            base_url=base_url,
+            chat_model=chat_model
+        )
+        
+        if response_data and isinstance(response_data, dict) and "question" in response_data:
+            return jsonify(response_data)
             
-        headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
-            
-        payload = {
-            "model": chat_model,
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.3,
-            "max_tokens": 500
+        # Fallback if AI fails
+        fallback = {
+            "question": f"What is a key concept in {context_text or topic['name']}?",
+            "options": ["Read the text above carefully", "Skip the section", "Guess randomly", "None of the above"],
+            "correct_index": 0,
+            "explanation": "Reviewing the material is always the best approach!"
         }
-        
-        import requests
-        resp = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=15)
-        resp.raise_for_status()
-        
-        content = resp.json()["choices"][0]["message"]["content"].strip()
-        if content.startswith("```json"):
-            content = content[7:-3].strip()
-        elif content.startswith("```"):
-            content = content[3:-3].strip()
+        return jsonify(fallback)
             
-        return jsonify(json.loads(content))
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
