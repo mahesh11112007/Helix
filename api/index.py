@@ -106,7 +106,8 @@ def create_app():
 app = create_app()
 
 # Start background replenishment thread only if not in testing/build mode
-if not os.environ.get("VERCEL_URL"):
+# and only once in development mode (Werkzeug starts two processes by default)
+if not os.environ.get("VERCEL_URL") and os.environ.get("WERKZEUG_RUN_MAIN") == "true":
     import threading
     from services.question_bank_service import question_bank_service
     def run_replenishment():

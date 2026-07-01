@@ -11,10 +11,33 @@ class WeeklyTestService:
         """
         today = datetime.now()
         
-        # Determine the cutoff date (7 days ago)
+        # 1. Tests are only available on Sundays
+        if today.weekday() != 6: # Sunday is 6
+            return
+            
+        # 2. Check if admin has released tests for this week
+        current_year, current_week, _ = today.isocalendar()
+        week_key = f"WEEKLY_TEST_RELEASE_{current_year}_W{current_week}"
+        
+        release_status = db_service.query("SELECT key_value FROM system_settings WHERE key_name = ?", (week_key,), one=True)
+        if not release_status or release_status["key_value"] != "approved":
+            # Admin hasn't approved or has dismissed this week's tests
+            return
+            
+        # Determine the cutoff date (7 days ago) to avoid regenerating if already exists
         seven_days_ago = today - timedelta(days=7)
         cutoff_date = seven_days_ago.replace(hour=0, minute=0, second=0, microsecond=0)
         
+        # 3. Enforce the "must register before Friday" rule
+        user = db_service.query("SELECT created_at FROM users WHERE id = ?", (user_id,), one=True)
+        if user and user.get("created_at"):
+            user_created = datetime.fromisoformat(user["created_at"])
+            # Get the Friday of the current week (Sunday is 6, Friday is 4. So 2 days ago if today is Sunday)
+            friday_cutoff = (today - timedelta(days=today.weekday() - 4)).replace(hour=0, minute=0, second=0, microsecond=0)
+            if user_created >= friday_cutoff:
+                print(f"[DEBUG] User {user_id} registered on or after Friday, skipping test for this week.")
+                return
+
         print(f"[DEBUG] check_and_generate for user_id: {user_id}")
         semesters = db_service.query("SELECT * FROM semesters WHERE user_id = ? ORDER BY created_at DESC", (user_id,))
         if not semesters:
@@ -108,7 +131,7 @@ class WeeklyTestService:
                 
             db_service.execute(
                 """INSERT INTO weekly_tests (id, user_id, subject_id, title, test_data, status, total_questions)
-                   VALUES (?, ?, 'ALL', ?, ?, 'pending', ?)""",
+                   VALUES (?, ?, 'ALL', ?, ?, 'approved', ?)""",
                 (test_id, user_id, "Weekly Assessment: Advanced Review", json.dumps(test_data), len(test_data))
             )
             

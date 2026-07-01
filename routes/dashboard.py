@@ -79,8 +79,19 @@ def index():
     from services.weekly_test_service import weekly_test_service
     weekly_test_service.check_and_generate(user["id"])
     
-    # Get pending weekly tests
-    pending_tests = db_service.query("SELECT * FROM weekly_tests WHERE user_id = ? AND status = 'pending' ORDER BY created_at DESC", (user["id"],))
+    # Get available weekly tests
+    pending_tests = db_service.query("SELECT * FROM weekly_tests WHERE user_id = ? AND status = 'approved' ORDER BY created_at DESC", (user["id"],))
+
+    # Check global admin approval status for the week
+    today = datetime.now()
+    is_sunday = (today.weekday() == 6)
+    weekly_test_status = None
+    if is_sunday:
+        current_year, current_week, _ = today.isocalendar()
+        week_key = f"WEEKLY_TEST_RELEASE_{current_year}_W{current_week}"
+        release_status_row = db_service.query("SELECT key_value FROM system_settings WHERE key_name = ?", (week_key,), one=True)
+        if release_status_row:
+            weekly_test_status = release_status_row["key_value"] # "approved" or "dismissed"
 
     return render_template(
         "dashboard/index.html",
@@ -90,7 +101,9 @@ def index():
         exams=exams,
         recent_files=recent_files,
         ai_suggestions=ai_suggestions,
-        pending_tests=pending_tests
+        pending_tests=pending_tests,
+        is_sunday=is_sunday,
+        weekly_test_status=weekly_test_status
     )
 
 @dashboard_bp.route("/setup", methods=["GET", "POST"])

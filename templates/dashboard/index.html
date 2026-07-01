@@ -188,8 +188,19 @@
                 </div>
                 {% endfor %}
             </div>
+            {% elif is_sunday %}
+                {% if weekly_test_status == 'dismissed' %}
+                <p class="text-xs text-gray-500">There are no weekly assessments for this week.</p>
+                {% elif weekly_test_status == 'approved' %}
+                <p class="text-xs text-gray-500">No pending tests. Great job!</p>
+                {% else %}
+                <div class="p-4 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-3">
+                    <i data-lucide="clock" class="w-5 h-5 text-amber-500"></i>
+                    <p class="text-xs text-amber-700 font-medium">This week's test is awaiting admin release. Check back later today!</p>
+                </div>
+                {% endif %}
             {% else %}
-            <p class="text-xs text-gray-500">No pending tests. Great job!</p>
+            <p class="text-xs text-gray-500">Weekly tests are generated every Sunday. Stay tuned!</p>
             {% endif %}
         </div>
     </div>

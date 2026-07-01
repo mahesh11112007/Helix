@@ -40,6 +40,7 @@ def dashboard():
             "GEMINI_API_KEYS": request.form.get("gemini_keys", "").strip(),
             "NVIDIA_NIM_API_KEYS": request.form.get("nvidia_keys", "").strip(),
             "GROQ_API_KEYS": request.form.get("groq_keys", "").strip(),
+            "CEREBRAS_API_KEYS": request.form.get("cerebras_keys", "").strip(),
             "OPENROUTER_API_KEYS": request.form.get("openrouter_keys", "").strip()
         }
         
@@ -67,10 +68,16 @@ def dashboard():
     # Fetch Genuine Support Requests
     requests_list = db_service.query("SELECT sr.*, p.email, p.full_name FROM support_requests sr JOIN profiles p ON sr.user_id = p.id WHERE sr.is_genuine = 1 ORDER BY CASE WHEN sr.status = 'open' THEN 0 ELSE 1 END, sr.created_at DESC")
     
-    # Fetch Pending Weekly Tests
-    pending_tests = db_service.query("SELECT wt.*, p.email, p.full_name FROM weekly_tests wt JOIN profiles p ON wt.user_id = p.id WHERE wt.status = 'pending_approval' ORDER BY wt.created_at DESC")
+    # Fetch Global Weekly Test Approval Status
+    from datetime import datetime
+    today = datetime.now()
+    current_year, current_week, _ = today.isocalendar()
+    week_key = f"WEEKLY_TEST_RELEASE_{current_year}_W{current_week}"
     
-    return render_template("admin/dashboard.html", settings=settings, users=users, proofs=proofs, requests=requests_list, pending_tests=pending_tests)
+    release_status_row = db_service.query("SELECT key_value FROM system_settings WHERE key_name = ?", (week_key,), one=True)
+    weekly_test_status = release_status_row["key_value"] if release_status_row else "pending"
+    
+    return render_template("admin/dashboard.html", settings=settings, users=users, proofs=proofs, requests=requests_list, weekly_test_status=weekly_test_status, current_week=f"Week {current_week}, {current_year}")
 
 @admin_bp.route("/proof/<proof_id>/<action>", methods=["POST"])
 def handle_proof(proof_id, action):
@@ -94,22 +101,31 @@ def handle_proof(proof_id, action):
         
     return redirect(url_for("admin.dashboard"))
 
-@admin_bp.route("/weekly-tests/<test_id>/<action>", methods=["POST"])
-def handle_weekly_test(test_id, action):
+@admin_bp.route("/weekly-tests/global/<action>", methods=["POST"])
+def handle_global_weekly_test(action):
     if not session.get("is_superadmin"):
         return redirect(url_for("admin.login"))
         
-    test = db_service.query("SELECT * FROM weekly_tests WHERE id = ?", (test_id,), one=True)
-    if not test:
-        flash("Test not found", "error")
-        return redirect(url_for("admin.dashboard"))
-        
+    from datetime import datetime
+    today = datetime.now()
+    current_year, current_week, _ = today.isocalendar()
+    week_key = f"WEEKLY_TEST_RELEASE_{current_year}_W{current_week}"
+    
     if action == "approve":
-        db_service.execute("UPDATE weekly_tests SET status = 'pending' WHERE id = ?", (test_id,))
-        flash("Weekly test approved and is now visible to the user.", "success")
+        existing = db_service.query("SELECT * FROM system_settings WHERE key_name = ?", (week_key,), one=True)
+        if existing:
+            db_service.execute("UPDATE system_settings SET key_value = 'approved', updated_at = CURRENT_TIMESTAMP WHERE key_name = ?", (week_key,))
+        else:
+            db_service.execute("INSERT INTO system_settings (key_name, key_value) VALUES (?, 'approved')", (week_key,))
+        flash(f"Weekly tests for Week {current_week} have been released globally.", "success")
+        
     elif action == "reject":
-        db_service.execute("DELETE FROM weekly_tests WHERE id = ?", (test_id,))
-        flash("Weekly test rejected and deleted.", "success")
+        existing = db_service.query("SELECT * FROM system_settings WHERE key_name = ?", (week_key,), one=True)
+        if existing:
+            db_service.execute("UPDATE system_settings SET key_value = 'dismissed', updated_at = CURRENT_TIMESTAMP WHERE key_name = ?", (week_key,))
+        else:
+            db_service.execute("INSERT INTO system_settings (key_name, key_value) VALUES (?, 'dismissed')", (week_key,))
+        flash(f"Weekly tests for Week {current_week} have been dismissed.", "success")
         
     return redirect(url_for("admin.dashboard"))
 
@@ -243,3 +259,46 @@ def upload_syllabus():
         print(f"Error processing PDF: {e}")
         flash(f"An error occurred: {str(e)}", "error")
         return redirect(url_for("admin.dashboard"))
+
+@admin_bp.route("/import-questions", methods=["POST"])
+def import_questions():
+    if not session.get("is_admin"):
+        return redirect(url_for("admin.login"))
+        
+    try:
+        json_file = request.files.get("json_file")
+        if not json_file or not json_file.filename.endswith(".json"):
+            flash("Please upload a valid JSON file.", "error")
+            return redirect(url_for("admin.dashboard"))
+            
+        data = json.loads(json_file.read().decode("utf-8"))
+        if not isinstance(data, list):
+            flash("JSON must contain a list of questions.", "error")
+            return redirect(url_for("admin.dashboard"))
+            
+        conn, cursor = db_service._get_conn()
+        try:
+            for q in data:
+                cursor.execute(db_service._prepare_query('''
+                    INSERT INTO question_bank 
+                    (id, subject_id, unit_id, topic_id, difficulty, question, options, correct_answer, explanation, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(id) DO NOTHING
+                '''), (
+                    q.get("id"), q.get("subject_id"), q.get("unit_id"), q.get("topic_id"), 
+                    q.get("difficulty"), q.get("question"), q.get("options"), 
+                    q.get("correct_answer"), q.get("explanation"), q.get("created_at")
+                ))
+            conn.commit()
+            flash(f"Successfully imported {len(data)} questions into the Question Bank!", "success")
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            cursor.close()
+            conn.close()
+            
+    except Exception as e:
+        flash(f"Import failed: {str(e)}", "error")
+        
+    return redirect(url_for("admin.dashboard"))

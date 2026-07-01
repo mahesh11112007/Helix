@@ -14,6 +14,7 @@ class QuestionBankService:
         Background job to check all topics and replenish the question bank if needed.
         Runs in a separate thread so it doesn't block the main app.
         """
+        import time
         print("[QuestionBank] Starting replenishment check...")
         try:
             topics = db_service.query("""
@@ -23,7 +24,12 @@ class QuestionBankService:
                 JOIN subjects s ON u.subject_id = s.id
             """)
             
+            topics_replenished = 0
             for topic in topics:
+                if topics_replenished >= 5:
+                    print("[QuestionBank] Reached max 5 topics for this run. Pausing until next cron job to respect API rate limits.")
+                    break
+                    
                 # Count current questions for this topic
                 count_res = db_service.query(
                     "SELECT COUNT(*) as count FROM question_bank WHERE topic_id = ?", 
@@ -35,7 +41,17 @@ class QuestionBankService:
                 if current_count < self.TARGET_QUESTIONS_PER_TOPIC:
                     needed = self.TARGET_QUESTIONS_PER_TOPIC - current_count
                     print(f"[QuestionBank] Topic {topic['topic_name']} needs {needed} questions. Generating...")
-                    self._generate_and_insert_questions(topic, min(needed, 10)) # Max 10 per request to avoid rate limits
+                    try:
+                        self._generate_and_insert_questions(topic, min(needed, 10)) # Max 10 per request to avoid rate limits
+                        topics_replenished += 1
+                        time.sleep(5)  # Pause to avoid 429 Too Many Requests
+                    except Exception as e:
+                        from services.ai_service import RateLimitExhaustedError
+                        if isinstance(e, RateLimitExhaustedError):
+                            print(f"[QuestionBank] Rate Limit Exhausted across all providers! Queueing for 10 minutes...")
+                            time.sleep(600)
+                        else:
+                            print(f"[QuestionBank] Error generating questions for {topic['topic_name']}: {e}")
                     
         except Exception as e:
             print(f"[QuestionBank] Error during replenishment: {e}")
@@ -76,6 +92,9 @@ class QuestionBankService:
                     )
                 print(f"[QuestionBank] Inserted {len(questions)} questions for {topic['topic_name']}.")
         except Exception as e:
-            print(f"[QuestionBank] Error generating questions for {topic['topic_name']}: {e}")
+            from services.ai_service import RateLimitExhaustedError
+            if isinstance(e, RateLimitExhaustedError):
+                raise e
+            print(f"[QuestionBank] Error parsing questions for {topic['topic_name']}: {e}")
 
 question_bank_service = QuestionBankService()

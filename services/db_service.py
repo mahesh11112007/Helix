@@ -33,7 +33,10 @@ class DBService:
         else:
             self.sqlite_db = "kiraak_study.db"
         
-        self._init_db()
+        try:
+            self._init_db()
+        except Exception as e:
+            print(f"Failed to initialize database: {e}")
 
     def _get_conn(self):
         if self.use_postgres:

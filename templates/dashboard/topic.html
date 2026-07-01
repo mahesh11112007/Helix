@@ -572,12 +572,14 @@
                 window.MathJax.typesetPromise([container]).then(() => {
                     console.log('MathJax typeset complete on structured content');
                 }).catch(err => console.error(err));
-            } else if (attempts < 20) {
+            } else if (attempts < 50) {
                 setTimeout(() => tryTypeset(attempts + 1), 200);
             }
         };
         tryTypeset();
-        tryTypeset();
+        document.addEventListener("mathjax-loaded", () => {
+            tryTypeset();
+        });
     });
 </script>
 

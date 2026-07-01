@@ -16,6 +16,9 @@ def _handle_auth_error(e):
             except Exception:
                 pass
 
+class RateLimitExhaustedError(Exception):
+    pass
+
 class AIService:
     def __init__(self):
         self.model = "meta/llama-3.1-8b-instruct"
@@ -23,72 +26,126 @@ class AIService:
         # Keep track of which key to use for load balancing
         self._key_index = 0
 
-    @property
-    def api_config(self):
-        """Returns a tuple of (api_key, ai_platform)"""
-        # pyrefly: ignore [missing-import]
+
+    def get_prioritized_configs(self):
+        """
+        Returns a strict priority list of API configurations (key, base_url, chat_model, vision_model, platform)
+        Priority: Gemini -> Groq -> Cerebras -> OpenRouter
+        """
         from flask import session
         from services.db_service import db_service
         import os
         
-        keys_str = ""
-        ai_platform = "nvidia"
-        is_fallback = True
-            
+        all_keys = {
+            "gemini": [],
+            "groq": [],
+            "cerebras": [],
+            "openrouter": [],
+            "nvidia": [],
+            "openai": []
+        }
+        
+        allowed_db_keys = ["GLOBAL_AI_API_KEYS", "NVIDIA_NIM_PAID_API_KEY", "NVIDIA_NIM_API_KEYS", "NVIDIA_NIM_API_KEY", "GEMINI_API_KEYS", "GROQ_API_KEYS", "CEREBRAS_API_KEYS", "OPENROUTER_API_KEYS", "OPENAI_API_KEY"]
+        
+        # Load keys from DB and Env
         combined = []
-        # Fetch from DB system_settings
         try:
             rows = db_service.query("SELECT key_name, key_value FROM system_settings")
             if rows:
                 for row in rows:
-                    if row["key_value"]:
-                        combined.append(row["key_value"])
+                    if row["key_name"] in allowed_db_keys and row["key_value"]:
+                        val = row["key_value"].strip()
+                        if val and "your_" not in val.lower() and "replace" not in val.lower():
+                            combined.append(val)
         except Exception:
             pass
             
-        env_vars = ["GLOBAL_AI_API_KEYS", "NVIDIA_NIM_PAID_API_KEY", "NVIDIA_NIM_API_KEYS", "NVIDIA_NIM_API_KEY", "GEMINI_API_KEYS", "GROQ_API_KEYS", "OPENROUTER_API_KEYS"]
-        for ev in env_vars:
+        for ev in allowed_db_keys:
             val = os.getenv(ev)
-            if val: combined.append(val)
+            if val:
+                val = val.strip()
+                if val and "your_" not in val.lower() and "replace" not in val.lower():
+                    combined.append(val)
+                    
         keys_str = ",".join(combined)
-            
-        if not keys_str:
-            return None, ai_platform
-            
         keys = [k.strip() for k in keys_str.split(",") if k.strip()]
-        if not keys:
-            return None, ai_platform
-            
-        # Rotate through available keys
-        key = keys[self._key_index % len(keys)]
-        self._key_index = (self._key_index + 1) % max(1, len(keys))
         
-        # Dynamically infer platform for global fallback keys
-        if is_fallback:
-            if key.startswith("sk-or-"):
-                ai_platform = "openrouter"
-            elif key.startswith("nvapi-"):
-                ai_platform = "nvidia"
-            elif key.startswith("AIza") or key.startswith("AQ."):
-                ai_platform = "gemini"
-            elif key.startswith("gsk_"):
-                ai_platform = "groq"
-            elif key.startswith("sk-"):
-                ai_platform = "openai"
-        
-        # Basic validation (if it's completely wrong format, treat as missing)
-        if len(key) < 15:
-            return None, ai_platform
-        if ai_platform == "nvidia" and not key.startswith("nvapi-"):
-            return None, ai_platform
-        if ai_platform == "openai" and not key.startswith("sk-"):
-            return None, ai_platform
-        if ai_platform == "gemini" and not (key.startswith("AIza") or key.startswith("AQ.")):
-            return None, ai_platform
-        if ai_platform == "openrouter" and not key.startswith("sk-or-"):
-            return None, ai_platform
+        for key in keys:
+            if len(key) < 15: continue
             
-        return key, ai_platform
+            ai_platform = None
+            if key.startswith("sk-or-"): ai_platform = "openrouter"
+            elif key.startswith("nvapi-"): ai_platform = "nvidia"
+            elif key.startswith("AIza") or key.startswith("AQ."): ai_platform = "gemini"
+            elif key.startswith("gsk_"): ai_platform = "groq"
+            elif key.startswith("sk-"): ai_platform = "openai"
+            else: ai_platform = "cerebras" # Assume Cerebras for unformatted keys if no other match, or maybe check specifically. 
+            
+            # Since Cerebras keys don't have a known fixed prefix yet, we can't strongly infer it unless it came from CEREBRAS_API_KEYS. 
+            # We'll just map it to the dictionary.
+            
+            if ai_platform:
+                all_keys[ai_platform].append(key)
+                
+        # Manually fetch Cerebras keys to be safe
+        try:
+            cer_row = db_service.query("SELECT key_value FROM system_settings WHERE key_name = 'CEREBRAS_API_KEYS'", one=True)
+            if cer_row and cer_row["key_value"]:
+                cer_keys = [k.strip() for k in cer_row["key_value"].split(",") if len(k.strip()) > 15]
+                all_keys["cerebras"].extend(cer_keys)
+        except: pass
+        
+        if os.getenv("CEREBRAS_API_KEYS"):
+            cer_keys = [k.strip() for k in os.getenv("CEREBRAS_API_KEYS").split(",") if len(k.strip()) > 15]
+            all_keys["cerebras"].extend(cer_keys)
+            
+        # Deduplicate
+        for k in all_keys:
+            all_keys[k] = list(set(all_keys[k]))
+            
+        # Priority Order: Gemini -> Groq -> Cerebras -> OpenRouter
+        priority_order = ["gemini", "groq", "cerebras", "openrouter", "nvidia", "openai"]
+        
+        configs = []
+        for plat in priority_order:
+            for key in all_keys[plat]:
+                cfg = self._get_config_for_key(key, plat)
+                if cfg:
+                    configs.append(cfg)
+                    
+        return configs
+
+    def _get_config_for_key(self, key, platform):
+        if platform == "openai":
+            return (key, "https://api.openai.com/v1", "gpt-4o-mini", "gpt-4o", platform)
+        elif platform == "gemini":
+            return (key, "https://generativelanguage.googleapis.com/v1beta/openai", "gemini-2.5-flash", "gemini-2.5-pro", platform)
+        elif platform == "groq":
+            return (key, "https://api.groq.com/openai/v1", "llama-3.3-70b-versatile", "llama-3.2-90b-vision-preview", platform)
+        elif platform == "cerebras":
+            return (key, "https://api.cerebras.ai/v1", "llama3.1-8b", "llama3.1-8b", platform)
+        elif platform == "openrouter":
+            return (key, "https://openrouter.ai/api/v1", "meta-llama/llama-3.3-70b-instruct:free", "meta-llama/llama-3.3-70b-instruct:free", platform)
+        elif platform == "nvidia":
+            return (key, "https://integrate.api.nvidia.com/v1", self.model, self.vision_model, platform)
+        return None
+
+    def _get_config(self):
+        """Restored for backward compatibility with methods not yet refactored to use get_prioritized_configs."""
+        configs = self.get_prioritized_configs()
+        if configs:
+            cfg = configs[0]
+            # Returns: key, base_url, chat_model, vision_model
+            return cfg[0], cfg[1], cfg[2], cfg[3]
+        return None, None, None, None
+
+    @property
+    def api_config(self):
+        """Maintained for backward compatibility. Returns the first available key."""
+        configs = self.get_prioritized_configs()
+        if configs:
+            return configs[0][0], configs[0][4]
+        return None, "nvidia"
 
     @property
     def api_key(self):
@@ -109,27 +166,6 @@ class AIService:
             pass
         return ""
 
-    def _get_config(self):
-        key, platform = self.api_config
-        if not key:
-            return None, None, None, None
-            
-        # Map platforms to endpoints and models
-        if platform == "openai":
-            return (key, "https://api.openai.com/v1", "gpt-4o-mini", "gpt-4o")
-        elif platform == "gemini":
-            return (key, "https://generativelanguage.googleapis.com/v1beta/openai", "gemini-2.5-flash", "gemini-2.5-pro")
-        elif platform == "groq":
-            return (key, "https://api.groq.com/openai/v1", "llama-3.3-70b-versatile", "llama-3.2-90b-vision-preview")
-        elif platform == "xai":
-            return (key, "https://api.x.ai/v1", "grok-beta", "grok-vision-beta")
-        elif platform == "openrouter":
-            return (key, "https://openrouter.ai/api/v1", "google/gemini-2.0-flash-exp:free", "google/gemini-2.0-flash-exp:free")
-        elif platform == "custom":
-            import os
-            return (key, os.getenv("CUSTOM_AI_BASE_URL", "http://localhost:8000/v1"), os.getenv("CUSTOM_AI_MODEL", "llama-3-8b"), os.getenv("CUSTOM_AI_MODEL", "llama-3-8b"))
-        else: # Default nvidia
-            return (key, "https://integrate.api.nvidia.com/v1", self.model, self.vision_model)
 
     def process_vision_document(self, image_bytes):
         """
@@ -733,30 +769,17 @@ Other Subjects:
 - Expand difficult concepts instead of summarizing them."""
 
     def _generate_partial(self, prompt, max_tokens=4096, retries=5, key=None, base_url=None, chat_model=None, custom_instr=""):
-        """Call the LLM API with retry logic and robust JSON extraction."""
-        if not key:
-            key, base_url, chat_model, vision_model = self._get_config()
-            custom_instr = self._get_custom_instructions()
-            
-        if not key:
+        """Call the LLM API with strict priority fallback and robust JSON extraction."""
+        import requests
+        import time
+        import json
+        
+        configs = self.get_prioritized_configs()
+        if not configs:
             return {}
-        
-        # Detect if this is a local/custom model
-        is_local = "127.0.0.1" in (base_url or "") or "localhost" in (base_url or "")
-        
-        if is_local:
-            # Simplified system prompt for small local models — NO LaTeX
-            system_prompt = self.HELIX_SYSTEM_PROMPT + """\n
-CRITICAL JSON OUTPUT RULES:
-1. Output ONLY valid JSON. No markdown wrappers, no extra text.
-2. Do NOT use LaTeX, math notation, dollar signs ($), or backslash commands.
-3. Write math in plain text: "x^2 + y^2 = z^2" not "$x^2$".
-4. Write fractions as "a/b" not "\\frac{a}{b}".
-5. Every string must be properly closed with a quote.
-6. Do not nest JSON inside JSON strings.
-7. Keep answers concise to avoid truncation."""
-        else:
-            system_prompt = self.HELIX_SYSTEM_PROMPT + """\n
+            
+        system_prompt_base = self.HELIX_SYSTEM_PROMPT + """
+
 CRITICAL JSON OUTPUT RULES:
 1. Output ONLY valid JSON. No markdown wrappers, no extra text.
 2. When writing math, use LaTeX: '$$...$$' for block equations, '$...$' for inline.
@@ -764,62 +787,58 @@ CRITICAL JSON OUTPUT RULES:
 4. Because you are outputting JSON, double-escape all LaTeX backslashes (e.g. \\\\frac instead of \\frac)."""
         
         if custom_instr:
-            system_prompt += f"\n\nUSER'S CUSTOM INSTRUCTIONS FOR AI BEHAVIOR:\n{custom_instr}\n"
-
-        payload = {
-            "model": chat_model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.3 if is_local else 0.5,
-            "top_p": 1,
-            "max_tokens": max_tokens,
-        }
-        # Only use response_format for cloud APIs that support it reliably
-        if not is_local:
-            payload["response_format"] = {"type": "json_object"}
+            system_prompt_base += f"\\n\\nUSER'S CUSTOM INSTRUCTIONS FOR AI BEHAVIOR:\\n{custom_instr}\\n"
             
-        headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+        messages = [
+            {"role": "system", "content": system_prompt_base},
+            {"role": "user", "content": prompt}
+        ]
+
+        last_error = None
         
-        for attempt in range(retries + 1):
-            try:
-                response = requests.post(
-                    f"{base_url}/chat/completions", 
-                    headers=headers, 
-                    json=payload,
-                    timeout=600
-                )
-                response.raise_for_status()
-                content = response.json()["choices"][0]["message"]["content"]
-                result = self._extract_json(content)
-                if result:
-                    return result
-                print(f"Empty JSON extraction on attempt {attempt + 1}")
-            except requests.exceptions.HTTPError as e:
-                _handle_auth_error(e)
-                print(f"HTTP Error in partial generation attempt {attempt + 1}: {e}")
+        for attempt in range(retries):
+            for cfg in configs:
+                cfg_key, cfg_base_url, cfg_chat_model, cfg_vision_model, platform = cfg
                 
-                # Fetch next key for rotation
-                new_key, new_base_url, new_chat_model, _ = self._get_config()
-                if new_key and new_key != key:
-                    key, base_url, chat_model = new_key, new_base_url, new_chat_model
-                    headers["Authorization"] = f"Bearer {key}"
-                    payload["model"] = chat_model
+                payload = {
+                    "model": cfg_chat_model,
+                    "messages": messages,
+                    "temperature": 0.5,
+                    "top_p": 1,
+                    "max_tokens": max_tokens,
+                    "response_format": {"type": "json_object"}
+                }
+                
+                # Exclude response_format for groq/cerebras if they don't support it reliably, but they usually do
+                
+                headers = {"Authorization": f"Bearer {cfg_key}", "Content-Type": "application/json"}
+                
+                try:
+                    response = requests.post(f"{cfg_base_url}/chat/completions", headers=headers, json=payload, timeout=90)
+                    response.raise_for_status()
                     
-                if e.response and e.response.status_code == 429:
-                    time.sleep(2 ** attempt)
-                    continue
-                if e.response and e.response.status_code >= 500:
-                    time.sleep(1 * (attempt + 1))
-                    continue
-            except requests.exceptions.Timeout:
-                print(f"Timeout on attempt {attempt + 1}")
-                time.sleep(1)
-            except Exception as e:
-                print(f"Error in partial generation attempt {attempt + 1}: {e}")
-                time.sleep(0.5)
-        return {}
+                    content = response.json()["choices"][0]["message"]["content"]
+                    result = self._extract_json(content)
+                    if result:
+                        return result
+                    print(f"[{platform.upper()}] Empty JSON extraction.")
+                except requests.exceptions.HTTPError as e:
+                    _handle_auth_error(e)
+                    status = e.response.status_code if e.response is not None else 'unknown'
+                    print(f"[{platform.upper()}] API HTTP Error {status}: {e}")
+                    last_error = e
+                    # Fallthrough to next config...
+                except Exception as e:
+                    print(f"[{platform.upper()}] API Request Error: {e}")
+                    last_error = e
+                    # Fallthrough to next config...
+            
+            # If we exhausted all configs in this attempt, wait and retry
+            print(f"[AI Service] All fallbacks exhausted for attempt {attempt + 1}. Retrying in 2 seconds...")
+            time.sleep(2)
+            
+        print("[AI Service] ALL retries and API Fallbacks exhausted! Rate limit or global auth failure.")
+        raise RateLimitExhaustedError("All AI providers failed. " + str(last_error))
 
     def generate_study_materials(self, topic_name, subject_name="", key=None, base_url=None, chat_model=None, custom_instr=""):
         """
@@ -1365,10 +1384,6 @@ Understanding {topic_name} requires working through real examples and practice p
 
     def triage_support_request(self, user_message):
         """Triages user support requests, classifies if admin intervention is needed, and provides an initial answer."""
-        key, base_url, chat_model, _ = self._get_config()
-        if not key:
-            return {"answer": "Our AI support is temporarily offline. We have forwarded your request to the admin team.", "needs_admin": True}
-            
         system_prompt = """
         You are the official Customer Support AI for Helix AI. 
         Your primary role is to assist users with billing, platform issues, and account management. 
@@ -1388,29 +1403,17 @@ Understanding {topic_name} requires working through real examples and practice p
         }
         """
         
-        payload = {
-            "model": chat_model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message}
-            ],
-            "temperature": 0.1,
-            "response_format": {"type": "json_object"}
-        }
-        
         try:
-            import requests, json
-            headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
-            response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=20)
-            response.raise_for_status()
-            content = response.json()["choices"][0]["message"]["content"]
-            parsed = json.loads(content)
-            return {
-                "answer": parsed.get("answer", "Thank you for your message. An admin will review it."),
-                "needs_admin": parsed.get("needs_admin", True)
-            }
-        except Exception as e:
-            print(f"Error in support triage: {e}")
+            parsed = self._generate_partial(prompt=user_message, custom_instr=system_prompt)
+        except RateLimitExhaustedError:
+            return {"answer": "Our AI support is temporarily offline due to high traffic. We have forwarded your request to the admin team.", "needs_admin": True}
+        
+        if not parsed:
             return {"answer": "An error occurred while processing your request. It has been forwarded to our admin team.", "needs_admin": True}
+            
+        return {
+            "answer": parsed.get("answer", "Thank you for your message. An admin will review it."),
+            "needs_admin": parsed.get("needs_admin", True)
+        }
 
 ai_service = AIService()
