@@ -90,7 +90,9 @@
     }
 
     /* MathJax Overrides */
-    .MathJax, mjx-container, .mjx-container {
+    .MathJax,
+    mjx-container,
+    .mjx-container {
         color: #000 !important;
         font-size: 110% !important;
     }
@@ -221,16 +223,19 @@
         <aside
             class="flex flex-col w-full xl:w-64 border-b xl:border-b-0 xl:border-r border-gray-200 bg-white xl:custom-scroll xl:overflow-y-auto p-6 shrink-0">
             <details class="group xl:hidden">
-                <summary class="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-gray-500 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <summary
+                    class="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-gray-500 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                     <span>On This Page</span>
-                    <svg class="w-4 h-4 transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-4 h-4 transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </summary>
                 <div class="mt-6">
                     <div class="space-y-4 mb-6">
                         <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                            <div id="reading-progress-mobile" class="h-full bg-[#0071e3] w-0 transition-all duration-300"></div>
+                            <div id="reading-progress-mobile"
+                                class="h-full bg-[#0071e3] w-0 transition-all duration-300"></div>
                         </div>
                         <p class="text-xs text-gray-500 text-right" id="reading-percentage-mobile">0% Read</p>
                     </div>
@@ -240,7 +245,7 @@
                     </nav>
                 </div>
             </details>
-            
+
             <div class="hidden xl:block">
                 <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-4">On This Page</h3>
                 <div class="space-y-4 mb-6">
@@ -503,14 +508,14 @@
         if (tocList.length > 0) {
             tocNav.innerHTML = '';
             if (tocNavMobile) tocNavMobile.innerHTML = '';
-            
+
             tocList.forEach((item, index) => {
                 const a = document.createElement('a');
                 a.href = '#' + item.id;
                 a.className = 'toc-link block px-3 py-2 rounded-lg text-gray-500 hover:bg-[#333] hover:text-[#1d1d1f] transition-all truncate';
                 a.textContent = item.title;
                 a.dataset.target = item.id;
-                
+
                 tocNav.appendChild(a);
                 if (tocNavMobile) {
                     const aMobile = a.cloneNode(true);
@@ -532,7 +537,7 @@
             const scrollHeight = scrollArea.scrollHeight - scrollArea.clientHeight;
             const scrollPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
             const roundedPercent = Math.round(scrollPercent) + '% Read';
-            
+
             if (progressBar) progressBar.style.width = scrollPercent + '%';
             if (progressText) progressText.textContent = roundedPercent;
             if (progressBarMobile) progressBarMobile.style.width = scrollPercent + '%';
@@ -721,7 +726,71 @@
 
 
     function printNotes() {
-        window.print();
+        const rawContainers = document.querySelectorAll('#raw-notes-container .markdown-body');
+        let fullMarkdown = '';
+        rawContainers.forEach(container => {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = container.innerHTML;
+            fullMarkdown += txt.value + '\n\n';
+        });
+
+        let htmlContent = '';
+        if (typeof marked !== 'undefined') {
+            htmlContent = marked.parse(fullMarkdown);
+        } else {
+            htmlContent = '<pre>' + fullMarkdown + '</pre>';
+        }
+
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Print - {{ topic.name }}</title>
+                <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }
+                    h1, h2, h3 { color: #000; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 24px; }
+                    p { margin-bottom: 16px; }
+                    ul, ol { margin-bottom: 16px; padding-left: 20px; }
+                    pre { background: #f5f5f5; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: monospace; }
+                    code { font-family: monospace; background: #f5f5f5; padding: 2px 4px; border-radius: 3px; }
+                    blockquote { border-left: 4px solid #ccc; margin: 0; padding-left: 16px; color: #666; }
+                    table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .header-info { text-align: center; margin-bottom: 30px; }
+                    .header-info h1 { border: none; margin-bottom: 5px; }
+                    .header-info p { color: #666; margin-top: 0; }
+                    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 8rem; color: rgba(0,0,0,0.05); z-index: -1; pointer-events: none; user-select: none; font-weight: bold; white-space: nowrap; }
+                </style>
+            </head>
+            <body>
+                <div class="watermark">Helix AI</div>
+                <div class="header-info">
+                    <h1>{{ topic.name }}</h1>
+                    <p>{{ topic.subject_name }} - {{ topic.unit_name }}</p>
+                </div>
+                ${htmlContent}
+                
+                <script>
+                    if (window.opener && window.opener.MathJax) {
+                        window.MathJax = window.opener.MathJax;
+                        const script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+                        script.onload = function() {
+                            MathJax.typesetPromise().then(() => {
+                                setTimeout(() => { window.print(); window.close(); }, 500);
+                            });
+                        };
+                        document.head.appendChild(script);
+                    } else {
+                        setTimeout(() => { window.print(); window.close(); }, 500);
+                    }
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
     }
 
 
