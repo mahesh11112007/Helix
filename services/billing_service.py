@@ -1,5 +1,6 @@
 import os
 import requests
+import datetime
 from services.db_service import db_service
 
 class BillingService:
@@ -69,9 +70,16 @@ class BillingService:
         try:
             # Update the user's tier to premium in the database
             db_service.execute("UPDATE user_usage SET subscription_tier = 'premium' WHERE user_id = ?", (user_id,))
-            # CRITICAL FIX: Ensure the profile is also marked as premium so the app bypasses limits
-            db_service.execute("UPDATE profiles SET is_premium = 1 WHERE id = ?", (user_id,))
-            print(f"Successfully upgraded user {user_id} to Premium!")
+            
+            # Set expiration to 30 days from now
+            expires_at = (datetime.datetime.utcnow() + datetime.timedelta(days=30)).isoformat()
+            
+            # CRITICAL FIX: Ensure the profile is also marked as premium and set the expiry date
+            db_service.execute(
+                "UPDATE profiles SET is_premium = 1, premium_expires_at = ? WHERE id = ?", 
+                (expires_at, user_id)
+            )
+            print(f"Successfully upgraded user {user_id} to Premium! Expires: {expires_at}")
             return True
         except Exception as e:
             print(f"Error upgrading user to premium: {e}")

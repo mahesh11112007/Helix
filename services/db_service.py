@@ -74,6 +74,8 @@ class DBService:
                 math_learning_level TEXT,
                 is_premium BOOLEAN DEFAULT FALSE,
                 premium_request_status TEXT,
+                premium_expires_at TIMESTAMP,
+                premium_reminder_sent BOOLEAN DEFAULT FALSE,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"""))
             
@@ -403,6 +405,24 @@ class DBService:
                 if self.use_postgres: cursor.execute("RELEASE SAVEPOINT sp2")
             except Exception:
                 if self.use_postgres: cursor.execute("ROLLBACK TO SAVEPOINT sp2")
+                pass
+                
+            # Migration: add premium_expires_at to profiles if it doesn't exist
+            try:
+                if self.use_postgres: cursor.execute("SAVEPOINT sp3")
+                cursor.execute("ALTER TABLE profiles ADD COLUMN premium_expires_at TIMESTAMP")
+                if self.use_postgres: cursor.execute("RELEASE SAVEPOINT sp3")
+            except Exception:
+                if self.use_postgres: cursor.execute("ROLLBACK TO SAVEPOINT sp3")
+                pass
+                
+            # Migration: add premium_reminder_sent to profiles if it doesn't exist
+            try:
+                if self.use_postgres: cursor.execute("SAVEPOINT sp4")
+                cursor.execute("ALTER TABLE profiles ADD COLUMN premium_reminder_sent BOOLEAN DEFAULT FALSE")
+                if self.use_postgres: cursor.execute("RELEASE SAVEPOINT sp4")
+            except Exception:
+                if self.use_postgres: cursor.execute("ROLLBACK TO SAVEPOINT sp4")
                 pass
                 
             conn.commit()

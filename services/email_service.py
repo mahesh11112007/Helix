@@ -159,4 +159,55 @@ class EmailService:
                 print(f"Resend API Response: {e.response.text}")
             return False
 
+    def send_premium_reminder(self, to_email, user_name):
+        if not self.api_key:
+            print("WARNING: RESEND_API_KEY is not set. Cannot send email.")
+            return False
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        # HTML Template for the email
+        html_content = f"""
+        <div style="font-family: 'Inter', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h1 style="color: #1d1d1f; margin: 0;">Helix AI Premium</h1>
+            </div>
+            <h2 style="color: #1d1d1f; font-size: 18px;">Hi {user_name},</h2>
+            <p style="color: #555; font-size: 16px; line-height: 1.6;">
+                Your KiraakStudy Premium subscription expires in exactly <strong>3 days</strong>.
+            </p>
+            <p style="color: #555; font-size: 16px; line-height: 1.6;">
+                Renew now to keep your advanced AI limits, priority access, and faster generation speeds! 
+                If your account expires, you will automatically be downgraded to the free Basic tier.
+            </p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="https://kiraakstudy.com/upgrade" style="background-color: #1d1d1f; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">Renew Premium Now</a>
+            </div>
+            <p style="color: #888; font-size: 14px; text-align: center;">
+                If you have any questions, feel free to contact our support team.
+            </p>
+        </div>
+        """
+
+        payload = {
+            "from": f"Helix AI Support <{self.sender_email}>",
+            "to": [to_email],
+            "subject": "Action Required: Your Premium Expires in 3 Days!",
+            "html": html_content
+        }
+
+        try:
+            response = requests.post("https://api.resend.com/emails", headers=headers, json=payload)
+            response.raise_for_status()
+            print(f"Premium reminder sent to {to_email}")
+            return True
+        except requests.exceptions.RequestException as e:
+            print(f"Error sending premium reminder via Resend: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Resend API Response: {e.response.text}")
+            return False
+
 email_service = EmailService()

@@ -1,6 +1,9 @@
 
 from flask import Blueprint, request, jsonify, redirect, url_for, render_template, current_app, flash
+import datetime
 from services.billing_service import billing_service
+from services.email_service import email_service
+from services.db_service import db_service
 from routes.dashboard import get_current_user
 
 billing_bp = Blueprint("billing", __name__)
@@ -106,5 +109,42 @@ def upload_proof():
         
         flash("Payment proof uploaded successfully! Our team will verify it shortly.", "success")
         return redirect(url_for("billing.upgrade_page"))
+
+@billing_bp.route("/api/cron/check-subscriptions", methods=["GET", "POST"])
+def check_subscriptions():
+    # Vercel Cron will hit this endpoint automatically
+    # Optional: Verify authorization header if configured in Vercel
+    
+    now = datetime.datetime.utcnow()
+    three_days_from_now = now + datetime.timedelta(days=3)
+    
+    # 1. Check for expired subscriptions and downgrade them
+    expired_users = db_service.query(
+        "SELECT id, email, full_name FROM profiles WHERE is_premium = 1 AND premium_expires_at <= ?",
+        (now.isoformat(),)
+    )
+    
+    for u in expired_users:
+        db_service.execute("UPDATE profiles SET is_premium = 0, premium_expires_at = NULL, premium_reminder_sent = FALSE WHERE id = ?", (u["id"],))
+        db_service.execute("UPDATE user_usage SET subscription_tier = 'free' WHERE user_id = ?", (u["id"],))
+        print(f"Downgraded expired premium user {u['email']}")
+
+    # 2. Check for subscriptions expiring in exactly 3 days that haven't received a reminder
+    remind_users = db_service.query(
+        "SELECT id, email, full_name FROM profiles WHERE is_premium = 1 AND premium_expires_at <= ? AND premium_expires_at > ? AND premium_reminder_sent = FALSE",
+        (three_days_from_now.isoformat(), now.isoformat())
+    )
+    
+    for u in remind_users:
+        success = email_service.send_premium_reminder(u["email"], u["full_name"] or "User")
+        if success:
+            db_service.execute("UPDATE profiles SET premium_reminder_sent = TRUE WHERE id = ?", (u["id"],))
+            print(f"Sent premium expiration reminder to {u['email']}")
+
+    return jsonify({
+        "status": "success",
+        "expired_processed": len(expired_users),
+        "reminders_sent": len(remind_users)
+    }), 200
 
 
