@@ -30,7 +30,7 @@
                 Go to Dashboard
             </a>
         </div>
-        {% elif current_user.is_premium %}
+        {% elif current_user and current_user.subscription_tier == 'premium' %}
         <div
             class="mb-12 max-w-3xl mx-auto bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-200 rounded-3xl p-10 text-center shadow-lg shadow-primary-900/5 animate-scale-in">
             <div
