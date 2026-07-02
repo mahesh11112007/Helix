@@ -46,7 +46,7 @@
                     </li>
                 </ul>
 
-                <button class="w-full py-3 rounded-xl bg-gray-100 text-gray-500 font-semibold cursor-not-allowed"
+                <button class="w-full py-3 rounded-xl border-2 border-gray-200 bg-white text-gray-500 font-semibold cursor-default"
                     disabled>
                     Current Plan
                 </button>
@@ -61,24 +61,27 @@
                 </div>
 
                 <h3 class="text-xl font-bold font-outfit text-primary-900 mb-2">Premium</h3>
-                <div class="text-4xl font-extrabold text-[#1d1d1f] mb-6">₹49<span
-                        class="text-sm font-medium text-gray-500">/month</span></div>
+                <div class="flex items-end gap-2 mb-2">
+                    <div class="text-4xl font-extrabold text-[#1d1d1f]">₹49<span class="text-sm font-medium text-gray-500">/month</span></div>
+                    <div class="px-2 py-1 bg-green-100 text-green-700 text-[10px] font-bold rounded-md mb-2">Less than ₹2/day</div>
+                </div>
+                <p class="text-sm font-semibold text-primary-700 mb-6">Unlimited notes • Faster AI • Priority access</p>
 
                 <ul class="space-y-4 mb-8">
                     <li class="flex items-start gap-3 text-sm font-medium text-gray-800">
-                        <div class="p-0.5 bg-primary-100 rounded-full text-primary-600 shrink-0"><i data-lucide="check"
+                        <div class="p-0.5 bg-green-100 rounded-full text-green-600 shrink-0"><i data-lucide="check"
                                 class="w-4 h-4"></i></div>
-                        50 AI Chats per day
+                        50 AI chats / day
                     </li>
                     <li class="flex items-start gap-3 text-sm font-medium text-gray-800">
-                        <div class="p-0.5 bg-primary-100 rounded-full text-primary-600 shrink-0"><i data-lucide="check"
+                        <div class="p-0.5 bg-green-100 rounded-full text-green-600 shrink-0"><i data-lucide="check"
                                 class="w-4 h-4"></i></div>
-                        20 AI Study Decks
+                        20 AI Study Decks / month
                     </li>
                     <li class="flex items-start gap-3 text-sm font-medium text-gray-800">
-                        <div class="p-0.5 bg-primary-100 rounded-full text-primary-600 shrink-0"><i data-lucide="check"
+                        <div class="p-0.5 bg-green-100 rounded-full text-green-600 shrink-0"><i data-lucide="check"
                                 class="w-4 h-4"></i></div>
-                        20 AI Command Bar
+                        20 AI Command Bar requests / day
                     </li>
                 </ul>
 
@@ -93,12 +96,21 @@
                     <button type="submit"
                         class="w-full py-4 rounded-xl bg-[#1d1d1f] hover:bg-black text-white font-semibold transition-all shadow-[0_4px_14px_rgba(0,0,0,0.25)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 group">
                         <i data-lucide="credit-card"
-                            class="w-5 h-5 text-gray-600 group-hover:text-gray-900 transition-colors"></i>
-                        Pay with UPI / Card
+                            class="w-5 h-5 text-gray-600 group-hover:text-white transition-colors"></i>
+                        Upgrade to Premium
                     </button>
-                    <div class="mt-3 text-center text-xs text-gray-500 flex items-center justify-center gap-1">
-                        <i data-lucide="lock" class="w-3 h-3"></i>
-                        Supports UPI, Cards, NetBanking via Instamojo
+                    
+                    <!-- Trust Badges -->
+                    <div class="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs font-medium text-gray-500">
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="lock" class="w-3.5 h-3.5 text-green-600"></i> Secure payment
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-primary-600"></i> Powered by Instamojo
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="calendar-off" class="w-3.5 h-3.5 text-gray-400"></i> Cancel anytime
+                        </div>
                     </div>
                 </form>
             </div>
