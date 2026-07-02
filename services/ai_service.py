@@ -911,9 +911,9 @@ Return JSON: {{"viva_questions": [{{"question": "...", "answer": "..."}}]}}"""
         else:
             prompts = {
                 "notes_summary": f"""
-            Generate extremely detailed, comprehensive academic study notes for the topic: '{topic_name}'{context_str}.
+            Generate extremely detailed, comprehensive textbook-style academic study notes for the topic: '{topic_name}'{context_str}.
             
-            IMPORTANT: The notes MUST be at least 800 words. Be thorough and cover:
+            CRITICAL: The notes MUST be a MINIMUM of 1500 words. Produce long-form, exhaustive content. Do NOT summarize briefly. Be thorough and cover:
             - Definition and introduction to the concept
             - Core principles with detailed explanations (not just bullet points)
             - Key terminology with definitions
