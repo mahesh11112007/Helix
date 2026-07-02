@@ -829,33 +829,33 @@ CRITICAL JSON OUTPUT RULES:
             for cfg in configs:
                 cfg_key, cfg_base_url, cfg_chat_model, cfg_vision_model, platform = cfg
                 
-                if platform == "gemini":
-                    # Native Gemini Format
-                    gemini_contents = []
-                    sys_msg = None
-                    for m in messages:
-                        if m["role"] == "system":
-                            sys_msg = {"role": "model", "parts": [{"text": m["content"]}]}
-                        else:
-                            gemini_contents.append({
-                                "role": "user" if m["role"] == "user" else "model",
-                                "parts": [{"text": m["content"]}]
-                            })
-                    if sys_msg:
-                        gemini_contents.insert(0, sys_msg)
-                        
-                    gemini_payload = {
-                        "contents": gemini_contents,
-                        "generationConfig": {
-                            "temperature": 0.5,
-                            "maxOutputTokens": max_tokens,
-                            "responseMimeType": "application/json"
+                try:
+                    if platform == "gemini":
+                        # Native Gemini Format
+                        gemini_contents = []
+                        sys_msg = None
+                        for m in messages:
+                            if m["role"] == "system":
+                                sys_msg = {"role": "model", "parts": [{"text": m["content"]}]}
+                            else:
+                                gemini_contents.append({
+                                    "role": "user" if m["role"] == "user" else "model",
+                                    "parts": [{"text": m["content"]}]
+                                })
+                        if sys_msg:
+                            gemini_contents.insert(0, sys_msg)
+                            
+                        gemini_payload = {
+                            "contents": gemini_contents,
+                            "generationConfig": {
+                                "temperature": 0.5,
+                                "maxOutputTokens": max_tokens,
+                                "responseMimeType": "application/json"
+                            }
                         }
-                    }
-                    url = f"https://generativelanguage.googleapis.com/v1beta/models/{cfg_chat_model}:generateContent?key={cfg_key}"
-                    headers = {"Content-Type": "application/json"}
-                    
-                    try:
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{cfg_chat_model}:generateContent?key={cfg_key}"
+                        headers = {"Content-Type": "application/json"}
+                        
                         response = requests.post(url, headers=headers, json=gemini_payload, timeout=90)
                         response.raise_for_status()
                         result_data = response.json()
@@ -865,26 +865,20 @@ CRITICAL JSON OUTPUT RULES:
                         if result:
                             return result
                         print(f"[{platform.upper()}] Empty JSON extraction.")
-                    except requests.exceptions.HTTPError as e:
-                        _handle_auth_error(e)
-                        status = e.response.status_code if e.response is not None else 'unknown'
-                        print(f"[{platform.upper()}] API HTTP Error {status}: {e}")
-                        last_error = e
-                else:
-                    payload = {
-                        "model": cfg_chat_model,
-                        "messages": messages,
-                        "temperature": 0.5,
-                        "top_p": 1,
-                        "max_tokens": max_tokens,
-                        "response_format": {"type": "json_object"}
-                    }
-                    
-                    # Exclude response_format for groq/cerebras if they don't support it reliably, but they usually do
-                    
-                    headers = {"Authorization": f"Bearer {cfg_key}", "Content-Type": "application/json"}
-                    
-                    try:
+                    else:
+                        payload = {
+                            "model": cfg_chat_model,
+                            "messages": messages,
+                            "temperature": 0.5,
+                            "top_p": 1,
+                            "max_tokens": max_tokens,
+                            "response_format": {"type": "json_object"}
+                        }
+                        
+                        # Exclude response_format for groq/cerebras if they don't support it reliably, but they usually do
+                        
+                        headers = {"Authorization": f"Bearer {cfg_key}", "Content-Type": "application/json"}
+                        
                         response = requests.post(f"{cfg_base_url}/chat/completions", headers=headers, json=payload, timeout=90)
                         response.raise_for_status()
                         
@@ -893,16 +887,14 @@ CRITICAL JSON OUTPUT RULES:
                         if result:
                             return result
                         print(f"[{platform.upper()}] Empty JSON extraction.")
-                    except requests.exceptions.HTTPError as e:
-                        _handle_auth_error(e)
-                        status = e.response.status_code if e.response is not None else 'unknown'
-                        print(f"[{platform.upper()}] API HTTP Error {status}: {e}")
-                        last_error = e
-                    # Fallthrough to next config...
+                except requests.exceptions.HTTPError as e:
+                    _handle_auth_error(e)
+                    status = e.response.status_code if e.response is not None else 'unknown'
+                    print(f"[{platform.upper()}] API HTTP Error {status}: {e}")
+                    last_error = e
                 except Exception as e:
                     print(f"[{platform.upper()}] API Request Error: {e}")
                     last_error = e
-                    # Fallthrough to next config...
             
             # If we exhausted all configs in this attempt, wait and retry
             print(f"[AI Service] All fallbacks exhausted for attempt {attempt + 1}. Retrying in 2 seconds...")
