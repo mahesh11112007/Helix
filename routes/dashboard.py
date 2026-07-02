@@ -553,8 +553,8 @@ def api_ai_coach():
     user = get_current_user()
     if not user: return jsonify({'error': 'Unauthorized'}), 401
 
-    profile = db_service.query('SELECT role FROM profiles WHERE id = ?', (user['id'],), one=True)
-    if not profile or profile.get('role') != 'premium':
+    profile = db_service.query('SELECT is_premium FROM profiles WHERE id = ?', (user['id'],), one=True)
+    if not profile or not profile.get('is_premium'):
         return jsonify({'suggestions': []})
 
     subjects = db_service.query('''SELECT s.name FROM subjects s JOIN semesters sem ON s.semester_id = sem.id WHERE sem.user_id = ? LIMIT 5''', (user['id'],))
