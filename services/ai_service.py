@@ -148,7 +148,7 @@ class AIService:
         if platform == "openai":
             return (key, "https://api.openai.com/v1", "gpt-4o-mini", "gpt-4o", platform)
         elif platform == "gemini":
-            return (key, "https://generativelanguage.googleapis.com/v1beta/openai", "gemini-1.5-flash", "gemini-1.5-pro", platform)
+            return (key, "https://generativelanguage.googleapis.com/v1beta", "gemini-2.5-flash", "gemini-2.5-pro", platform)
         elif platform == "groq":
             return (key, "https://api.groq.com/openai/v1", "llama-3.3-70b-versatile", "llama-3.2-90b-vision-preview", platform)
         elif platform == "cerebras":
@@ -829,33 +829,75 @@ CRITICAL JSON OUTPUT RULES:
             for cfg in configs:
                 cfg_key, cfg_base_url, cfg_chat_model, cfg_vision_model, platform = cfg
                 
-                payload = {
-                    "model": cfg_chat_model,
-                    "messages": messages,
-                    "temperature": 0.5,
-                    "top_p": 1,
-                    "max_tokens": max_tokens,
-                    "response_format": {"type": "json_object"}
-                }
-                
-                # Exclude response_format for groq/cerebras if they don't support it reliably, but they usually do
-                
-                headers = {"Authorization": f"Bearer {cfg_key}", "Content-Type": "application/json"}
-                
-                try:
-                    response = requests.post(f"{cfg_base_url}/chat/completions", headers=headers, json=payload, timeout=90)
-                    response.raise_for_status()
+                if platform == "gemini":
+                    # Native Gemini Format
+                    gemini_contents = []
+                    sys_msg = None
+                    for m in messages:
+                        if m["role"] == "system":
+                            sys_msg = {"role": "model", "parts": [{"text": m["content"]}]}
+                        else:
+                            gemini_contents.append({
+                                "role": "user" if m["role"] == "user" else "model",
+                                "parts": [{"text": m["content"]}]
+                            })
+                    if sys_msg:
+                        gemini_contents.insert(0, sys_msg)
+                        
+                    gemini_payload = {
+                        "contents": gemini_contents,
+                        "generationConfig": {
+                            "temperature": 0.5,
+                            "maxOutputTokens": max_tokens,
+                            "responseMimeType": "application/json"
+                        }
+                    }
+                    url = f"https://generativelanguage.googleapis.com/v1beta/models/{cfg_chat_model}:generateContent?key={cfg_key}"
+                    headers = {"Content-Type": "application/json"}
                     
-                    content = response.json()["choices"][0]["message"]["content"]
-                    result = self._extract_json(content)
-                    if result:
-                        return result
-                    print(f"[{platform.upper()}] Empty JSON extraction.")
-                except requests.exceptions.HTTPError as e:
-                    _handle_auth_error(e)
-                    status = e.response.status_code if e.response is not None else 'unknown'
-                    print(f"[{platform.upper()}] API HTTP Error {status}: {e}")
-                    last_error = e
+                    try:
+                        response = requests.post(url, headers=headers, json=gemini_payload, timeout=90)
+                        response.raise_for_status()
+                        result_data = response.json()
+                        content = result_data["candidates"][0]["content"]["parts"][0]["text"]
+                        
+                        result = self._extract_json(content)
+                        if result:
+                            return result
+                        print(f"[{platform.upper()}] Empty JSON extraction.")
+                    except requests.exceptions.HTTPError as e:
+                        _handle_auth_error(e)
+                        status = e.response.status_code if e.response is not None else 'unknown'
+                        print(f"[{platform.upper()}] API HTTP Error {status}: {e}")
+                        last_error = e
+                else:
+                    payload = {
+                        "model": cfg_chat_model,
+                        "messages": messages,
+                        "temperature": 0.5,
+                        "top_p": 1,
+                        "max_tokens": max_tokens,
+                        "response_format": {"type": "json_object"}
+                    }
+                    
+                    # Exclude response_format for groq/cerebras if they don't support it reliably, but they usually do
+                    
+                    headers = {"Authorization": f"Bearer {cfg_key}", "Content-Type": "application/json"}
+                    
+                    try:
+                        response = requests.post(f"{cfg_base_url}/chat/completions", headers=headers, json=payload, timeout=90)
+                        response.raise_for_status()
+                        
+                        content = response.json()["choices"][0]["message"]["content"]
+                        result = self._extract_json(content)
+                        if result:
+                            return result
+                        print(f"[{platform.upper()}] Empty JSON extraction.")
+                    except requests.exceptions.HTTPError as e:
+                        _handle_auth_error(e)
+                        status = e.response.status_code if e.response is not None else 'unknown'
+                        print(f"[{platform.upper()}] API HTTP Error {status}: {e}")
+                        last_error = e
                     # Fallthrough to next config...
                 except Exception as e:
                     print(f"[{platform.upper()}] API Request Error: {e}")
