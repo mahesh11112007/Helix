@@ -148,7 +148,7 @@ class AIService:
         if platform == "openai":
             return (key, "https://api.openai.com/v1", "gpt-4o-mini", "gpt-4o", platform)
         elif platform == "gemini":
-            return (key, "https://generativelanguage.googleapis.com/v1beta/openai", "gemini-2.5-flash", "gemini-2.5-pro", platform)
+            return (key, "https://generativelanguage.googleapis.com/v1beta/openai", "gemini-1.5-flash", "gemini-1.5-pro", platform)
         elif platform == "groq":
             return (key, "https://api.groq.com/openai/v1", "llama-3.3-70b-versatile", "llama-3.2-90b-vision-preview", platform)
         elif platform == "cerebras":
