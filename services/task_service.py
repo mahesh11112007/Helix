@@ -63,8 +63,8 @@ class TaskService:
                     key = profile["api_keys"]
                     platform = profile["ai_platform"] or "custom"
                     custom_instr = profile["custom_instructions"] or ""
-                    math_learning_level = profile.get("math_learning_level") or ""
-                    is_premium = bool(profile.get("is_premium"))
+                    math_learning_level = dict(profile).get("math_learning_level") or ""
+                    is_premium = bool(dict(profile).get("is_premium"))
                     
                     import os
                     if platform == "openai":
@@ -88,9 +88,9 @@ class TaskService:
                 else:
                     # Fallback to system default config
                     key, base_url, chat_model, _ = ai_service._get_config()
-                    if profile and profile.get("custom_instructions"):
+                    if profile and dict(profile).get("custom_instructions"):
                         custom_instr = profile["custom_instructions"]
-                    is_premium = bool(profile.get("is_premium")) if profile else False
+                    is_premium = bool(dict(profile).get("is_premium")) if profile else False
             else:
                 is_premium = False
             
@@ -111,7 +111,7 @@ class TaskService:
                     )
                 
                 # Dynamic Key Rotation for Premium Users using Admin Pool
-                if is_premium and (not profile or not profile.get("api_keys")):
+                if is_premium and (not profile or not dict(profile).get("api_keys")):
                     key, base_url, chat_model, _ = ai_service._get_config()
                 if isinstance(topic_data, (tuple, list)):
                     tid = topic_data[0]
@@ -131,7 +131,7 @@ class TaskService:
                     
                 try:
                     topic_custom_instr = custom_instr
-                    if "math" in sname.lower() and profile and profile.get("math_learning_level"):
+                    if "math" in sname.lower() and profile and dict(profile).get("math_learning_level"):
                         level = profile["math_learning_level"]
                         if level == "beginner":
                             topic_custom_instr += "\n[MATH STUDENT LEVEL: BEGINNER] Use very simple language. Explain every symbol before using it. Assume no prior knowledge. Show every calculation step. Use many worked examples and diagrams. Introduce mathematical terminology gradually. Frequently check understanding."

@@ -30,7 +30,7 @@ class WeeklyTestService:
         
         # 3. Enforce the "must register before Friday" rule
         user = db_service.query("SELECT created_at FROM users WHERE id = ?", (user_id,), one=True)
-        if user and user.get("created_at"):
+        if user and dict(user).get("created_at"):
             user_created = datetime.fromisoformat(user["created_at"])
             # Get the Friday of the current week (Sunday is 6, Friday is 4. So 2 days ago if today is Sunday)
             friday_cutoff = (today - timedelta(days=today.weekday() - 4)).replace(hour=0, minute=0, second=0, microsecond=0)

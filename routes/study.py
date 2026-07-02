@@ -179,7 +179,7 @@ def generate_resources(topic_id):
         
     if topic["subject_name"] and "math" in topic["subject_name"].lower():
         profile = db_service.query("SELECT math_learning_level FROM profiles WHERE id = ?", (user_id,), one=True)
-        if not profile or not profile.get("math_learning_level"):
+        if not profile or not dict(profile).get("math_learning_level"):
             return redirect(url_for("study.math_level_prompt", topic_id=topic_id))
             
     if not usage_service.can_generate_deck(user_id):
@@ -294,7 +294,7 @@ def mini_quiz(topic_id):
         base_url = None
         chat_model = None
         
-        is_premium = bool(profile.get("is_premium")) if profile else False
+        is_premium = bool(dict(profile).get("is_premium")) if profile else False
         
         if key:
             # User has their own key, infer platform and model
