@@ -64,13 +64,6 @@ def index():
         (user["id"],)
     )
     
-    # Simple Mock AI Suggestions based on streak
-    ai_suggestions = [
-        "Revise your weak topic: DBMS Normalization.",
-        "Take a 25-minute Pomodoro session to finish Unit 1 notes.",
-        "Create a quiz for Computer Networks to test your retention."
-    ]
-
     # If no semesters, redirect to setup wizard
     if not semesters:
         return redirect(url_for("dashboard.setup"))
@@ -100,7 +93,6 @@ def index():
         sessions=sessions,
         exams=exams,
         recent_files=recent_files,
-        ai_suggestions=ai_suggestions,
         pending_tests=pending_tests,
         is_sunday=is_sunday,
         weekly_test_status=weekly_test_status
@@ -127,13 +119,18 @@ def setup():
         # Format semester name
         sem_name = f"{year} - {group} ({board.upper()})"
         import re
-        match = re.match(r"(c\d+)_(\d+)(?:st|nd|rd|th)_sem", year, re.IGNORECASE)
-        if match:
-            curriculum = match.group(1).upper()
-            sem_num = match.group(2)
+        match_c24 = re.match(r"(c\d+)_(\d+)(?:st|nd|rd|th)_sem", year, re.IGNORECASE)
+        if match_c24:
+            curriculum = match_c24.group(1).upper()
+            sem_num = match_c24.group(2)
             board_upper = board.upper()
             formatted_board = "TG SBTET" if board_upper == "SBTET_TG" else ("AP SBTET" if board_upper == "SBTET_AP" else board_upper)
             sem_name = f"{curriculum} SEM {sem_num} - {formatted_board} {group.upper()}"
+        elif year in ["first_year", "second_year"]:
+            yr_str = "1st Year" if year == "first_year" else "2nd Year"
+            board_upper = board.upper()
+            formatted_board = "TG Board" if board_upper == "TG" else ("AP Board" if board_upper == "AP" else board_upper)
+            sem_name = f"{yr_str} - {formatted_board} {group.upper()}"
             
         sem_id = str(uuid.uuid4())
         db_service.execute(
@@ -550,3 +547,27 @@ def leaderboard():
     """)
     
     return render_template("dashboard/leaderboard.html", entries=top_entries)
+
+@dashboard_bp.route('/api/dashboard/ai-coach')
+def api_ai_coach():
+    user = get_current_user()
+    if not user: return jsonify({'error': 'Unauthorized'}), 401
+
+    profile = db_service.query('SELECT role FROM profiles WHERE id = ?', (user['id'],), one=True)
+    if not profile or profile.get('role') != 'premium':
+        return jsonify({'suggestions': []})
+
+    subjects = db_service.query('''SELECT s.name FROM subjects s JOIN semesters sem ON s.semester_id = sem.id WHERE sem.user_id = ? LIMIT 5''', (user['id'],))
+    subject_names = [s['name'] for s in subjects]
+
+    from services.ai_service import ai_service
+    prompt = f'The user is studying: {", ".join(subject_names) if subject_names else "general subjects"}. Provide exactly 3 short, personalized, actionable study tips (1 sentence each). Output JSON with a "tips" array.'
+
+    try:
+        result = ai_service._generate_partial(prompt, max_tokens=200)
+        tips = result.get('tips', [])
+        if not tips: raise ValueError('No tips')
+    except Exception:
+        tips = ['Take a 25-minute Pomodoro session today.', 'Review your most recent notes to reinforce memory.', 'Test yourself with a quick flashcard session.']
+
+    return jsonify({'suggestions': tips})
