@@ -124,10 +124,21 @@ def setup():
             flash("Please fill all fields", "error")
             return redirect(url_for("dashboard.setup"))
             
+        # Format semester name
+        sem_name = f"{year} - {group} ({board.upper()})"
+        import re
+        match = re.match(r"(c\d+)_(\d+)(?:st|nd|rd|th)_sem", year, re.IGNORECASE)
+        if match:
+            curriculum = match.group(1).upper()
+            sem_num = match.group(2)
+            board_upper = board.upper()
+            formatted_board = "TG SBTET" if board_upper == "SBTET_TG" else ("AP SBTET" if board_upper == "SBTET_AP" else board_upper)
+            sem_name = f"{curriculum} SEM {sem_num} - {formatted_board} {group.upper()}"
+            
         sem_id = str(uuid.uuid4())
         db_service.execute(
             "INSERT INTO semesters (id, user_id, name) VALUES (?, ?, ?)",
-            (sem_id, user["id"], f"{year} - {group} ({board.upper()})")
+            (sem_id, user["id"], sem_name)
         )
         
         subjects = syllabus_service.get_subjects_for_group(education, board, year, group)
