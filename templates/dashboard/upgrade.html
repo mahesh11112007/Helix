@@ -26,8 +26,22 @@
             <h2 class="text-2xl font-bold text-green-900 mb-2">Welcome to Premium!</h2>
             <p class="text-green-700 mb-6">Your payment was successful and your account has been upgraded instantly.</p>
             <a href="{{ url_for('dashboard.index') }}"
-                class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-green-600 text-gray-900 font-semibold hover:bg-green-700 transition-all shadow-md shadow-green-600/20">
+                class="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition-all shadow-md shadow-green-600/20">
                 Go to Dashboard
+            </a>
+        </div>
+        {% elif current_user.is_premium %}
+        <div
+            class="mb-12 max-w-3xl mx-auto bg-gradient-to-br from-primary-50 to-primary-100 border border-primary-200 rounded-3xl p-10 text-center shadow-lg shadow-primary-900/5 animate-scale-in">
+            <div
+                class="w-20 h-20 bg-primary-200 rounded-full flex items-center justify-center mx-auto mb-6 text-primary-600 shadow-sm">
+                <i data-lucide="crown" class="w-10 h-10"></i>
+            </div>
+            <h2 class="text-3xl font-bold font-outfit text-primary-900 mb-3">You are a Premium Member!</h2>
+            <p class="text-lg text-primary-700 mb-8 max-w-lg mx-auto">Your account is fully upgraded. You have access to all Premium features, faster AI generation, and priority support.</p>
+            <a href="{{ url_for('dashboard.index') }}"
+                class="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-primary-600 text-white text-lg font-bold hover:bg-primary-700 transition-all shadow-md shadow-primary-600/20">
+                Start Studying
             </a>
         </div>
         {% else %}
